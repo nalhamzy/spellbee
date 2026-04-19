@@ -1,0 +1,14 @@
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+
+# Upload keystore IS committed — only signs uploads to Play; Play re-signs
+# with its own App Signing Key.
+# key.properties
+# **/*.keystore
+# **/*.jks

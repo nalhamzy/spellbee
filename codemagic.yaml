@@ -1,0 +1,173 @@
+# ========================================================================
+# Ideal AI Flutter release pipeline — reusable template.
+# Replace every occurrence of spellbee with the app's lowercase slug.
+# Example: com.idealai.chromapulse  →  package/bundle = com.idealai.spellbee
+# ========================================================================
+
+workflows:
+  # ----------------------------------------------------------------------
+  # UNIFIED RELEASE — both stores from a single tag push.
+  # Trigger: git tag v1.0.0 && git push --tags
+  # ----------------------------------------------------------------------
+  release-both:
+    name: Release (iOS + Android)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    triggering:
+      events: [tag]
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
+    integrations:
+      app_store_connect: admin
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.idealai.spellbee
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      java: 17
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: "com.idealai.spellbee"
+    scripts:
+      - name: Extract version from pubspec
+        script: |
+          VERSION_NAME=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//')
+          BUILD_NUMBER=$(grep '^version:' pubspec.yaml | sed 's/.*+//')
+          if [ -z "$BUILD_NUMBER" ] || [ "$BUILD_NUMBER" = "$VERSION_NAME" ]; then
+            BUILD_NUMBER=$PROJECT_BUILD_NUMBER
+          fi
+          echo "VERSION_NAME=$VERSION_NAME" >> $CM_ENV
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $CM_ENV
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Build Android AAB
+        script: |
+          flutter build appbundle --release \
+            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios
+          pod repo update
+          pod install
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Build iOS IPA
+        script: |
+          flutter build ipa --release \
+            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/app/outputs/bundle/release/*.aab
+      - build/app/outputs/mapping/release/mapping.txt
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: production
+        submit_as_draft: true
+        # DO NOT add changes_not_sent_for_review for first release — Play
+        # rejects it until the app has completed one review cycle.
+      email:
+        recipients: [nalhamzy@gmail.com]
+        notify: {success: true, failure: true}
+
+  # ----------------------------------------------------------------------
+  # iOS ONLY
+  # ----------------------------------------------------------------------
+  ios-release:
+    name: iOS Release
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: admin
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.idealai.spellbee
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Extract version from pubspec
+        script: |
+          VERSION_NAME=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//')
+          BUILD_NUMBER=$(grep '^version:' pubspec.yaml | sed 's/.*+//')
+          if [ -z "$BUILD_NUMBER" ] || [ "$BUILD_NUMBER" = "$VERSION_NAME" ]; then
+            BUILD_NUMBER=$PROJECT_BUILD_NUMBER
+          fi
+          echo "VERSION_NAME=$VERSION_NAME" >> $CM_ENV
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $CM_ENV
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios
+          pod repo update
+          pod install
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Build iOS IPA
+        script: |
+          flutter build ipa --release \
+            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
+      email:
+        recipients: [nalhamzy@gmail.com]
+        notify: {success: true, failure: true}
+
+  # ----------------------------------------------------------------------
+  # ANDROID ONLY
+  # ----------------------------------------------------------------------
+  android-release:
+    name: Android Release
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      java: 17
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: "com.idealai.spellbee"
+    scripts:
+      - name: Extract version from pubspec
+        script: |
+          VERSION_NAME=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//')
+          BUILD_NUMBER=$(grep '^version:' pubspec.yaml | sed 's/.*+//')
+          if [ -z "$BUILD_NUMBER" ] || [ "$BUILD_NUMBER" = "$VERSION_NAME" ]; then
+            BUILD_NUMBER=$PROJECT_BUILD_NUMBER
+          fi
+          echo "VERSION_NAME=$VERSION_NAME" >> $CM_ENV
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $CM_ENV
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Build AAB
+        script: |
+          flutter build appbundle --release \
+            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER
+    artifacts:
+      - build/app/outputs/bundle/release/*.aab
+      - build/app/outputs/mapping/release/mapping.txt
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: production
+        submit_as_draft: true
+      email:
+        recipients: [nalhamzy@gmail.com]
+        notify: {success: true, failure: true}
