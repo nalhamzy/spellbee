@@ -125,8 +125,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       row(Icons.all_inclusive_rounded, 'Unlimited AI-generated word packs'),
       row(Icons.list_alt_rounded, 'Unlimited parent-made word lists'),
       row(Icons.block_rounded, 'No ads, ever'),
-      row(Icons.picture_as_pdf_rounded, 'Export progress as a PDF'),
-      row(Icons.record_voice_over_rounded, 'Premium voice packs'),
+      row(Icons.record_voice_over_rounded, 'Enhanced voice pronunciation'),
     ]);
   }
 

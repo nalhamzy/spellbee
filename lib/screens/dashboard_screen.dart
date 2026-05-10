@@ -237,7 +237,7 @@ class DashboardScreen extends ConsumerWidget {
                         fontWeight: FontWeight.w900,
                       )),
                   SizedBox(height: 2),
-                  Text('Unlimited AI word packs, no ads, parent PDF reports.',
+                  Text('Unlimited AI word packs, no ads, unlimited lists.',
                       style: TextStyle(color: Colors.white, fontSize: 12)),
                 ],
               ),

@@ -9,9 +9,9 @@ platform limit.
 
 ### App Name (30 char — primary SEO)
 ```
-SpellBee: Spelling Bee for Kids
+SpellBee: Spelling Bee Kids
 ```
-**31 chars** — if Apple rejects (cap is 30), drop "for": `SpellBee: Spelling Bee Kids` (27).
+**27 chars** — trimmed from 31-char original ("for" dropped) to satisfy Apple's 30-char cap. Use this in ASC.
 
 ### Subtitle (30 char)
 ```
@@ -44,7 +44,7 @@ TWO WAYS TO PRACTICE
 • SPELL ALOUD — Tap the mic and say each letter. SpellBee understands letter names ("see a tee" → CAT) and whole words, so there's no typing between attempts.
 
 EIGHT DIFFICULTY LEVELS
-From K-1 starter words to Scripps-tier stumpers like "pneumonoultramicroscopicsilicovolcanoconiosis". Every word ships with a definition and an example sentence so the context lands.
+From K-1 starter words to championship-tier stumpers like "pneumonoultramicroscopicsilicovolcanoconiosis". Every word ships with a definition and an example sentence so the context lands.
 
 AI WORD PACKS
 Give SpellBee a theme — dinosaurs, space, baking, cooking, mythology — and it generates a fresh 10-word pack at your level. Powered by on-device sampling as a fallback when you're offline, and Gemini for themed packs when connected.
@@ -70,8 +70,7 @@ Unlock everything for less than one coffee a month:
 • Unlimited AI-generated word packs
 • Unlimited parent-made word lists (free tier: 3)
 • No ads, ever
-• PDF progress reports parents can share or print
-• Premium voice packs
+• Enhanced voice pronunciation
 
 Monthly, yearly (save 44%), or a one-time lifetime. Cancel any time.
 
@@ -82,12 +81,12 @@ Free to start. Premium when your bee-er is ready.
 ```
 Initial release.
 
-• 8 difficulty levels, K-1 to Scripps-tier
+• 8 difficulty levels, K-1 to championship-tier
 • Voice pronunciation + sentence + definition
 • Type or spell-aloud modes (speech-to-text)
 • AI-generated themed word packs (Gemini)
 • Parent-curated custom lists
-• Premium: no ads, unlimited AI, PDF export
+• Premium: no ads, unlimited AI word packs
 ```
 
 ### Support URL
@@ -131,7 +130,7 @@ SpellBee is a local-first spelling-bee practice app for students. All data (cust
 | Duration | 1 Month |
 | Price | $2.99 |
 | Display Name | `Premium Monthly` |
-| Description | `Unlimited AI word packs, unlimited custom lists, no ads, PDF exports. Renews monthly.` |
+| Description | `Unlimited AI word packs, unlimited custom lists, no ads. Renews monthly.` |
 
 ### Product 2 — Premium Yearly
 | Field | Value |
@@ -219,7 +218,7 @@ treatment; leaving it off gives you full ad inventory.
 | Product ID | `spellbee_premium_monthly` |
 |---|---|
 | Name | `Premium Monthly` |
-| Description | `Unlimited AI word packs, unlimited custom lists, no ads, PDF exports.` |
+| Description | `Unlimited AI word packs, unlimited custom lists, no ads.` |
 | Base plan | 1 month auto-renewing, $2.99 USD |
 | Free trial (optional) | 7 days |
 
@@ -244,7 +243,7 @@ treatment; leaving it off gives you full ad inventory.
 
 | # | Caption |
 |---|---|
-| 01_home | `Pick your level — K-1 to Scripps-tier.` |
+| 01_home | `Pick your level — K-1 to championship-tier.` |
 | 02_listen | `Hear every word in a clear voice.` |
 | 03_typing | `Type the word or spell it aloud.` |
 | 04_correct | `Build streaks. Master the tricky ones.` |
