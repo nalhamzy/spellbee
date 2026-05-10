@@ -9,6 +9,10 @@ class PlayerStats extends Equatable {
   final int bestStreak;       // longest correct streak within a test
   final int currentStreak;
   final int? lastPlayedEpochMs;
+  /// Days since Unix epoch on which the user last completed a daily word.
+  final int? lastDailyEpochDay;
+  /// Consecutive days the user has completed a daily word or any test.
+  final int dailyStreak;
 
   const PlayerStats({
     this.totalTests = 0,
@@ -17,6 +21,8 @@ class PlayerStats extends Equatable {
     this.bestStreak = 0,
     this.currentStreak = 0,
     this.lastPlayedEpochMs,
+    this.lastDailyEpochDay,
+    this.dailyStreak = 0,
   });
 
   double get accuracy =>
@@ -29,6 +35,8 @@ class PlayerStats extends Equatable {
     int? bestStreak,
     int? currentStreak,
     int? lastPlayedEpochMs,
+    int? lastDailyEpochDay,
+    int? dailyStreak,
   }) =>
       PlayerStats(
         totalTests: totalTests ?? this.totalTests,
@@ -37,6 +45,8 @@ class PlayerStats extends Equatable {
         bestStreak: bestStreak ?? this.bestStreak,
         currentStreak: currentStreak ?? this.currentStreak,
         lastPlayedEpochMs: lastPlayedEpochMs ?? this.lastPlayedEpochMs,
+        lastDailyEpochDay: lastDailyEpochDay ?? this.lastDailyEpochDay,
+        dailyStreak: dailyStreak ?? this.dailyStreak,
       );
 
   Map<String, dynamic> toJson() => {
@@ -46,6 +56,8 @@ class PlayerStats extends Equatable {
         'bestStreak': bestStreak,
         'currentStreak': currentStreak,
         'lastPlayedEpochMs': lastPlayedEpochMs,
+        'lastDailyEpochDay': lastDailyEpochDay,
+        'dailyStreak': dailyStreak,
       };
 
   factory PlayerStats.fromJson(Map<String, dynamic> j) => PlayerStats(
@@ -55,6 +67,8 @@ class PlayerStats extends Equatable {
         bestStreak: j['bestStreak'] as int? ?? 0,
         currentStreak: j['currentStreak'] as int? ?? 0,
         lastPlayedEpochMs: j['lastPlayedEpochMs'] as int?,
+        lastDailyEpochDay: j['lastDailyEpochDay'] as int?,
+        dailyStreak: j['dailyStreak'] as int? ?? 0,
       );
 
   String encode() => jsonEncode(toJson());
@@ -69,5 +83,7 @@ class PlayerStats extends Equatable {
         bestStreak,
         currentStreak,
         lastPlayedEpochMs,
+        lastDailyEpochDay,
+        dailyStreak,
       ];
 }

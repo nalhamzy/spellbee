@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
+import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
@@ -15,6 +16,10 @@ class DashboardScreen extends ConsumerWidget {
     final stats = ref.watch(playerStatsProvider);
     final level = ref.watch(selectedLevelProvider);
     final accPct = (stats.accuracy * 100).round();
+
+    final dailyWord = ref.watch(dailyWordProvider);
+    final dailyDone = ref.watch(dailyWordDoneProvider);
+    final dailyStreak = stats.dailyStreak;
 
     return SafeArea(
       child: ResponsiveContentBox(
@@ -33,9 +38,15 @@ class DashboardScreen extends ConsumerWidget {
                       fontWeight: FontWeight.w900,
                       color: AppTheme.ink,
                     )),
+                if (dailyStreak > 0) ...[
+                  const Spacer(),
+                  _StreakBadge(streak: dailyStreak),
+                ],
               ],
             ),
             SizedBox(height: context.s(18)),
+            _DailyWordCard(word: dailyWord, done: dailyDone),
+            SizedBox(height: context.s(16)),
             _statsRow(context, stats.totalTests, accPct, stats.bestStreak),
             SizedBox(height: context.s(22)),
             Text('Start a quick bee',
@@ -245,6 +256,141 @@ class DashboardScreen extends ConsumerWidget {
             const Icon(Icons.chevron_right_rounded, color: Colors.white),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Daily Word Card ──────────────────────────────────────────────────────
+
+class _StreakBadge extends StatelessWidget {
+  final int streak;
+  const _StreakBadge({required this.streak});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppTheme.honey,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppTheme.honeyDark.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('🔥', style: TextStyle(fontSize: 14)),
+          const SizedBox(width: 4),
+          Text('$streak day${streak == 1 ? '' : 's'}',
+              style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 13,
+                  color: AppTheme.ink)),
+        ],
+      ),
+    );
+  }
+}
+
+class _DailyWordCard extends ConsumerWidget {
+  final Word word;
+  final bool done;
+  const _DailyWordCard({required this.word, required this.done});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: EdgeInsets.all(context.s(16)),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(context.s(18)),
+        border: Border.all(
+          color: done ? AppTheme.sage : AppTheme.honeyDark,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (done ? AppTheme.sage : AppTheme.honey)
+                .withValues(alpha: 0.15),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                done ? Icons.check_circle_rounded : Icons.wb_sunny_rounded,
+                color: done ? AppTheme.sage : AppTheme.honeyDark,
+                size: 18,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                done ? 'Word of the Day — done!' : 'Word of the Day',
+                style: TextStyle(
+                  color: done ? AppTheme.sage : AppTheme.honeyDark,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.s(8)),
+          Text(
+            word.text.toUpperCase(),
+            style: TextStyle(
+              fontSize: context.s(26),
+              fontWeight: FontWeight.w900,
+              color: AppTheme.ink,
+              letterSpacing: 1.5,
+            ),
+          ),
+          SizedBox(height: context.s(4)),
+          Text(
+            word.definition,
+            style: const TextStyle(color: AppTheme.mute, fontSize: 13),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: context.s(12)),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    done ? AppTheme.sage : AppTheme.honey,
+                foregroundColor: done ? Colors.white : AppTheme.ink,
+                shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(context.s(12))),
+                padding:
+                    EdgeInsets.symmetric(vertical: context.s(10)),
+              ),
+              onPressed: done
+                  ? null
+                  : () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => TestScreen(
+                          words: [word],
+                          title: 'Word of the Day',
+                          onComplete: () => ref
+                              .read(playerStatsProvider.notifier)
+                              .recordDailyWordComplete(),
+                        ),
+                      ));
+                    },
+              child: Text(
+                done ? 'Come back tomorrow' : 'Spell it now',
+                style: const TextStyle(
+                    fontWeight: FontWeight.w900, fontSize: 14),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

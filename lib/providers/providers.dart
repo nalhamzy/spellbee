@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
+import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/ad_service.dart';
 import 'package:spellbee/core/services/ai_word_generator.dart';
@@ -8,6 +10,7 @@ import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/core/services/stt_service.dart';
 import 'package:spellbee/core/services/tts_service.dart';
+export 'package:spellbee/core/services/tts_service.dart' show VoiceSpeed;
 
 // ─── Service providers (overridden in main.dart) ───────────────────────
 
@@ -27,9 +30,29 @@ final adServiceProvider = Provider<AdService>((ref) {
 
 final ttsServiceProvider = Provider<TtsService>((ref) {
   final s = TtsService();
+  // Sync the persisted speed into the service and keep it in sync on changes.
+  final idx = ref.read(storageServiceProvider).getVoiceSpeedIndex();
+  s.setSpeed(VoiceSpeed.values[idx.clamp(0, VoiceSpeed.values.length - 1)]);
+  ref.listen<VoiceSpeed>(voiceSpeedProvider, (_, next) => s.setSpeed(next));
   ref.onDispose(s.dispose);
   return s;
 });
+
+final voiceSpeedProvider =
+    NotifierProvider<VoiceSpeedNotifier, VoiceSpeed>(VoiceSpeedNotifier.new);
+
+class VoiceSpeedNotifier extends Notifier<VoiceSpeed> {
+  @override
+  VoiceSpeed build() {
+    final idx = ref.read(storageServiceProvider).getVoiceSpeedIndex();
+    return VoiceSpeed.values[idx.clamp(0, VoiceSpeed.values.length - 1)];
+  }
+
+  Future<void> set(VoiceSpeed s) async {
+    state = s;
+    await ref.read(storageServiceProvider).setVoiceSpeedIndex(s.index);
+  }
+}
 
 final sttServiceProvider = Provider<SttService>((ref) => SttService());
 
@@ -47,6 +70,37 @@ class TabNotifier extends Notifier<AppTab> {
   AppTab build() => AppTab.home;
   void go(AppTab t) => state = t;
 }
+
+// ─── Daily word ─────────────────────────────────────────────────────────
+
+/// All catalog words flattened into a single list, sorted deterministically.
+/// Computed once — same order every app session.
+List<Word> _allCatalogWords() {
+  final words = <Word>[];
+  for (final level in (kWordsCatalog.keys.toList()..sort())) {
+    words.addAll(kWordsCatalog[level] ?? []);
+  }
+  return words;
+}
+
+/// Returns today's Word of the Day — deterministic by date so every device
+/// shows the same word. Uses epochDay % catalog-size.
+final dailyWordProvider = Provider<Word>((ref) {
+  final allWords = _allCatalogWords();
+  final epochDay =
+      DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
+  return allWords[epochDay % allWords.length];
+});
+
+/// Today's epoch-day integer (days since 1970-01-01).
+int _todayEpochDay() =>
+    DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
+
+/// True when the user has already completed today's daily word.
+final dailyWordDoneProvider = Provider<bool>((ref) {
+  final stats = ref.watch(playerStatsProvider);
+  return stats.lastDailyEpochDay == _todayEpochDay();
+});
 
 // ─── Player stats ───────────────────────────────────────────────────────
 
@@ -74,6 +128,23 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
           ? state.currentStreak + 1
           : 0, // reset streak if the test wasn't perfect
       lastPlayedEpochMs: now,
+    );
+    await ref.read(storageServiceProvider).saveStats(state);
+  }
+
+  /// Call when the user correctly spells today's daily word.
+  Future<void> recordDailyWordComplete() async {
+    final today = _todayEpochDay();
+    if (state.lastDailyEpochDay == today) return; // already counted
+
+    final yesterday = today - 1;
+    final newStreak = state.lastDailyEpochDay == yesterday
+        ? state.dailyStreak + 1
+        : 1; // streak broken — reset to 1
+
+    state = state.copyWith(
+      lastDailyEpochDay: today,
+      dailyStreak: newStreak,
     );
     await ref.read(storageServiceProvider).saveStats(state);
   }
