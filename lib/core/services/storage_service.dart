@@ -69,9 +69,21 @@ class StorageService {
 
   static const _kSelectedLevel = 'sb.settings.level';
   static const _kParentPin = 'sb.settings.pin';
+  static const _kVoiceSpeed = 'sb.settings.voiceSpeed';
+  static const _kPollyVoice = 'polly_voice';
 
   int getSelectedLevel() => _prefs.getInt(_kSelectedLevel) ?? 3;
   Future<void> setSelectedLevel(int v) => _prefs.setInt(_kSelectedLevel, v);
+
+  /// Returns 0 (calm), 1 (normal) or 2 (fast). Defaults to calm so the
+  /// voice is kid-friendly out of the box.
+  int getVoiceSpeedIndex() => _prefs.getInt(_kVoiceSpeed) ?? 0;
+  Future<void> setVoiceSpeedIndex(int v) =>
+      _prefs.setInt(_kVoiceSpeed, v);
+
+  String getPollyVoice() => _prefs.getString(_kPollyVoice) ?? 'Kevin';
+  Future<void> setPollyVoice(String voice) =>
+      _prefs.setString(_kPollyVoice, voice);
 
   String? getParentPin() => _prefs.getString(_kParentPin);
   Future<void> setParentPin(String? pin) async {

@@ -10,6 +10,8 @@ import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/core/services/stt_service.dart';
 import 'package:spellbee/core/services/tts_service.dart';
+export 'package:spellbee/core/services/aws_polly_tts_service.dart'
+    show AwsPollyTtsService;
 export 'package:spellbee/core/services/tts_service.dart' show VoiceSpeed;
 
 // ─── Service providers (overridden in main.dart) ───────────────────────
@@ -30,10 +32,12 @@ final adServiceProvider = Provider<AdService>((ref) {
 
 final ttsServiceProvider = Provider<TtsService>((ref) {
   final s = TtsService();
-  // Sync the persisted speed into the service and keep it in sync on changes.
-  final idx = ref.read(storageServiceProvider).getVoiceSpeedIndex();
+  final storage = ref.read(storageServiceProvider);
+  final idx = storage.getVoiceSpeedIndex();
   s.setSpeed(VoiceSpeed.values[idx.clamp(0, VoiceSpeed.values.length - 1)]);
+  s.setPollyVoice(storage.getPollyVoice());
   ref.listen<VoiceSpeed>(voiceSpeedProvider, (_, next) => s.setSpeed(next));
+  ref.listen<String>(pollyVoiceProvider, (_, next) => s.setPollyVoice(next));
   ref.onDispose(s.dispose);
   return s;
 });
@@ -51,6 +55,19 @@ class VoiceSpeedNotifier extends Notifier<VoiceSpeed> {
   Future<void> set(VoiceSpeed s) async {
     state = s;
     await ref.read(storageServiceProvider).setVoiceSpeedIndex(s.index);
+  }
+}
+
+final pollyVoiceProvider =
+    NotifierProvider<PollyVoiceNotifier, String>(PollyVoiceNotifier.new);
+
+class PollyVoiceNotifier extends Notifier<String> {
+  @override
+  String build() => ref.read(storageServiceProvider).getPollyVoice();
+
+  Future<void> set(String voice) async {
+    state = voice;
+    await ref.read(storageServiceProvider).setPollyVoice(voice);
   }
 }
 

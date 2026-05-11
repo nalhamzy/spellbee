@@ -70,6 +70,52 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
             ]),
+            if (AwsPollyTtsService.hasKey) ...[
+              SizedBox(height: context.s(16)),
+              Text('POLLY VOICE',
+                  style: const TextStyle(
+                    color: AppTheme.mute,
+                    fontSize: 11,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w800,
+                  )),
+              SizedBox(height: context.s(6)),
+              _card(context, [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 6),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.mic_rounded,
+                          color: AppTheme.honeyDark),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text('AWS Polly voice',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.ink)),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  child: SegmentedButton<String>(
+                    style: SegmentedButton.styleFrom(
+                      selectedBackgroundColor: AppTheme.honey,
+                      selectedForegroundColor: AppTheme.ink,
+                    ),
+                    segments: const [
+                      ButtonSegment(value: 'Kevin', label: Text('Kevin')),
+                      ButtonSegment(value: 'Joanna', label: Text('Joanna')),
+                      ButtonSegment(value: 'Matthew', label: Text('Matthew')),
+                    ],
+                    selected: {ref.watch(pollyVoiceProvider)},
+                    onSelectionChanged: (s) =>
+                        ref.read(pollyVoiceProvider.notifier).set(s.first),
+                  ),
+                ),
+              ]),
+            ],
             SizedBox(height: context.s(16)),
             _card(context, [
               ListTile(
@@ -109,7 +155,8 @@ class SettingsScreen extends ConsumerWidget {
                 leading: const Icon(Icons.info_outline_rounded),
                 title: const Text('About SpellBee'),
                 subtitle: Text(
-                    'v1.0.0 · Premium voice: ${OpenAiTtsService.hasKey ? "OpenAI" : "device TTS"}'),
+                    'v1.0.0 · Premium voice: '
+                    '${AwsPollyTtsService.hasKey ? "AWS Polly" : OpenAiTtsService.hasKey ? "OpenAI" : "device TTS"}'),
                 onTap: () {},
               ),
             ]),

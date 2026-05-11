@@ -49,7 +49,7 @@ class DashboardScreen extends ConsumerWidget {
             SizedBox(height: context.s(16)),
             _statsRow(context, stats.totalTests, accPct, stats.bestStreak),
             SizedBox(height: context.s(22)),
-            Text('Start a quick bee',
+            Text('Start a quick bee  •  Pick your grade',
                 style: Theme.of(context).textTheme.headlineSmall),
             SizedBox(height: context.s(10)),
             _levelPicker(context, ref, level),
@@ -110,6 +110,29 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
+  String _chipLabel(int lvl) {
+    switch (lvl) {
+      case 1:
+        return 'Grade K-1';
+      case 2:
+        return 'Grade 2';
+      case 3:
+        return 'Grade 3';
+      case 4:
+        return 'Grade 4';
+      case 5:
+        return 'Grade 5';
+      case 6:
+        return 'Middle School';
+      case 7:
+        return 'Regional Bee';
+      case 8:
+        return 'Championship';
+      default:
+        return 'Level $lvl';
+    }
+  }
+
   Widget _levelPicker(BuildContext c, WidgetRef ref, int level) {
     return SizedBox(
       height: c.s(44),
@@ -134,7 +157,7 @@ class DashboardScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'Lv $lvl  •  ${kLevelLabels[lvl]}',
+                    _chipLabel(lvl),
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: lvl == level ? AppTheme.ink : AppTheme.mute,
@@ -160,9 +183,9 @@ class DashboardScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(c.s(16))),
         ),
         icon: const Icon(Icons.play_arrow_rounded, size: 28),
-        label: const Text('Start a 10-word test',
+        label: Text('Start  •  ${kLevelLabels[level]}',
             style:
-                TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         onPressed: () {
           final pool = kWordsCatalog[level] ?? [];
           if (pool.isEmpty) return;

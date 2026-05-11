@@ -36,17 +36,40 @@ class AiWordGenerator {
 
   // ── Local fallback ─────────────────────────────────────────────────
 
+  static final Set<String> _recentlyShown = {};
+
   List<Word> _sampleLocal({required int count, required int level}) {
     final pool = <Word>[];
-    // Gather this level plus the one below to give some variety.
-    for (final l in {level - 1, level, level + 1}) {
+    for (final l in {level - 2, level - 1, level + 1}) {
       if (kWordsCatalog.containsKey(l)) {
         pool.addAll(kWordsCatalog[l]!);
       }
     }
+    if (kWordsCatalog.containsKey(level)) {
+      pool.addAll(kWordsCatalog[level]!);
+      pool.addAll(kWordsCatalog[level]!);
+      pool.addAll(kWordsCatalog[level]!);
+    }
     if (pool.isEmpty) pool.addAll(kAllWords);
-    pool.shuffle();
-    return pool.take(count).toList();
+
+    final filtered = pool
+        .where((w) => !_recentlyShown.contains(w.text))
+        .toList();
+    final source = filtered.isNotEmpty ? filtered : pool;
+    source.shuffle();
+    final picked = source.take(count).toList();
+
+    for (final w in picked) {
+      _recentlyShown.add(w.text);
+    }
+    if (_recentlyShown.length > 80) {
+      final oldest = _recentlyShown.take(40).toList();
+      for (final t in oldest) {
+        _recentlyShown.remove(t);
+      }
+    }
+
+    return picked;
   }
 
   // ── Gemini ──────────────────────────────────────────────────────────

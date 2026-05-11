@@ -18,11 +18,10 @@ class AdIds {
   static const _testRewardedAndroid     = 'ca-app-pub-3940256099942544/5224354917';
   static const _testRewardedIos         = 'ca-app-pub-3940256099942544/1712485313';
 
-  // TODO(spellbee): replace with real unit IDs from apps.admob.com.
-  static const _prodBannerAndroid       = 'ca-app-pub-4401199263287951/XXXXXXXXXX';
-  static const _prodBannerIos           = 'ca-app-pub-4401199263287951/XXXXXXXXXX';
-  static const _prodRewardedAndroid     = 'ca-app-pub-4401199263287951/XXXXXXXXXX';
-  static const _prodRewardedIos         = 'ca-app-pub-4401199263287951/XXXXXXXXXX';
+  static const _prodBannerAndroid       = 'ca-app-pub-2199673102027930/XXXXXXXXXX';
+  static const _prodBannerIos           = 'ca-app-pub-2199673102027930/3870987509';
+  static const _prodRewardedAndroid     = 'ca-app-pub-2199673102027930/XXXXXXXXXX';
+  static const _prodRewardedIos         = 'ca-app-pub-2199673102027930/6632882218';
 
   static bool get _useTest =>
       kDebugMode || _prodBannerAndroid.contains('XXXXXXXXXX');

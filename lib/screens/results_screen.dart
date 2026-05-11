@@ -5,13 +5,31 @@ import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 
-class ResultsScreen extends ConsumerWidget {
+class ResultsScreen extends ConsumerStatefulWidget {
   final TestResult result;
   final String title;
   const ResultsScreen({super.key, required this.result, required this.title});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ResultsScreen> createState() => _ResultsScreenState();
+}
+
+class _ResultsScreenState extends ConsumerState<ResultsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final tts = ref.read(ttsServiceProvider);
+      final premium = ref.read(isPremiumProvider);
+      final stub = widget.result.accuracy >= 1.0 ? 'new_best' : 'test_complete';
+      tts.playPhrase(stub, premium: premium);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final result = widget.result;
+    final title = widget.title;
     final pct = (result.accuracy * 100).round();
     String blurb;
     if (pct == 100) {
@@ -107,14 +125,14 @@ class ResultsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${result.correct} of ${result.total} correct',
+                Text('${widget.result.correct} of ${widget.result.total} correct',
                     style: TextStyle(
                         fontSize: context.s(16),
                         fontWeight: FontWeight.w800,
                         color: AppTheme.ink)),
                 SizedBox(height: context.s(4)),
                 Text(
-                  '${result.elapsed.inSeconds}s total',
+                  '${widget.result.elapsed.inSeconds}s total',
                   style: const TextStyle(color: AppTheme.ink),
                 ),
               ],
