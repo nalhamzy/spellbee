@@ -30,6 +30,7 @@ workflows:
       java: 17
       groups:
         - google_play
+        - spellbee_secrets
       vars:
         PACKAGE_NAME: "com.idealai.spellbee"
     scripts:
@@ -47,7 +48,10 @@ workflows:
       - name: Build Android AAB
         script: |
           flutter build appbundle --release \
-            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER
+            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
+            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
+            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
+            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY
       - name: Install CocoaPods dependencies
         script: |
           cd ios
@@ -59,6 +63,9 @@ workflows:
         script: |
           flutter build ipa --release \
             --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
+            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
+            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
+            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -95,6 +102,8 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+      groups:
+        - spellbee_secrets
     scripts:
       - name: Extract version from pubspec
         script: |
@@ -118,6 +127,9 @@ workflows:
         script: |
           flutter build ipa --release \
             --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
+            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
+            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
+            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -142,6 +154,7 @@ workflows:
       java: 17
       groups:
         - google_play
+        - spellbee_secrets
       vars:
         PACKAGE_NAME: "com.idealai.spellbee"
     scripts:
@@ -159,7 +172,10 @@ workflows:
       - name: Build AAB
         script: |
           flutter build appbundle --release \
-            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER
+            --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
+            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
+            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
+            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY
     artifacts:
       - build/app/outputs/bundle/release/*.aab
       - build/app/outputs/mapping/release/mapping.txt
