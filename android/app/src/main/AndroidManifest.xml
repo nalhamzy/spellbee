@@ -26,10 +26,9 @@
             </intent-filter>
         </activity>
 
-        <!-- AdMob App ID — sample ID used until real IDs are pasted from apps.admob.com. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-2199673102027930~8042166807"/>
 
         <meta-data
             android:name="flutterEmbedding"

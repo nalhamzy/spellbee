@@ -18,9 +18,9 @@ class AdIds {
   static const _testRewardedAndroid     = 'ca-app-pub-3940256099942544/5224354917';
   static const _testRewardedIos         = 'ca-app-pub-3940256099942544/1712485313';
 
-  static const _prodBannerAndroid       = 'ca-app-pub-2199673102027930/XXXXXXXXXX';
+  static const _prodBannerAndroid       = 'ca-app-pub-2199673102027930/8633193743';
   static const _prodBannerIos           = 'ca-app-pub-2199673102027930/3870987509';
-  static const _prodRewardedAndroid     = 'ca-app-pub-2199673102027930/XXXXXXXXXX';
+  static const _prodRewardedAndroid     = 'ca-app-pub-2199673102027930/3374724094';
   static const _prodRewardedIos         = 'ca-app-pub-2199673102027930/6632882218';
 
   static bool get _useTest =>
