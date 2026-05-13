@@ -1,8 +1,7 @@
 name: spellbee
 description: "SpellBee — Spelling-bee practice with AI-generated word packs and voice feedback."
 publish_to: 'none'
-version: 1.0.1+2
-
+version: 1.0.2+3
 environment:
   sdk: ^3.11.0
 
@@ -56,3 +55,4 @@ flutter:
     - assets/icon/
     - assets/audio/words/
     - assets/audio/phrases/
+
