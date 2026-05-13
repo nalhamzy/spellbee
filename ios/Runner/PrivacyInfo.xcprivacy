@@ -33,16 +33,6 @@
 				<string>CA92.1</string>
 			</array>
 		</dict>
-
-		<!-- google_mobile_ads (AdMob) reads active-keyboard list for ad relevance -->
-		<dict>
-			<key>NSPrivacyAccessedAPIType</key>
-			<string>NSPrivacyAccessedAPICategoryActiveKeyboards</string>
-			<key>NSPrivacyAccessedAPITypeReasons</key>
-			<array>
-				<string>1C8F.1</string>
-			</array>
-		</dict>
 	</array>
 </dict>
 </plist>
