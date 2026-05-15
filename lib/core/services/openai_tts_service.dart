@@ -1,25 +1,28 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-/// Premium voice via OpenAI's /audio/speech endpoint.
+/// Premium voice via the studio TTS gateway.
 ///
-/// Pass the API key at build time via:
-///   flutter run --dart-define=OPENAI_API_KEY=sk-...
+/// The mobile app must never ship an OpenAI/AWS provider key. Instead, pass a
+/// studio gateway URL and optional short-lived client token at build time:
+///   flutter run --dart-define=TTS_GATEWAY_URL=https://.../spellbeeTts
+///   flutter run --dart-define=TTS_GATEWAY_TOKEN=...
 ///
-/// The service fetches MP3 bytes, caches them under the app's temporary
-/// directory keyed by (text, voice), and plays via `audioplayers`. Every
-/// method degrades gracefully — if the network call fails, callers should
-/// fall back to on-device flutter_tts.
+/// The gateway should call OpenAI's Speech endpoint server-side, enforce
+/// entitlement/quota/rate limits, and return MP3 bytes. Every method degrades
+/// gracefully; if the gateway fails, callers fall back to on-device TTS.
 class OpenAiTtsService {
-  static const _apiKey = String.fromEnvironment('OPENAI_API_KEY');
-  static bool get hasKey => _apiKey.isNotEmpty;
+  static const _gatewayUrl = String.fromEnvironment('TTS_GATEWAY_URL');
+  static const _gatewayToken = String.fromEnvironment('TTS_GATEWAY_TOKEN');
+  static bool get hasKey => _gatewayUrl.isNotEmpty;
 
-  static const String _model = 'gpt-4o-mini-tts';   // newest cheap TTS tier
-  static const String _defaultVoice = 'nova';       // young, clear, kid-friendly
+  static const String _model = 'gpt-4o-mini-tts';
+  static const String _defaultVoice = 'marin';
 
   final _player = AudioPlayer();
   Directory? _cacheDir;
@@ -31,10 +34,11 @@ class OpenAiTtsService {
 
   String _keyFor(String text, String voice) {
     final safe = text.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
-    return 'sb_tts_${voice}_${safe.substring(0, safe.length.clamp(0, 40))}_${text.hashCode}.mp3';
+    final short = safe.substring(0, safe.length.clamp(0, 40));
+    return 'sb_tts_${voice}_${short}_${text.hashCode}.mp3';
   }
 
-  /// Pronounce [text]. Returns true if the remote call + playback succeeded;
+  /// Pronounce [text]. Returns true if the gateway + playback succeeded;
   /// false means the caller should fall back to native TTS.
   Future<bool> speak(String text, {String? voice, double speed = 1.0}) async {
     if (!hasKey) return false;
@@ -42,15 +46,15 @@ class OpenAiTtsService {
       final v = voice ?? _defaultVoice;
       final dir = await _dir();
       final speedTag = (speed * 100).round();
-      final file = File(
-          '${dir.path}/${_keyFor('${text}_$speedTag', v)}');
+      final file = File('${dir.path}/${_keyFor('${text}_$speedTag', v)}');
       if (!file.existsSync()) {
         final resp = await http
             .post(
-              Uri.parse('https://api.openai.com/v1/audio/speech'),
+              Uri.parse(_gatewayUrl),
               headers: {
-                'Authorization': 'Bearer $_apiKey',
                 'Content-Type': 'application/json',
+                if (_gatewayToken.isNotEmpty)
+                  'Authorization': 'Bearer $_gatewayToken',
               },
               body: jsonEncode({
                 'model': _model,
@@ -58,6 +62,7 @@ class OpenAiTtsService {
                 'input': text,
                 'response_format': 'mp3',
                 'speed': speed,
+                'purpose': 'spellbee-pronunciation',
               }),
             )
             .timeout(const Duration(seconds: 20));

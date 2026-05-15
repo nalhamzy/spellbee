@@ -7,6 +7,28 @@ import 'package:spellbee/core/services/openai_tts_service.dart';
 /// need every syllable space.
 enum VoiceSpeed { calm, normal, fast }
 
+enum VoiceQuality { device, studio }
+
+extension VoiceQualityLabel on VoiceQuality {
+  String get label {
+    switch (this) {
+      case VoiceQuality.device:
+        return 'Device';
+      case VoiceQuality.studio:
+        return 'Studio';
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case VoiceQuality.device:
+        return 'Local voice. Works offline and uses no AI API.';
+      case VoiceQuality.studio:
+        return 'Premium high-quality AI voice through the studio gateway.';
+    }
+  }
+}
+
 extension VoiceSpeedRate on VoiceSpeed {
   /// flutter_tts engine rate (0.0-1.0 on all platforms).
   double get ttsRate {
@@ -45,13 +67,10 @@ extension VoiceSpeedRate on VoiceSpeed {
   }
 }
 
-/// Thin TTS wrapper that routes between:
-///   - [OpenAiTtsService] when the user is premium AND an
-///     OPENAI_API_KEY dart-define is present at build time
-///   - [FlutterTts] (on-device) otherwise
-///
-/// Callers pass [premium] on every call so an expiring subscription silently
-/// falls back without the service having to watch Riverpod.
+/// Thin TTS wrapper that routes between the studio voice gateway, legacy
+/// Polly fallback, bundled MP3s, and on-device TTS. Callers pass [premium] on
+/// every call so an expiring subscription silently falls back without the
+/// service having to watch Riverpod.
 class TtsService {
   final _tts = FlutterTts();
   final _openai = OpenAiTtsService();
@@ -59,6 +78,7 @@ class TtsService {
   final _bundled = BundledTtsService();
   bool _ready = false;
   VoiceSpeed _speed = VoiceSpeed.calm;
+  VoiceQuality _quality = VoiceQuality.device;
   String _pollyVoice = AwsPollyTtsService.defaultVoice;
 
   bool get hasPremiumVoice =>
@@ -66,6 +86,10 @@ class TtsService {
 
   void setPollyVoice(String voice) {
     _pollyVoice = voice;
+  }
+
+  void setQuality(VoiceQuality quality) {
+    _quality = quality;
   }
 
   Future<void> setSpeed(VoiceSpeed s) async {
@@ -83,15 +107,18 @@ class TtsService {
     _ready = true;
   }
 
-  /// Say [sentence]. Premium priority: bundled asset → AWS Polly → OpenAI → device TTS.
-  Future<void> _sayWithFallback(String sentence,
-      {required bool premium}) async {
-    if (premium && AwsPollyTtsService.hasKey) {
-      final ok = await _polly.speak(sentence, voice: _pollyVoice);
+  /// Say [sentence]. Studio priority: gateway, legacy Polly, then device TTS.
+  Future<void> _sayWithFallback(
+    String sentence, {
+    required bool premium,
+  }) async {
+    final useStudio = premium && _quality == VoiceQuality.studio;
+    if (useStudio && OpenAiTtsService.hasKey) {
+      final ok = await _openai.speak(sentence, speed: _speed.openAiRate);
       if (ok) return;
     }
-    if (premium && OpenAiTtsService.hasKey) {
-      final ok = await _openai.speak(sentence, speed: _speed.openAiRate);
+    if (useStudio && AwsPollyTtsService.hasKey) {
+      final ok = await _polly.speak(sentence, voice: _pollyVoice);
       if (ok) return;
     }
     await _ensureReady();
@@ -104,26 +131,26 @@ class TtsService {
   /// Pronounce a word. Premium + bundled asset → instant, offline. Otherwise
   /// falls through the premium/device chain.
   Future<void> speakWord(String word, {bool premium = false}) async {
-    if (premium && await _bundled.hasWord(word)) {
+    if (premium &&
+        _quality == VoiceQuality.studio &&
+        await _bundled.hasWord(word)) {
       final played = await _bundled.playWord(word);
       if (played) return;
     }
     await _sayWithFallback(_beeSentence(word), premium: premium);
   }
 
-  Future<void> speakDefinition(String word, String definition,
-          {bool premium = false}) =>
-      _sayWithFallback(
-        '$word. Definition: $definition',
-        premium: premium,
-      );
+  Future<void> speakDefinition(
+    String word,
+    String definition, {
+    bool premium = false,
+  }) => _sayWithFallback('$word. Definition: $definition', premium: premium);
 
-  Future<void> speakExample(String word, String example,
-          {bool premium = false}) =>
-      _sayWithFallback(
-        '$word. In a sentence: $example',
-        premium: premium,
-      );
+  Future<void> speakExample(
+    String word,
+    String example, {
+    bool premium = false,
+  }) => _sayWithFallback('$word. In a sentence: $example', premium: premium);
 
   Future<void> spellOut(String word, {bool premium = false}) async {
     final spaced = word.toUpperCase().split('').join(', ');
@@ -134,7 +161,9 @@ class TtsService {
   /// asset stub (e.g. 'great', 'new_best'). Falls back to flutter_tts using
   /// the stub with underscores turned into spaces.
   Future<void> playPhrase(String stub, {bool premium = false}) async {
-    if (premium && await _bundled.hasPhrase(stub)) {
+    if (premium &&
+        _quality == VoiceQuality.studio &&
+        await _bundled.hasPhrase(stub)) {
       final played = await _bundled.playPhrase(stub);
       if (played) return;
     }

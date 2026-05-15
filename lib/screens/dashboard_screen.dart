@@ -16,104 +16,96 @@ class DashboardScreen extends ConsumerWidget {
     final stats = ref.watch(playerStatsProvider);
     final level = ref.watch(selectedLevelProvider);
     final accPct = (stats.accuracy * 100).round();
-
     final dailyWord = ref.watch(dailyWordProvider);
     final dailyDone = ref.watch(dailyWordDoneProvider);
-    final dailyStreak = stats.dailyStreak;
 
     return SafeArea(
       child: ResponsiveContentBox(
         child: ListView(
           padding: EdgeInsets.fromLTRB(
-              context.s(20), context.s(16), context.s(20), context.s(120)),
+            context.s(20),
+            context.s(16),
+            context.s(20),
+            context.s(120),
+          ),
           children: [
-            Row(
-              children: [
-                Text('🐝',
-                    style: TextStyle(fontSize: context.s(36))),
-                SizedBox(width: context.s(10)),
-                Text('SpellBee',
-                    style: TextStyle(
-                      fontSize: context.s(30),
-                      fontWeight: FontWeight.w900,
-                      color: AppTheme.ink,
-                    )),
-                if (dailyStreak > 0) ...[
-                  const Spacer(),
-                  _StreakBadge(streak: dailyStreak),
-                ],
-              ],
-            ),
-            SizedBox(height: context.s(18)),
-            _DailyWordCard(word: dailyWord, done: dailyDone),
+            _Header(streak: stats.dailyStreak),
             SizedBox(height: context.s(16)),
-            _statsRow(context, stats.totalTests, accPct, stats.bestStreak),
+            _StartTrailButton(
+              level: level,
+              onPressed: () => _start(context, level),
+            ),
+            SizedBox(height: context.s(14)),
+            _HeroPanel(
+              word: dailyWord,
+              done: dailyDone,
+              onStart: dailyDone
+                  ? null
+                  : () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => TestScreen(
+                            words: [dailyWord],
+                            title: 'Daily word',
+                            onComplete: () => ref
+                                .read(playerStatsProvider.notifier)
+                                .recordDailyWordComplete(),
+                          ),
+                        ),
+                      );
+                    },
+            ),
             SizedBox(height: context.s(22)),
-            Text('Start a quick bee  •  Pick your grade',
-                style: Theme.of(context).textTheme.headlineSmall),
+            _SectionTitle(
+              title: 'Practice level',
+              subtitle: kLevelLabels[level] ?? 'Level $level',
+            ),
             SizedBox(height: context.s(10)),
             _levelPicker(context, ref, level),
-            SizedBox(height: context.s(12)),
-            _primaryStart(context, ref, level),
+            SizedBox(height: context.s(18)),
+            _SimpleChoices(ref: ref),
+            if (!ref.watch(isPremiumProvider)) ...[
+              SizedBox(height: context.s(22)),
+              _PremiumBanner(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                  );
+                },
+              ),
+            ],
             SizedBox(height: context.s(22)),
-            Text('Or jump into',
-                style: Theme.of(context).textTheme.headlineSmall),
+            _SectionTitle(title: 'Parent view', subtitle: 'Progress'),
             SizedBox(height: context.s(10)),
-            _quickCards(context, ref),
-            SizedBox(height: context.s(22)),
-            if (!ref.watch(isPremiumProvider)) _premiumBanner(context),
+            _StatsRail(
+              tests: stats.totalTests,
+              accuracy: accPct,
+              bestStreak: stats.bestStreak,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _statsRow(BuildContext c, int tests, int accPct, int best) {
-    Widget cell(String label, String value, {Color? color}) {
-      return Expanded(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: c.s(12)),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            border: Border.all(color: AppTheme.outline),
-            borderRadius: BorderRadius.circular(c.s(14)),
-          ),
-          child: Column(
-            children: [
-              Text(value,
-                  style: TextStyle(
-                    fontSize: c.s(22),
-                    fontWeight: FontWeight.w900,
-                    color: color ?? AppTheme.honeyDark,
-                  )),
-              Text(label,
-                  style: const TextStyle(
-                    color: AppTheme.mute,
-                    fontSize: 11,
-                    letterSpacing: 0.8,
-                    fontWeight: FontWeight.w700,
-                  )),
-            ],
-          ),
+  static void _start(BuildContext context, int level) {
+    final pool = kWordsCatalog[level] ?? [];
+    if (pool.isEmpty) return;
+    final sampled = [...pool]..shuffle();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => TestScreen(
+          words: sampled.take(10).toList(),
+          title: 'Level $level trail',
         ),
-      );
-    }
-
-    return Row(
-      children: [
-        cell('Tests', '$tests'),
-        SizedBox(width: c.s(8)),
-        cell('Accuracy', '$accPct%', color: AppTheme.sage),
-        SizedBox(width: c.s(8)),
-        cell('Best streak', '$best', color: AppTheme.coral),
-      ],
+      ),
     );
   }
 
   String _chipLabel(int lvl) {
     switch (lvl) {
       case 1:
-        return 'Grade K-1';
+        return 'K-1';
       case 2:
         return 'Grade 2';
       case 3:
@@ -123,11 +115,11 @@ class DashboardScreen extends ConsumerWidget {
       case 5:
         return 'Grade 5';
       case 6:
-        return 'Middle School';
+        return 'Middle';
       case 7:
-        return 'Regional Bee';
+        return 'Regional';
       case 8:
-        return 'Championship';
+        return 'Champion';
       default:
         return 'Level $lvl';
     }
@@ -146,21 +138,21 @@ class DashboardScreen extends ConsumerWidget {
                 onTap: () => ref.read(selectedLevelProvider.notifier).set(lvl),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 160),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: c.s(14), vertical: 0),
+                  padding: EdgeInsets.symmetric(horizontal: c.s(15)),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: lvl == level ? AppTheme.honey : AppTheme.surface,
+                    color: lvl == level ? AppTheme.ink : AppTheme.surface,
                     border: Border.all(
-                      color: lvl == level ? AppTheme.honey : AppTheme.outline,
+                      color: lvl == level ? AppTheme.ink : AppTheme.outline,
                     ),
                     borderRadius: BorderRadius.circular(999),
+                    boxShadow: lvl == level ? AppTheme.softShadow : null,
                   ),
                   child: Text(
                     _chipLabel(lvl),
                     style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: lvl == level ? AppTheme.ink : AppTheme.mute,
+                      fontWeight: FontWeight.w900,
+                      color: lvl == level ? Colors.white : AppTheme.mute,
                     ),
                   ),
                 ),
@@ -170,113 +162,280 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _primaryStart(BuildContext c, WidgetRef ref, int level) {
-    return SizedBox(
-      width: double.infinity,
-      height: c.s(56),
-      child: FilledButton.icon(
-        style: FilledButton.styleFrom(
-          backgroundColor: AppTheme.honey,
-          foregroundColor: AppTheme.ink,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(c.s(16))),
+class _Header extends StatelessWidget {
+  final int streak;
+  const _Header({required this.streak});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'SpellBee',
+                style: TextStyle(
+                  color: AppTheme.ink,
+                  fontSize: 31,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                'A cozy spelling room for brave little readers.',
+                style: TextStyle(color: AppTheme.mute, fontSize: 13),
+              ),
+            ],
+          ),
         ),
-        icon: const Icon(Icons.play_arrow_rounded, size: 28),
-        label: Text('Start  •  ${kLevelLabels[level]}',
-            style:
-                const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-        onPressed: () {
-          final pool = kWordsCatalog[level] ?? [];
-          if (pool.isEmpty) return;
-          final sampled = [...pool]..shuffle();
-          Navigator.of(c).push(MaterialPageRoute(
-            builder: (_) => TestScreen(
-              words: sampled.take(10).toList(),
-              title: 'Level $level test',
-            ),
-          ));
+        if (streak > 0) _StreakBadge(streak: streak),
+      ],
+    );
+  }
+}
+
+class _HeroPanel extends StatelessWidget {
+  final Word word;
+  final bool done;
+  final VoidCallback? onStart;
+
+  const _HeroPanel({
+    required this.word,
+    required this.done,
+    required this.onStart,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(context.s(18)),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppTheme.surface2, AppTheme.aqua],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(context.s(28)),
+        border: Border.all(color: AppTheme.outline),
+        boxShadow: AppTheme.softShadow,
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final showMascot = constraints.maxWidth >= 360;
+          return Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _LabelPill(
+                      icon: done
+                          ? Icons.check_circle_rounded
+                          : Icons.wb_sunny_rounded,
+                      label: done ? 'Daily word done' : 'Daily word',
+                      color: done ? AppTheme.sage : AppTheme.honeyDark,
+                    ),
+                    SizedBox(height: context.s(12)),
+                    Text(
+                      word.text.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppTheme.ink,
+                        fontSize: context.s(30),
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    SizedBox(height: context.s(6)),
+                    Text(
+                      word.definition,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppTheme.mute,
+                        fontSize: 13,
+                      ),
+                    ),
+                    SizedBox(height: context.s(14)),
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: done ? AppTheme.sage : AppTheme.ink,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.s(16),
+                          vertical: context.s(12),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(context.s(16)),
+                        ),
+                      ),
+                      onPressed: onStart,
+                      icon: Icon(
+                        done ? Icons.done_rounded : Icons.play_arrow_rounded,
+                      ),
+                      label: Text(
+                        done ? 'Come back later' : 'Spell it now',
+                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (showMascot) ...[
+                SizedBox(width: context.s(10)),
+                SizedBox(
+                  width: context.s(108),
+                  height: context.s(118),
+                  child: const _BeeMascot(),
+                ),
+              ],
+            ],
+          );
         },
       ),
     );
   }
+}
 
-  Widget _quickCards(BuildContext c, WidgetRef ref) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: c.s(10),
-      mainAxisSpacing: c.s(10),
-      childAspectRatio: 1.35,
+class _BeeMascot extends StatelessWidget {
+  const _BeeMascot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
       children: [
-        _QuickCard(
-          icon: Icons.auto_awesome_rounded,
-          color: AppTheme.violet,
-          title: 'AI word pack',
-          subtitle: 'Thematic 10-word drill',
-          onTap: () => ref.read(tabProvider.notifier).go(AppTab.practice),
+        Positioned(
+          top: 10,
+          left: 3,
+          child: _wing(AppTheme.surface.withValues(alpha: 0.82)),
         ),
-        _QuickCard(
-          icon: Icons.library_books_rounded,
-          color: AppTheme.sky,
-          title: 'My lists',
-          subtitle: 'Parent-made word sets',
-          onTap: () => ref.read(tabProvider.notifier).go(AppTab.lists),
+        Positioned(
+          top: 10,
+          right: 3,
+          child: _wing(AppTheme.surface.withValues(alpha: 0.82)),
         ),
-        _QuickCard(
-          icon: Icons.timeline_rounded,
-          color: AppTheme.sage,
-          title: 'Stats',
-          subtitle: 'Streaks & accuracy',
-          onTap: () => ref.read(tabProvider.notifier).go(AppTab.stats),
+        Container(
+          width: 76,
+          height: 86,
+          decoration: BoxDecoration(
+            color: AppTheme.honey,
+            borderRadius: BorderRadius.circular(38),
+            border: Border.all(color: AppTheme.ink, width: 3),
+          ),
         ),
-        _QuickCard(
-          icon: Icons.settings_rounded,
-          color: AppTheme.coral,
-          title: 'Settings',
-          subtitle: 'Pin + voice + data',
-          onTap: () => ref.read(tabProvider.notifier).go(AppTab.settings),
+        Positioned(
+          top: 34,
+          child: Container(width: 70, height: 8, color: AppTheme.ink),
         ),
+        Positioned(
+          top: 56,
+          child: Container(width: 62, height: 8, color: AppTheme.ink),
+        ),
+        const Positioned(top: 22, left: 36, child: _Eye()),
+        const Positioned(top: 22, right: 36, child: _Eye()),
       ],
     );
   }
 
-  Widget _premiumBanner(BuildContext c) {
-    return InkWell(
-      onTap: () => Navigator.of(c)
-          .push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
-      borderRadius: BorderRadius.circular(c.s(20)),
-      child: Container(
-        padding: EdgeInsets.all(c.s(16)),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppTheme.violet, AppTheme.violet.withValues(alpha: 0.75)],
-          ),
-          borderRadius: BorderRadius.circular(c.s(20)),
+  Widget _wing(Color color) {
+    return Container(
+      width: 42,
+      height: 54,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: AppTheme.sky.withValues(alpha: 0.35)),
+      ),
+    );
+  }
+}
+
+class _Eye extends StatelessWidget {
+  const _Eye();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 9,
+      height: 9,
+      decoration: const BoxDecoration(
+        color: AppTheme.ink,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+}
+
+class _StatsRail extends StatelessWidget {
+  final int tests;
+  final int accuracy;
+  final int bestStreak;
+
+  const _StatsRail({
+    required this.tests,
+    required this.accuracy,
+    required this.bestStreak,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _MiniStat(label: 'Tests', value: '$tests', color: AppTheme.sky),
+        SizedBox(width: context.s(9)),
+        _MiniStat(label: 'Accuracy', value: '$accuracy%', color: AppTheme.sage),
+        SizedBox(width: context.s(9)),
+        _MiniStat(
+          label: 'Best run',
+          value: '$bestStreak',
+          color: AppTheme.coral,
         ),
-        child: Row(
+      ],
+    );
+  }
+}
+
+class _MiniStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _MiniStat({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: context.s(12)),
+        decoration: AppTheme.card(color: color.withValues(alpha: 0.15)),
+        child: Column(
           children: [
-            const Icon(Icons.workspace_premium_rounded,
-                color: Colors.white, size: 30),
-            SizedBox(width: c.s(12)),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Go Premium',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                      )),
-                  SizedBox(height: 2),
-                  Text('Unlimited AI word packs, no ads, unlimited lists.',
-                      style: TextStyle(color: Colors.white, fontSize: 12)),
-                ],
+            Text(
+              value,
+              style: TextStyle(
+                color: color,
+                fontSize: context.s(22),
+                fontWeight: FontWeight.w900,
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.white),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AppTheme.mute,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ],
         ),
       ),
@@ -284,151 +443,109 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-// ── Daily Word Card ──────────────────────────────────────────────────────
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final String subtitle;
 
-class _StreakBadge extends StatelessWidget {
-  final int streak;
-  const _StreakBadge({required this.streak});
+  const _SectionTitle({required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppTheme.honey,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppTheme.honeyDark.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text('🔥', style: TextStyle(fontSize: 14)),
-          const SizedBox(width: 4),
-          Text('$streak day${streak == 1 ? '' : 's'}',
-              style: const TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 13,
-                  color: AppTheme.ink)),
-        ],
-      ),
+    return Row(
+      children: [
+        Expanded(
+          child: Text(title, style: Theme.of(context).textTheme.headlineSmall),
+        ),
+        Flexible(
+          child: Text(
+            subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              color: AppTheme.mute,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
-class _DailyWordCard extends ConsumerWidget {
-  final Word word;
-  final bool done;
-  const _DailyWordCard({required this.word, required this.done});
+class _StartTrailButton extends StatelessWidget {
+  final int level;
+  final VoidCallback onPressed;
+
+  const _StartTrailButton({required this.level, required this.onPressed});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: EdgeInsets.all(context.s(16)),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(context.s(18)),
-        border: Border.all(
-          color: done ? AppTheme.sage : AppTheme.honeyDark,
-          width: 1.5,
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: context.s(58),
+      child: FilledButton.icon(
+        style: FilledButton.styleFrom(
+          backgroundColor: AppTheme.honey,
+          foregroundColor: AppTheme.ink,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.s(20)),
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: (done ? AppTheme.sage : AppTheme.honey)
-                .withValues(alpha: 0.15),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                done ? Icons.check_circle_rounded : Icons.wb_sunny_rounded,
-                color: done ? AppTheme.sage : AppTheme.honeyDark,
-                size: 18,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                done ? 'Word of the Day — done!' : 'Word of the Day',
-                style: TextStyle(
-                  color: done ? AppTheme.sage : AppTheme.honeyDark,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.s(8)),
-          Text(
-            word.text.toUpperCase(),
-            style: TextStyle(
-              fontSize: context.s(26),
-              fontWeight: FontWeight.w900,
-              color: AppTheme.ink,
-              letterSpacing: 1.5,
-            ),
-          ),
-          SizedBox(height: context.s(4)),
-          Text(
-            word.definition,
-            style: const TextStyle(color: AppTheme.mute, fontSize: 13),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: context.s(12)),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor:
-                    done ? AppTheme.sage : AppTheme.honey,
-                foregroundColor: done ? Colors.white : AppTheme.ink,
-                shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(context.s(12))),
-                padding:
-                    EdgeInsets.symmetric(vertical: context.s(10)),
-              ),
-              onPressed: done
-                  ? null
-                  : () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => TestScreen(
-                          words: [word],
-                          title: 'Word of the Day',
-                          onComplete: () => ref
-                              .read(playerStatsProvider.notifier)
-                              .recordDailyWordComplete(),
-                        ),
-                      ));
-                    },
-              child: Text(
-                done ? 'Come back tomorrow' : 'Spell it now',
-                style: const TextStyle(
-                    fontWeight: FontWeight.w900, fontSize: 14),
-              ),
-            ),
-          ),
-        ],
+        icon: const Icon(Icons.play_arrow_rounded, size: 30),
+        label: Text(
+          'Start level $level trail',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+        ),
+        onPressed: onPressed,
       ),
     );
   }
 }
 
-class _QuickCard extends StatelessWidget {
+class _SimpleChoices extends StatelessWidget {
+  final WidgetRef ref;
+  const _SimpleChoices({required this.ref});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _WideActionCard(
+          icon: Icons.auto_awesome_rounded,
+          color: AppTheme.violet,
+          background: AppTheme.lilac,
+          title: 'Make a word pack',
+          subtitle: 'Pick a theme and practice a fresh set.',
+          onTap: () => ref.read(tabProvider.notifier).go(AppTab.practice),
+        ),
+        SizedBox(height: context.s(10)),
+        _WideActionCard(
+          icon: Icons.library_books_rounded,
+          color: AppTheme.sky,
+          background: AppTheme.aqua,
+          title: 'Practice my list',
+          subtitle: 'Use spelling words from school or home.',
+          onTap: () => ref.read(tabProvider.notifier).go(AppTab.lists),
+        ),
+      ],
+    );
+  }
+}
+
+class _WideActionCard extends StatelessWidget {
   final IconData icon;
   final Color color;
+  final Color background;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
-  const _QuickCard({
+  const _WideActionCard({
     required this.icon,
     required this.color,
+    required this.background,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -438,37 +555,178 @@ class _QuickCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(context.s(22)),
       child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          border: Border.all(color: AppTheme.outline),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: EdgeInsets.all(context.s(15)),
+        decoration: AppTheme.card(color: background, radius: context.s(22)),
+        child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              width: context.s(48),
+              height: context.s(48),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.surface.withValues(alpha: 0.82),
+                borderRadius: BorderRadius.circular(context.s(16)),
               ),
-              child: Icon(icon, color: color, size: 22),
+              child: Icon(icon, color: color, size: context.s(26)),
             ),
-            const Spacer(),
-            Text(title,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 15,
-                    color: AppTheme.ink)),
-            const SizedBox(height: 2),
-            Text(subtitle,
-                style: const TextStyle(
-                    color: AppTheme.mute, fontSize: 12)),
+            SizedBox(width: context.s(12)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  SizedBox(height: context.s(2)),
+                  Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: color),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _PremiumBanner extends StatelessWidget {
+  final VoidCallback onTap;
+  const _PremiumBanner({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(context.s(24)),
+      child: Container(
+        padding: EdgeInsets.all(context.s(16)),
+        decoration: AppTheme.card(color: AppTheme.lilac, radius: context.s(24)),
+        child: Row(
+          children: [
+            Container(
+              width: context.s(46),
+              height: context.s(46),
+              decoration: const BoxDecoration(
+                color: AppTheme.violet,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.workspace_premium_rounded,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: context.s(12)),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Unlock the studio voice',
+                    style: TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Unlimited word packs, no ads, better pronunciation.',
+                    style: TextStyle(color: AppTheme.mute, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: AppTheme.violet),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StreakBadge extends StatelessWidget {
+  final int streak;
+  const _StreakBadge({required this.streak});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppTheme.rose,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppTheme.coral.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.local_fire_department_rounded,
+            color: AppTheme.coral,
+            size: 17,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '$streak',
+            style: const TextStyle(
+              color: AppTheme.ink,
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LabelPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _LabelPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
       ),
     );
   }

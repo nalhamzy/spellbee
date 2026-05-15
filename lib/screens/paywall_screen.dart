@@ -21,9 +21,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       await ref.read(iapServiceProvider).buy(_selected);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Couldn\'t start purchase: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not start purchase: $e')));
       }
     }
   }
@@ -34,9 +34,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppTheme.bg,
-        elevation: 0,
-        foregroundColor: AppTheme.ink,
         actions: [
           TextButton(
             onPressed: () => ref.read(iapServiceProvider).restore(),
@@ -46,38 +43,26 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       ),
       body: SafeArea(
         child: ResponsiveContentBox(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: EdgeInsets.all(context.s(20)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  children: [
-                    Text('🐝', style: TextStyle(fontSize: context.s(40))),
-                    SizedBox(width: context.s(8)),
-                    Text('SpellBee',
-                        style: Theme.of(context).textTheme.headlineLarge),
-                  ],
-                ),
-                SizedBox(height: context.s(4)),
-                Text('Premium',
-                    style: TextStyle(
-                      fontSize: context.s(30),
-                      fontWeight: FontWeight.w900,
-                      color: AppTheme.violet,
-                    )),
-                SizedBox(height: context.s(12)),
+                _hero(context),
+                SizedBox(height: context.s(14)),
                 _perks(context),
+                SizedBox(height: context.s(14)),
+                _ValueNudge(context),
                 SizedBox(height: context.s(22)),
                 productsAsync.when(
                   data: (products) => _tiers(context, products),
-                  error: (_, __) => _tiers(context, const []),
+                  error: (_, _) => _tiers(context, const []),
                   loading: () => Padding(
                     padding: EdgeInsets.all(context.s(24)),
                     child: const Center(child: CircularProgressIndicator()),
                   ),
                 ),
-                const Spacer(),
+                SizedBox(height: context.s(18)),
                 SizedBox(
                   width: double.infinity,
                   height: context.s(56),
@@ -86,20 +71,28 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       backgroundColor: AppTheme.violet,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(context.s(16))),
+                        borderRadius: BorderRadius.circular(context.s(18)),
+                      ),
                     ),
                     onPressed: _buy,
-                    child: const Text('Unlock Premium',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w900)),
+                    child: Text(
+                      _selected == IapProductIds.premiumLifetime
+                          ? 'Pay Once & Unlock'
+                          : 'Start Premium',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(height: context.s(8)),
-                const Text(
-                  'Subscriptions renew automatically until cancelled in the '
-                  'App Store / Google Play. Lifetime is a one-time payment.',
+                Text(
+                  _selected == IapProductIds.premiumLifetime
+                      ? 'One-time purchase. No subscription renewal.'
+                      : 'Subscriptions renew automatically until cancelled. Lifetime is a one-time payment.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.mute, fontSize: 11),
+                  style: const TextStyle(color: AppTheme.mute, fontSize: 11),
                 ),
               ],
             ),
@@ -109,24 +102,70 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
   }
 
+  Widget _hero(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(context.s(18)),
+      decoration: AppTheme.card(color: AppTheme.lilac, radius: context.s(28)),
+      child: Row(
+        children: [
+          Container(
+            width: context.s(58),
+            height: context.s(58),
+            decoration: const BoxDecoration(
+              color: AppTheme.violet,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.workspace_premium_rounded,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(width: context.s(12)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'SpellBee Premium',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'A calmer, richer spelling room for daily practice.',
+                  style: TextStyle(color: AppTheme.mute, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _perks(BuildContext c) {
     Widget row(IconData i, String label) => Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Row(children: [
-            Icon(i, size: 20, color: AppTheme.violet),
-            const SizedBox(width: 8),
-            Expanded(
-                child: Text(label,
-                    style: const TextStyle(
-                        color: AppTheme.ink, fontSize: 14))),
-          ]),
-        );
-    return Column(children: [
-      row(Icons.all_inclusive_rounded, 'Unlimited AI-generated word packs'),
-      row(Icons.list_alt_rounded, 'Unlimited parent-made word lists'),
-      row(Icons.block_rounded, 'No ads, ever'),
-      row(Icons.record_voice_over_rounded, 'Enhanced voice pronunciation'),
-    ]);
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(i, size: 20, color: AppTheme.violet),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(color: AppTheme.ink, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+    return Column(
+      children: [
+        row(Icons.all_inclusive_rounded, 'Unlimited AI-generated word packs'),
+        row(Icons.list_alt_rounded, 'Unlimited parent-made word lists'),
+        row(Icons.block_rounded, 'No ads, ever'),
+        row(Icons.record_voice_over_rounded, 'Studio voice pronunciation'),
+      ],
+    );
   }
 
   Widget _tiers(BuildContext c, List<IapProduct> products) {
@@ -140,18 +179,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     return Column(
       children: [
         _tile(
-          id: IapProductIds.premiumMonthly,
-          title: 'Monthly',
-          subtitle: 'Try premium month-to-month',
-          price: monthly?.price ?? '\$2.99',
-          period: '/month',
-        ),
-        SizedBox(height: c.s(8)),
-        _tile(
           id: IapProductIds.premiumYearly,
           title: 'Yearly',
-          subtitle: 'Best value — save 44%',
-          price: yearly?.price ?? '\$19.99',
+          subtitle: 'Best value for steady school practice',
+          price: yearly?.price ?? '\$29.99',
           period: '/year',
           highlight: true,
         ),
@@ -159,9 +190,17 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         _tile(
           id: IapProductIds.premiumLifetime,
           title: 'Lifetime',
-          subtitle: 'Pay once. Keep forever.',
-          price: lifetime?.price ?? '\$39.99',
+          subtitle: 'Pay once for this family',
+          price: lifetime?.price ?? '\$49.99',
           period: 'one-time',
+        ),
+        SizedBox(height: c.s(8)),
+        _tile(
+          id: IapProductIds.premiumMonthly,
+          title: 'Monthly',
+          subtitle: 'Try premium month-to-month',
+          price: monthly?.price ?? '\$4.99',
+          period: '/month',
         ),
       ],
     );
@@ -177,17 +216,18 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   }) {
     final selected = _selected == id;
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(18),
       onTap: () => setState(() => _selected = id),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          color: highlight ? AppTheme.surface2 : AppTheme.surface,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected ? AppTheme.violet : AppTheme.outline,
             width: selected ? 2 : 1,
           ),
+          boxShadow: selected ? AppTheme.softShadow : null,
         ),
         child: Row(
           children: [
@@ -202,50 +242,98 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [
-                    Text(title,
+                  Row(
+                    children: [
+                      Text(
+                        title,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w900,
-                            color: AppTheme.ink,
-                            fontSize: 15)),
-                    if (highlight) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppTheme.honey,
-                          borderRadius: BorderRadius.circular(6),
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.ink,
+                          fontSize: 15,
                         ),
-                        child: const Text('POPULAR',
-                            style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w900,
-                                color: AppTheme.ink)),
                       ),
+                      if (highlight) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.honey,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'POPULAR',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.ink,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ]),
-                  Text(subtitle,
-                      style: const TextStyle(
-                          color: AppTheme.mute, fontSize: 12)),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                  ),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(price,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                        color: AppTheme.ink)),
-                Text(period,
-                    style: const TextStyle(
-                        color: AppTheme.mute, fontSize: 11)),
+                Text(
+                  price,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    color: AppTheme.ink,
+                  ),
+                ),
+                Text(
+                  period,
+                  style: const TextStyle(color: AppTheme.mute, fontSize: 11),
+                ),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ValueNudge extends StatelessWidget {
+  final BuildContext pageContext;
+  const _ValueNudge(this.pageContext);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(pageContext.s(12)),
+      decoration: AppTheme.card(
+        color: AppTheme.mint,
+        border: AppTheme.sage.withValues(alpha: 0.35),
+        shadow: false,
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.school_rounded, color: AppTheme.sage),
+          SizedBox(width: pageContext.s(8)),
+          const Expanded(
+            child: Text(
+              'Designed for daily practice: better voice, no ads, and unlimited custom lessons.',
+              style: TextStyle(
+                color: AppTheme.ink,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

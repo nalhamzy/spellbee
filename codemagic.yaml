@@ -49,9 +49,10 @@ workflows:
         script: |
           flutter build appbundle --release \
             --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
-            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
-            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
-            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY
+            --dart-define=TTS_GATEWAY_URL=$TTS_GATEWAY_URL \
+            --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
+            --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
+            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN
       - name: Install CocoaPods dependencies
         script: |
           cd ios
@@ -63,9 +64,10 @@ workflows:
         script: |
           flutter build ipa --release \
             --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
-            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
-            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
-            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY \
+            --dart-define=TTS_GATEWAY_URL=$TTS_GATEWAY_URL \
+            --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
+            --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
+            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -127,9 +129,10 @@ workflows:
         script: |
           flutter build ipa --release \
             --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
-            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
-            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
-            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY \
+            --dart-define=TTS_GATEWAY_URL=$TTS_GATEWAY_URL \
+            --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
+            --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
+            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -173,9 +176,10 @@ workflows:
         script: |
           flutter build appbundle --release \
             --build-name=$VERSION_NAME --build-number=$BUILD_NUMBER \
-            --dart-define=AWS_POLLY_KEY_ID=$AWS_POLLY_KEY_ID \
-            --dart-define=AWS_POLLY_SECRET=$AWS_POLLY_SECRET \
-            --dart-define=OPENAI_API_KEY=$OPENAI_API_KEY
+            --dart-define=TTS_GATEWAY_URL=$TTS_GATEWAY_URL \
+            --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
+            --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
+            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN
     artifacts:
       - build/app/outputs/bundle/release/*.aab
       - build/app/outputs/mapping/release/mapping.txt

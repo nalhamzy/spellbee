@@ -1,19 +1,24 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/word.dart';
 
-/// Generates word packs either via Gemini (if GEMINI_API_KEY is passed via
-/// --dart-define) or by sampling the baked-in catalog as a deterministic
-/// fallback. Free tier users get local-only generation; premium users can
-/// tap Gemini for thematic packs.
+/// Generates word packs through the studio gateway when configured, otherwise
+/// samples the baked-in catalog. Provider keys must stay server-side.
 class AiWordGenerator {
-  static const _apiKey = String.fromEnvironment('GEMINI_API_KEY');
-  static bool get canCallRemote => _apiKey.isNotEmpty;
+  static const _gatewayUrl = String.fromEnvironment(
+    'WORD_GENERATOR_GATEWAY_URL',
+  );
+  static const _gatewayToken = String.fromEnvironment(
+    'WORD_GENERATOR_GATEWAY_TOKEN',
+  );
+
+  static bool get canCallRemote => _gatewayUrl.isNotEmpty;
 
   /// Produce [count] words at approximately [level] difficulty. If [theme]
-  /// is non-empty and an API key is present, calls Gemini. Otherwise samples
-  /// the catalog.
+  /// is non-empty and the gateway is present, asks the studio service for a
+  /// thematic pack. Otherwise samples the local catalog.
   Future<List<Word>> generate({
     required int count,
     required int level,
@@ -21,20 +26,18 @@ class AiWordGenerator {
   }) async {
     if (canCallRemote && theme.trim().isNotEmpty) {
       try {
-        final remote = await _callGemini(
+        final remote = await _callGateway(
           count: count,
           level: level,
           theme: theme.trim(),
         );
         if (remote.isNotEmpty) return remote;
       } catch (_) {
-        // fall through to local
+        // Gracefully fall back to local words if the gateway is unavailable.
       }
     }
     return _sampleLocal(count: count, level: level);
   }
-
-  // ── Local fallback ─────────────────────────────────────────────────
 
   static final Set<String> _recentlyShown = {};
 
@@ -72,55 +75,47 @@ class AiWordGenerator {
     return picked;
   }
 
-  // ── Gemini ──────────────────────────────────────────────────────────
-
-  Future<List<Word>> _callGemini({
+  Future<List<Word>> _callGateway({
     required int count,
     required int level,
     required String theme,
   }) async {
-    final url = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/'
-      'gemini-1.5-flash:generateContent?key=$_apiKey',
-    );
-    final prompt =
-        'Generate exactly $count spelling-bee words for a level-$level '
-        '(${_levelHint(level)}) student, themed around "$theme". '
-        'Return STRICT JSON in this shape and nothing else: '
-        '{"words":[{"text":"word","definition":"short definition",'
-        '"example":"one-sentence example using the word"}]}. '
-        'Use real words. Make sure the difficulty matches the level. '
-        'No prefaces, no code fences, no explanations.';
-    final body = jsonEncode({
-      'contents': [
-        {
-          'parts': [
-            {'text': prompt}
-          ]
-        }
-      ],
-      'generationConfig': {'response_mime_type': 'application/json'},
-    });
     final resp = await http
-        .post(url,
-            headers: {'Content-Type': 'application/json'}, body: body)
+        .post(
+          Uri.parse(_gatewayUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            if (_gatewayToken.isNotEmpty)
+              'Authorization': 'Bearer $_gatewayToken',
+          },
+          body: jsonEncode({
+            'count': count.clamp(1, 12),
+            'level': level.clamp(1, 8),
+            'level_hint': _levelHint(level),
+            'theme': theme,
+            'purpose': 'spellbee-word-pack',
+          }),
+        )
         .timeout(const Duration(seconds: 25));
+
     if (resp.statusCode != 200) {
-      throw Exception('Gemini HTTP ${resp.statusCode}');
+      throw Exception('Word gateway HTTP ${resp.statusCode}');
     }
-    final j = jsonDecode(resp.body) as Map<String, dynamic>;
-    final text = (((j['candidates'] as List?)?.firstOrNull as Map?)
-            ?['content']?['parts']?[0]?['text']) as String?;
-    if (text == null) return const [];
-    final inner = jsonDecode(text) as Map<String, dynamic>;
-    final rawList = inner['words'] as List? ?? const [];
+
+    final decoded = jsonDecode(resp.body);
+    final rawList = decoded is Map<String, dynamic>
+        ? decoded['words'] as List? ?? const []
+        : const [];
+
     return rawList
         .whereType<Map<String, dynamic>>()
-        .map((m) => Word(
-              (m['text'] as String? ?? '').toLowerCase().trim(),
-              m['definition'] as String? ?? '',
-              m['example'] as String? ?? '',
-            ))
+        .map(
+          (m) => Word(
+            (m['text'] as String? ?? '').toLowerCase().trim(),
+            m['definition'] as String? ?? '',
+            m['example'] as String? ?? '',
+          ),
+        )
         .where((w) => w.text.isNotEmpty)
         .take(count)
         .toList();

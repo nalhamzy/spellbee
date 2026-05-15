@@ -12,7 +12,10 @@ import 'package:spellbee/core/services/stt_service.dart';
 import 'package:spellbee/core/services/tts_service.dart';
 export 'package:spellbee/core/services/aws_polly_tts_service.dart'
     show AwsPollyTtsService;
-export 'package:spellbee/core/services/tts_service.dart' show VoiceSpeed;
+export 'package:spellbee/core/services/openai_tts_service.dart'
+    show OpenAiTtsService;
+export 'package:spellbee/core/services/tts_service.dart'
+    show VoiceQuality, VoiceQualityLabel, VoiceSpeed;
 
 // ─── Service providers (overridden in main.dart) ───────────────────────
 
@@ -35,15 +38,24 @@ final ttsServiceProvider = Provider<TtsService>((ref) {
   final storage = ref.read(storageServiceProvider);
   final idx = storage.getVoiceSpeedIndex();
   s.setSpeed(VoiceSpeed.values[idx.clamp(0, VoiceSpeed.values.length - 1)]);
+  final qualityIdx = storage.getVoiceQualityIndex();
+  s.setQuality(
+    VoiceQuality.values[qualityIdx.clamp(0, VoiceQuality.values.length - 1)],
+  );
   s.setPollyVoice(storage.getPollyVoice());
   ref.listen<VoiceSpeed>(voiceSpeedProvider, (_, next) => s.setSpeed(next));
+  ref.listen<VoiceQuality>(
+    voiceQualityProvider,
+    (_, next) => s.setQuality(next),
+  );
   ref.listen<String>(pollyVoiceProvider, (_, next) => s.setPollyVoice(next));
   ref.onDispose(s.dispose);
   return s;
 });
 
-final voiceSpeedProvider =
-    NotifierProvider<VoiceSpeedNotifier, VoiceSpeed>(VoiceSpeedNotifier.new);
+final voiceSpeedProvider = NotifierProvider<VoiceSpeedNotifier, VoiceSpeed>(
+  VoiceSpeedNotifier.new,
+);
 
 class VoiceSpeedNotifier extends Notifier<VoiceSpeed> {
   @override
@@ -58,8 +70,27 @@ class VoiceSpeedNotifier extends Notifier<VoiceSpeed> {
   }
 }
 
-final pollyVoiceProvider =
-    NotifierProvider<PollyVoiceNotifier, String>(PollyVoiceNotifier.new);
+final voiceQualityProvider =
+    NotifierProvider<VoiceQualityNotifier, VoiceQuality>(
+      VoiceQualityNotifier.new,
+    );
+
+class VoiceQualityNotifier extends Notifier<VoiceQuality> {
+  @override
+  VoiceQuality build() {
+    final idx = ref.read(storageServiceProvider).getVoiceQualityIndex();
+    return VoiceQuality.values[idx.clamp(0, VoiceQuality.values.length - 1)];
+  }
+
+  Future<void> set(VoiceQuality quality) async {
+    state = quality;
+    await ref.read(storageServiceProvider).setVoiceQualityIndex(quality.index);
+  }
+}
+
+final pollyVoiceProvider = NotifierProvider<PollyVoiceNotifier, String>(
+  PollyVoiceNotifier.new,
+);
 
 class PollyVoiceNotifier extends Notifier<String> {
   @override
@@ -73,14 +104,15 @@ class PollyVoiceNotifier extends Notifier<String> {
 
 final sttServiceProvider = Provider<SttService>((ref) => SttService());
 
-final aiGeneratorProvider = Provider<AiWordGenerator>((ref) => AiWordGenerator());
+final aiGeneratorProvider = Provider<AiWordGenerator>(
+  (ref) => AiWordGenerator(),
+);
 
 // ─── Tabs ───────────────────────────────────────────────────────────────
 
 enum AppTab { home, practice, lists, stats, settings }
 
-final tabProvider =
-    NotifierProvider<TabNotifier, AppTab>(TabNotifier.new);
+final tabProvider = NotifierProvider<TabNotifier, AppTab>(TabNotifier.new);
 
 class TabNotifier extends Notifier<AppTab> {
   @override
@@ -121,8 +153,9 @@ final dailyWordDoneProvider = Provider<bool>((ref) {
 
 // ─── Player stats ───────────────────────────────────────────────────────
 
-final playerStatsProvider =
-    NotifierProvider<PlayerStatsNotifier, PlayerStats>(PlayerStatsNotifier.new);
+final playerStatsProvider = NotifierProvider<PlayerStatsNotifier, PlayerStats>(
+  PlayerStatsNotifier.new,
+);
 
 class PlayerStatsNotifier extends Notifier<PlayerStats> {
   @override
@@ -134,8 +167,9 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
     required int longestStreak,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final bestStreak =
-        longestStreak > state.bestStreak ? longestStreak : state.bestStreak;
+    final bestStreak = longestStreak > state.bestStreak
+        ? longestStreak
+        : state.bestStreak;
     state = state.copyWith(
       totalTests: state.totalTests + 1,
       totalWordsAsked: state.totalWordsAsked + asked,
@@ -159,18 +193,16 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
         ? state.dailyStreak + 1
         : 1; // streak broken — reset to 1
 
-    state = state.copyWith(
-      lastDailyEpochDay: today,
-      dailyStreak: newStreak,
-    );
+    state = state.copyWith(lastDailyEpochDay: today, dailyStreak: newStreak);
     await ref.read(storageServiceProvider).saveStats(state);
   }
 }
 
 // ─── Premium ────────────────────────────────────────────────────────────
 
-final premiumProvider =
-    NotifierProvider<PremiumNotifier, PremiumState>(PremiumNotifier.new);
+final premiumProvider = NotifierProvider<PremiumNotifier, PremiumState>(
+  PremiumNotifier.new,
+);
 
 class PremiumNotifier extends Notifier<PremiumState> {
   @override
@@ -194,8 +226,7 @@ final isPremiumProvider = Provider<bool>(
   (ref) => ref.watch(premiumProvider).isPremium,
 );
 
-final iapProductsProvider =
-    FutureProvider<List<IapProduct>>((ref) async {
+final iapProductsProvider = FutureProvider<List<IapProduct>>((ref) async {
   try {
     return await ref.read(iapServiceProvider).loadProducts();
   } catch (_) {
@@ -205,8 +236,9 @@ final iapProductsProvider =
 
 // ─── Custom word lists ──────────────────────────────────────────────────
 
-final wordListsProvider =
-    NotifierProvider<WordListsNotifier, List<WordList>>(WordListsNotifier.new);
+final wordListsProvider = NotifierProvider<WordListsNotifier, List<WordList>>(
+  WordListsNotifier.new,
+);
 
 class WordListsNotifier extends Notifier<List<WordList>> {
   @override
@@ -232,8 +264,9 @@ class WordListsNotifier extends Notifier<List<WordList>> {
 
 // ─── Settings ──────────────────────────────────────────────────────────
 
-final selectedLevelProvider =
-    NotifierProvider<SelectedLevelNotifier, int>(SelectedLevelNotifier.new);
+final selectedLevelProvider = NotifierProvider<SelectedLevelNotifier, int>(
+  SelectedLevelNotifier.new,
+);
 
 class SelectedLevelNotifier extends Notifier<int> {
   @override
@@ -247,8 +280,9 @@ class SelectedLevelNotifier extends Notifier<int> {
 
 // ─── Daily AI credits (free tier) ──────────────────────────────────────
 
-final aiCreditsProvider =
-    NotifierProvider<AiCreditsNotifier, int>(AiCreditsNotifier.new);
+final aiCreditsProvider = NotifierProvider<AiCreditsNotifier, int>(
+  AiCreditsNotifier.new,
+);
 
 class AiCreditsNotifier extends Notifier<int> {
   @override

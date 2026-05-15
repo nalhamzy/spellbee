@@ -32,9 +32,7 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp> {
       ref.read(iapServiceProvider).onPurchaseError = (msg) {
         final ctx = _scaffoldMessenger.currentContext;
         if (ctx != null) {
-          ScaffoldMessenger.of(ctx).showSnackBar(
-            SnackBar(content: Text(msg)),
-          );
+          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(msg)));
         }
       };
     });
@@ -70,22 +68,15 @@ class _AppShell extends ConsumerWidget {
             position: Tween<Offset>(
               begin: const Offset(0, 0.02),
               end: Offset.zero,
-            ).animate(
-                CurvedAnimation(parent: anim, curve: Curves.easeOut)),
+            ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOut)),
             child: child,
           ),
         ),
-        child: KeyedSubtree(
-          key: ValueKey(tab),
-          child: _screenFor(tab),
-        ),
+        child: KeyedSubtree(key: ValueKey(tab), child: _screenFor(tab)),
       ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
-        children: const [
-          _BannerAdSlot(),
-          _BottomNav(),
-        ],
+        children: const [_BannerAdSlot(), _BottomNav()],
       ),
     );
   }
@@ -128,19 +119,13 @@ class _BottomNav extends ConsumerWidget {
     return SafeArea(
       top: false,
       child: Container(
-        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        margin: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
         decoration: BoxDecoration(
           color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppTheme.outline),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          boxShadow: AppTheme.softShadow,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -155,8 +140,7 @@ class _BottomNav extends ConsumerWidget {
               icon: Icons.auto_awesome_rounded,
               label: 'Practice',
               selected: tab == AppTab.practice,
-              onTap: () =>
-                  ref.read(tabProvider.notifier).go(AppTab.practice),
+              onTap: () => ref.read(tabProvider.notifier).go(AppTab.practice),
             ),
             _NavItem(
               icon: Icons.library_books_rounded,
@@ -174,8 +158,7 @@ class _BottomNav extends ConsumerWidget {
               icon: Icons.settings_rounded,
               label: 'You',
               selected: tab == AppTab.settings,
-              onTap: () =>
-                  ref.read(tabProvider.notifier).go(AppTab.settings),
+              onTap: () => ref.read(tabProvider.notifier).go(AppTab.settings),
             ),
           ],
         ),
@@ -198,28 +181,31 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppTheme.honeyDark : AppTheme.mute;
+    final color = selected ? AppTheme.ink : AppTheme.mute;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(18),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        constraints: const BoxConstraints(minWidth: 58),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
         decoration: BoxDecoration(
-          color:
-              selected ? AppTheme.honey.withValues(alpha: 0.12) : null,
-          borderRadius: BorderRadius.circular(12),
+          color: selected ? AppTheme.honey : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: color, size: 22),
             const SizedBox(height: 2),
-            Text(label,
-                style: TextStyle(
-                    color: color,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800)),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ],
         ),
       ),

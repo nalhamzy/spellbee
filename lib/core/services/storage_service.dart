@@ -15,20 +15,20 @@ class StorageService {
 
   List<WordList> loadLists() {
     final raw = _prefs.getStringList(_kLists) ?? const [];
-    return raw.map((e) {
-      try {
-        return WordList.decode(e);
-      } catch (_) {
-        return null;
-      }
-    }).whereType<WordList>().toList();
+    return raw
+        .map((e) {
+          try {
+            return WordList.decode(e);
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<WordList>()
+        .toList();
   }
 
   Future<void> saveLists(List<WordList> lists) async {
-    await _prefs.setStringList(
-      _kLists,
-      lists.map((l) => l.encode()).toList(),
-    );
+    await _prefs.setStringList(_kLists, lists.map((l) => l.encode()).toList());
   }
 
   // ── Player stats ───────────────────────────────────────────────────
@@ -70,6 +70,7 @@ class StorageService {
   static const _kSelectedLevel = 'sb.settings.level';
   static const _kParentPin = 'sb.settings.pin';
   static const _kVoiceSpeed = 'sb.settings.voiceSpeed';
+  static const _kVoiceQuality = 'sb.settings.voiceQuality';
   static const _kPollyVoice = 'polly_voice';
 
   int getSelectedLevel() => _prefs.getInt(_kSelectedLevel) ?? 3;
@@ -78,8 +79,10 @@ class StorageService {
   /// Returns 0 (calm), 1 (normal) or 2 (fast). Defaults to calm so the
   /// voice is kid-friendly out of the box.
   int getVoiceSpeedIndex() => _prefs.getInt(_kVoiceSpeed) ?? 0;
-  Future<void> setVoiceSpeedIndex(int v) =>
-      _prefs.setInt(_kVoiceSpeed, v);
+  Future<void> setVoiceSpeedIndex(int v) => _prefs.setInt(_kVoiceSpeed, v);
+
+  int getVoiceQualityIndex() => _prefs.getInt(_kVoiceQuality) ?? 0;
+  Future<void> setVoiceQualityIndex(int v) => _prefs.setInt(_kVoiceQuality, v);
 
   String getPollyVoice() => _prefs.getString(_kPollyVoice) ?? 'Kevin';
   Future<void> setPollyVoice(String voice) =>
@@ -102,8 +105,7 @@ class StorageService {
     return '${d.year}-${d.month}-${d.day}';
   }
 
-  int getAiCredits() =>
-      _prefs.getInt('$_kAiCreditsPrefix${_todayKey()}') ?? 1;
+  int getAiCredits() => _prefs.getInt('$_kAiCreditsPrefix${_todayKey()}') ?? 1;
   Future<void> setAiCredits(int v) =>
       _prefs.setInt('$_kAiCreditsPrefix${_todayKey()}', v);
 
@@ -111,8 +113,8 @@ class StorageService {
 
   /// Only used by tests / debug.
   String exportAll() => jsonEncode({
-        'lists': _prefs.getStringList(_kLists),
-        'stats': _prefs.getString(_kStats),
-        'premium': _prefs.getString(_kPremium),
-      });
+    'lists': _prefs.getStringList(_kLists),
+    'stats': _prefs.getString(_kStats),
+    'premium': _prefs.getString(_kPremium),
+  });
 }

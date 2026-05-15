@@ -29,6 +29,7 @@ class TestScreen extends ConsumerStatefulWidget {
   final List<Word> words;
   final String title;
   final bool savesStats;
+
   /// Optional callback invoked after stats are saved and the test completes
   /// successfully (all words answered). Used by the daily-word flow to
   /// trigger streak tracking.
@@ -112,9 +113,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   }
 
   Future<void> _speakSpellOut() async {
-    await ref
-        .read(ttsServiceProvider)
-        .spellOut(_w.text, premium: _premium);
+    await ref.read(ttsServiceProvider).spellOut(_w.text, premium: _premium);
   }
 
   // ── Input handling ─────────────────────────────────────────────────
@@ -214,8 +213,10 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       });
     } else {
       const misses = ['not_quite', 'almost', 'close_one'];
-      tts.playPhrase(misses[math.Random().nextInt(misses.length)],
-          premium: _premium);
+      tts.playPhrase(
+        misses[math.Random().nextInt(misses.length)],
+        premium: _premium,
+      );
       // Spell it out 0.9s in.
       Future.delayed(const Duration(milliseconds: 900), () {
         if (mounted && _s.revealed) _speakSpellOut();
@@ -279,11 +280,13 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final submitted = it.typed.isNotEmpty
           ? it.typed.toLowerCase()
           : SttService.normalize(it.sttTranscript).toLowerCase();
-      items.add(AskedItem(
-        target: target,
-        submitted: submitted,
-        isCorrect: it.correct ?? false,
-      ));
+      items.add(
+        AskedItem(
+          target: target,
+          submitted: submitted,
+          isCorrect: it.correct ?? false,
+        ),
+      );
     }
     final result = TestResult(
       items: items,
@@ -291,7 +294,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       endedAt: DateTime.now(),
     );
     if (widget.savesStats) {
-      await ref.read(playerStatsProvider.notifier).recordTestComplete(
+      await ref
+          .read(playerStatsProvider.notifier)
+          .recordTestComplete(
             asked: result.total,
             correct: result.correct,
             longestStreak: _longestStreak,
@@ -299,9 +304,11 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     }
     widget.onComplete?.call();
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (_) => ResultsScreen(result: result, title: widget.title),
-    ));
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => ResultsScreen(result: result, title: widget.title),
+      ),
+    );
   }
 
   // ── Hints ──────────────────────────────────────────────────────────
@@ -343,8 +350,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final first = _w.text.substring(0, 1);
       if (!_s.typed.toLowerCase().startsWith(first.toLowerCase())) {
         _ctrl.text = first;
-        _ctrl.selection =
-            TextSelection.collapsed(offset: _ctrl.text.length);
+        _ctrl.selection = TextSelection.collapsed(offset: _ctrl.text.length);
         _s.typed = _ctrl.text;
         _focus.requestFocus();
       }
@@ -364,9 +370,6 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     final progress = (_idx + 1) / widget.words.length;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppTheme.bg,
-        elevation: 0,
-        foregroundColor: AppTheme.ink,
         title: Text(widget.title),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),
@@ -388,24 +391,35 @@ class _TestScreenState extends ConsumerState<TestScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _topBar(progress),
-                SizedBox(height: context.s(14)),
-                _HearCard(
-                  onHearWord: _speak,
-                  onHearDefinition: _speakDefinition,
-                  onHearExample: _speakExample,
+                Expanded(
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _topBar(progress),
+                        SizedBox(height: context.s(14)),
+                        _HearCard(
+                          onHearWord: _speak,
+                          onHearDefinition: _speakDefinition,
+                          onHearExample: _speakExample,
+                        ),
+                        SizedBox(height: context.s(16)),
+                        _modeToggle(),
+                        SizedBox(height: context.s(16)),
+                        _mode == InputMode.keyboard
+                            ? _keyboardInput()
+                            : _micInput(),
+                        SizedBox(height: context.s(10)),
+                        _inputRetryRow(),
+                        SizedBox(height: context.s(14)),
+                        if (_s.revealed) _revealCard(),
+                      ],
+                    ),
+                  ),
                 ),
-                SizedBox(height: context.s(16)),
-                _modeToggle(),
-                SizedBox(height: context.s(16)),
-                _mode == InputMode.keyboard
-                    ? _keyboardInput()
-                    : _micInput(),
-                SizedBox(height: context.s(10)),
-                _inputRetryRow(),
-                SizedBox(height: context.s(14)),
-                if (_s.revealed) _revealCard(),
-                const Spacer(),
+                SizedBox(height: context.s(12)),
                 _bottomActions(),
               ],
             ),
@@ -416,59 +430,59 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   }
 
   Widget _topBar(double progress) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            IconButton(
-              onPressed: _isFirst ? null : _previous,
-              icon: const Icon(Icons.chevron_left_rounded),
-              tooltip: 'Previous word',
-              style: IconButton.styleFrom(
-                backgroundColor: _isFirst
-                    ? AppTheme.surface2
-                    : AppTheme.surface,
-                foregroundColor:
-                    _isFirst ? AppTheme.mute : AppTheme.ink,
+    return Container(
+      padding: EdgeInsets.all(context.s(12)),
+      decoration: AppTheme.card(radius: context.s(20), shadow: false),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                onPressed: _isFirst ? null : _previous,
+                icon: const Icon(Icons.chevron_left_rounded),
+                tooltip: 'Previous word',
+                style: IconButton.styleFrom(
+                  backgroundColor: _isFirst ? AppTheme.surface2 : AppTheme.mint,
+                  foregroundColor: _isFirst ? AppTheme.mute : AppTheme.ink,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                children: [
-                  ClipRRect(
-                    borderRadius:
-                        BorderRadius.circular(context.s(8)),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: context.s(8),
-                      backgroundColor: AppTheme.surface2,
-                      color: AppTheme.honey,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(context.s(8)),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: context.s(10),
+                        backgroundColor: AppTheme.surface2,
+                        color: AppTheme.sage,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Word ${_idx + 1} of ${widget.words.length}'
-                    '  •  Streak $_runStreak',
-                    style: const TextStyle(
-                        color: AppTheme.mute, fontSize: 12),
-                  ),
-                ],
+                    const SizedBox(height: 6),
+                    Text(
+                      'Word ${_idx + 1} of ${widget.words.length} - Streak $_runStreak',
+                      style: const TextStyle(
+                        color: AppTheme.mute,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            TextButton.icon(
-              onPressed: _skip,
-              icon: const Icon(Icons.skip_next_rounded, size: 18),
-              label: const Text('Skip'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppTheme.mute,
+              const SizedBox(width: 8),
+              TextButton.icon(
+                onPressed: _skip,
+                icon: const Icon(Icons.skip_next_rounded, size: 18),
+                label: const Text('Skip'),
+                style: TextButton.styleFrom(foregroundColor: AppTheme.mute),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -476,8 +490,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     return Container(
       padding: EdgeInsets.all(context.s(4)),
       decoration: BoxDecoration(
-        color: AppTheme.surface2,
-        borderRadius: BorderRadius.circular(context.s(14)),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.outline),
+        borderRadius: BorderRadius.circular(context.s(18)),
       ),
       child: Row(
         children: [
@@ -528,7 +543,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
           letterSpacing: 0.5,
         ),
         contentPadding: EdgeInsets.symmetric(
-            horizontal: context.s(16), vertical: context.s(16)),
+          horizontal: context.s(16),
+          vertical: context.s(16),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.s(14)),
           borderSide: const BorderSide(color: AppTheme.outline),
@@ -614,13 +631,13 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     return Container(
       padding: EdgeInsets.all(context.s(16)),
       decoration: BoxDecoration(
-        color: (ok ? AppTheme.sage : AppTheme.coral)
-            .withValues(alpha: 0.12),
+        color: ok ? AppTheme.mint : AppTheme.rose,
         border: Border.all(
           color: ok ? AppTheme.sage : AppTheme.coral,
-          width: 2,
+          width: 1.5,
         ),
-        borderRadius: BorderRadius.circular(context.s(16)),
+        borderRadius: BorderRadius.circular(context.s(20)),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -653,9 +670,10 @@ class _TestScreenState extends ConsumerState<TestScreen> {
           ),
           if (_w.definition.isNotEmpty) ...[
             SizedBox(height: context.s(4)),
-            Text(_w.definition,
-                style: const TextStyle(
-                    color: AppTheme.mute, fontSize: 13)),
+            Text(
+              _w.definition,
+              style: const TextStyle(color: AppTheme.mute, fontSize: 13),
+            ),
           ],
         ],
       ),
@@ -736,7 +754,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                   borderRadius: BorderRadius.circular(context.s(16)),
                 ),
                 textStyle: const TextStyle(
-                    fontWeight: FontWeight.w900, fontSize: 15),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
               ),
             ),
           ),
@@ -784,30 +804,41 @@ class _HearCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(context.s(16)),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        border: Border.all(color: AppTheme.outline),
-        borderRadius: BorderRadius.circular(context.s(18)),
-      ),
+      padding: EdgeInsets.all(context.s(18)),
+      decoration: AppTheme.card(color: AppTheme.aqua, radius: context.s(26)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
-            child: FilledButton.tonalIcon(
-              onPressed: onHearWord,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.honey,
-                foregroundColor: AppTheme.ink,
-                padding: EdgeInsets.symmetric(
-                    horizontal: context.s(24),
-                    vertical: context.s(14)),
+            child: Container(
+              width: context.s(96),
+              height: context.s(96),
+              decoration: const BoxDecoration(
+                color: AppTheme.honey,
+                shape: BoxShape.circle,
               ),
-              icon: const Icon(Icons.volume_up_rounded),
-              label: const Text('Hear the word'),
+              child: IconButton(
+                tooltip: 'Hear the word',
+                onPressed: onHearWord,
+                icon: Icon(
+                  Icons.volume_up_rounded,
+                  color: AppTheme.ink,
+                  size: context.s(42),
+                ),
+              ),
             ),
           ),
-          SizedBox(height: context.s(10)),
+          SizedBox(height: context.s(12)),
+          const Center(
+            child: Text(
+              'Listen first, then spell.',
+              style: TextStyle(
+                color: AppTheme.ink,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          SizedBox(height: context.s(12)),
           Row(
             children: [
               Expanded(
@@ -815,6 +846,11 @@ class _HearCard extends StatelessWidget {
                   onPressed: onHearDefinition,
                   icon: const Icon(Icons.menu_book_rounded, size: 18),
                   label: const Text('Definition'),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: AppTheme.surface,
+                    foregroundColor: AppTheme.ink,
+                    side: const BorderSide(color: AppTheme.outline),
+                  ),
                 ),
               ),
               SizedBox(width: context.s(8)),
@@ -823,6 +859,11 @@ class _HearCard extends StatelessWidget {
                   onPressed: onHearExample,
                   icon: const Icon(Icons.chat_rounded, size: 18),
                   label: const Text('In a sentence'),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: AppTheme.surface,
+                    foregroundColor: AppTheme.ink,
+                    side: const BorderSide(color: AppTheme.outline),
+                  ),
                 ),
               ),
             ],
@@ -852,8 +893,7 @@ class _ModeChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
         decoration: BoxDecoration(
           color: selected ? AppTheme.honey : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
@@ -861,15 +901,19 @@ class _ModeChip extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon,
-                size: 18,
-                color: selected ? AppTheme.ink : AppTheme.mute),
+            Icon(
+              icon,
+              size: 18,
+              color: selected ? AppTheme.ink : AppTheme.mute,
+            ),
             const SizedBox(width: 6),
-            Text(label,
-                style: TextStyle(
-                  color: selected ? AppTheme.ink : AppTheme.mute,
-                  fontWeight: FontWeight.w700,
-                )),
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? AppTheme.ink : AppTheme.mute,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ],
         ),
       ),
@@ -916,12 +960,14 @@ class _HintSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('Need a hint?',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: AppTheme.ink,
-              )),
+          const Text(
+            'Need a hint?',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: AppTheme.ink,
+            ),
+          ),
           const SizedBox(height: 16),
           _HintTile(
             icon: Icons.slow_motion_video_rounded,
@@ -993,15 +1039,19 @@ class _HintTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 15,
-                          color: AppTheme.ink)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                      color: AppTheme.ink,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(subtitle,
-                      style: const TextStyle(
-                          color: AppTheme.mute, fontSize: 12)),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                  ),
                 ],
               ),
             ),
