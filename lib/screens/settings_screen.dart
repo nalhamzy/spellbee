@@ -14,7 +14,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremium = ref.watch(isPremiumProvider);
     final quality = ref.watch(voiceQualityProvider);
-    final hasStudioVoice = OpenAiTtsService.hasKey || AwsPollyTtsService.hasKey;
+    final hasStudioVoice = ref.read(ttsServiceProvider).hasPremiumVoice;
 
     return SafeArea(
       child: ResponsiveContentBox(
@@ -93,7 +93,7 @@ class SettingsScreen extends ConsumerWidget {
                   leading: const Icon(Icons.info_outline_rounded),
                   title: const Text('About SpellBee'),
                   subtitle: Text(
-                    'Studio voice: ${hasStudioVoice ? "configured" : "not configured"}',
+                    'Studio voice: ${hasStudioVoice ? "ready" : "not configured"}',
                   ),
                 ),
               ],
@@ -111,7 +111,11 @@ class SettingsScreen extends ConsumerWidget {
                       color: AppTheme.coral,
                     ),
                     title: const Text('Unlock premium'),
-                    subtitle: const Text('Visible in debug builds only.'),
+                    subtitle: Text(
+                      isPremium
+                          ? 'Testing mode is unlocked in this debug build.'
+                          : 'Visible in debug builds only.',
+                    ),
                     onChanged: (on) async {
                       if (on) {
                         await ref
@@ -234,13 +238,13 @@ class _QualityPicker extends StatelessWidget {
               ),
             ),
           ],
-          if (quality == VoiceQuality.studio && !hasStudioVoice) ...[
+          if (quality == VoiceQuality.studio && hasStudioVoice) ...[
             SizedBox(height: context.s(10)),
             const _Notice(
-              icon: Icons.cloud_off_rounded,
-              color: AppTheme.coral,
+              icon: Icons.offline_bolt_rounded,
+              color: AppTheme.sage,
               text:
-                  'No studio voice gateway is configured in this build, so device voice will be used.',
+                  'Studio voice is ready. Bundled premium audio plays offline for core words and phrases.',
             ),
           ],
         ],

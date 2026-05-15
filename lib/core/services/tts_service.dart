@@ -24,7 +24,7 @@ extension VoiceQualityLabel on VoiceQuality {
       case VoiceQuality.device:
         return 'Local voice. Works offline and uses no AI API.';
       case VoiceQuality.studio:
-        return 'Premium high-quality AI voice through the studio gateway.';
+        return 'Premium voice pack for core words, with device fallback.';
     }
   }
 }
@@ -81,8 +81,7 @@ class TtsService {
   VoiceQuality _quality = VoiceQuality.device;
   String _pollyVoice = AwsPollyTtsService.defaultVoice;
 
-  bool get hasPremiumVoice =>
-      AwsPollyTtsService.hasKey || OpenAiTtsService.hasKey;
+  bool get hasPremiumVoice => true;
 
   void setPollyVoice(String voice) {
     _pollyVoice = voice;
