@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/services/iap_service.dart';
-import 'package:spellbee/core/utils/parent_gate.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 
@@ -37,15 +36,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       appBar: AppBar(
         actions: [
           TextButton(
-            onPressed: () async {
-              final passed = await showParentGate(
-                context,
-                reason: 'Ask a parent before restoring store purchases.',
-              );
-              if (passed) {
-                ref.read(iapServiceProvider).restore();
-              }
-            },
+            onPressed: () => ref.read(iapServiceProvider).restore(),
             child: const Text('Restore'),
           ),
         ],
@@ -334,7 +325,7 @@ class _ValueNudge extends StatelessWidget {
           SizedBox(width: pageContext.s(8)),
           const Expanded(
             child: Text(
-              'Designed for daily practice: better voice, parent-gated purchases, and unlimited custom lessons.',
+              'Designed for daily practice: clearer pronunciation, unlimited custom lessons, and simple store checkout.',
               style: TextStyle(
                 color: AppTheme.ink,
                 fontSize: 12,

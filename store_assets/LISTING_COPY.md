@@ -113,7 +113,7 @@ https://nalhamzy.github.io/spellbee/privacy.html
 
 ### App Review — Review Notes
 ```
-SpellBee is a local-first spelling-bee practice app for students. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). Premium and Restore are behind an in-app parent gate. Ads are not shown in the learning flow. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
+SpellBee is a local-first spelling-bee practice app for students. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). Ads are not shown in the learning flow. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
 ```
 
 ---
@@ -128,7 +128,7 @@ SpellBee is a local-first spelling-bee practice app for students. All data (cust
 | Type | Auto-Renewable Subscription |
 | Subscription Group | `spellbee_premium` |
 | Duration | 1 Month |
-| Price | $2.99 |
+| Price | $4.99 |
 | Display Name | `Premium Monthly` |
 | Description | `Unlimited AI word packs, unlimited custom lists, and studio voice. Renews monthly.` |
 
@@ -140,9 +140,9 @@ SpellBee is a local-first spelling-bee practice app for students. All data (cust
 | Type | Auto-Renewable Subscription |
 | Subscription Group | `spellbee_premium` (same group as monthly) |
 | Duration | 1 Year |
-| Price | $19.99 (save 44%) |
+| Price | $29.99 (save 50% vs monthly) |
 | Display Name | `Premium Yearly` |
-| Description | `Save 44% vs monthly. Everything in Premium, billed yearly.` |
+| Description | `Save 50% vs monthly. Everything in Premium, billed yearly.` |
 
 ### Product 3 — Premium Lifetime
 | Field | Value |
@@ -150,13 +150,13 @@ SpellBee is a local-first spelling-bee practice app for students. All data (cust
 | Product ID | `spellbee_premium_lifetime` |
 | Reference Name | `SpellBee Premium (Lifetime)` |
 | Type | Non-Consumable |
-| Price | $39.99 one-time |
+| Price | $49.99 one-time |
 | Display Name | `Premium Lifetime` |
 | Description | `Pay once. Keep forever. Everything in Premium with no subscription.` |
 
 **IAP review notes (same for all three):**
 ```
-Premium upgrade for SpellBee. To reproduce: launch app → tap "Go Premium" from Home or Settings → pass the parent gate by entering 12 for 7 + 5 → select this tier → confirm. Validate in sandbox with any tester account. No login or external API required.
+Premium upgrade for SpellBee. To reproduce: launch app → tap "Go Premium" from Home or Settings → select this tier → confirm. Validate in sandbox with any tester account. No login or external API required.
 ```
 
 Review screenshot: `store_assets/ios/05_premium.png` (1290×2796).
@@ -219,22 +219,22 @@ treatment; leaving it off gives you full ad inventory.
 |---|---|
 | Name | `Premium Monthly` |
 | Description | `Unlimited AI word packs, unlimited custom lists, and studio voice.` |
-| Base plan | 1 month auto-renewing, $2.99 USD |
-| Free trial (optional) | 7 days |
+| Base plan | 1 month auto-renewing, $4.99 USD |
+| Free trial | Not configured |
 
 ### Subscription 2 — Premium Yearly
 | Product ID | `spellbee_premium_yearly` |
 |---|---|
 | Name | `Premium Yearly` |
-| Description | `Save 44%. Everything in Premium, billed yearly.` |
-| Base plan | 1 year auto-renewing, $19.99 USD |
+| Description | `Save 50%. Everything in Premium, billed yearly.` |
+| Base plan | 1 year auto-renewing, $29.99 USD |
 
 ### In-App Product — Lifetime
 | Product ID | `spellbee_premium_lifetime` |
 |---|---|
 | Name | `Premium Lifetime` |
 | Description | `Pay once. Keep forever.` |
-| Price | $39.99 USD |
+| Price | $49.99 USD |
 | State | Active |
 
 ---

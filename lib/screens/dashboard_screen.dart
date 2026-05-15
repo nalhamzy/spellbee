@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/word.dart';
-import 'package:spellbee/core/utils/parent_gate.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -66,7 +66,11 @@ class DashboardScreen extends ConsumerWidget {
             _SimpleChoices(ref: ref),
             if (!ref.watch(isPremiumProvider)) ...[
               SizedBox(height: context.s(22)),
-              _PremiumBanner(onTap: () => openPaywallAfterParentGate(context)),
+              _PremiumBanner(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                ),
+              ),
             ],
             SizedBox(height: context.s(22)),
             _SectionTitle(title: 'Parent view', subtitle: 'Progress'),

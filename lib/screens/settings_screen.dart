@@ -1,11 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/constants/theme.dart';
-import 'package:spellbee/core/utils/parent_gate.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/paywall_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -40,7 +38,9 @@ class SettingsScreen extends ConsumerWidget {
                   hasStudioVoice: hasStudioVoice,
                   onChanged: (value) =>
                       ref.read(voiceQualityProvider.notifier).set(value),
-                  onPremiumTap: () => openPaywallAfterParentGate(context),
+                  onPremiumTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                  ),
                 ),
                 if (AwsPollyTtsService.hasKey) ...[
                   const Divider(height: 0),
@@ -65,21 +65,15 @@ class SettingsScreen extends ConsumerWidget {
                         : 'Unlock studio voice and unlimited packs.',
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => openPaywallAfterParentGate(context),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                  ),
                 ),
                 const Divider(height: 0),
                 ListTile(
                   leading: const Icon(Icons.restore_rounded),
                   title: const Text('Restore purchases'),
-                  onTap: () async {
-                    final passed = await showParentGate(
-                      context,
-                      reason: 'Ask a parent before restoring store purchases.',
-                    );
-                    if (passed) {
-                      ref.read(iapServiceProvider).restore();
-                    }
-                  },
+                  onTap: () => ref.read(iapServiceProvider).restore(),
                 ),
               ],
             ),
@@ -102,37 +96,6 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            if (kDebugMode) ...[
-              SizedBox(height: context.s(16)),
-              const _SectionLabel('Dev tools', color: AppTheme.coral),
-              SizedBox(height: context.s(7)),
-              _SettingsCard(
-                children: [
-                  SwitchListTile(
-                    value: isPremium,
-                    secondary: const Icon(
-                      Icons.science_outlined,
-                      color: AppTheme.coral,
-                    ),
-                    title: const Text('Unlock premium'),
-                    subtitle: Text(
-                      isPremium
-                          ? 'Testing mode is unlocked in this debug build.'
-                          : 'Visible in debug builds only.',
-                    ),
-                    onChanged: (on) async {
-                      if (on) {
-                        await ref
-                            .read(premiumProvider.notifier)
-                            .activate(IapProductIds.premiumLifetime);
-                      } else {
-                        await ref.read(premiumProvider.notifier).clear();
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ],
           ],
         ),
       ),
@@ -383,16 +346,15 @@ class _Notice extends StatelessWidget {
 
 class _SectionLabel extends StatelessWidget {
   final String label;
-  final Color color;
 
-  const _SectionLabel(this.label, {this.color = AppTheme.mute});
+  const _SectionLabel(this.label);
 
   @override
   Widget build(BuildContext context) {
     return Text(
       label.toUpperCase(),
       style: TextStyle(
-        color: color,
+        color: AppTheme.mute,
         fontSize: 11,
         letterSpacing: 1.3,
         fontWeight: FontWeight.w900,

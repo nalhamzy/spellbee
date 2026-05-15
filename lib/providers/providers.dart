@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
@@ -225,7 +224,7 @@ class PremiumNotifier extends Notifier<PremiumState> {
 
 final isPremiumProvider = Provider<bool>((ref) {
   const forcePremium = bool.fromEnvironment('FORCE_PREMIUM_UNLOCK');
-  if (forcePremium || kDebugMode) return true;
+  if (forcePremium) return true;
   return ref.watch(premiumProvider).isPremium;
 });
 

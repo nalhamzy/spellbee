@@ -3,8 +3,8 @@
 class IapProductIds {
   IapProductIds._();
 
-  static const premiumMonthly  = 'spellbee_premium_monthly';  // $4.99/mo
-  static const premiumYearly   = 'spellbee_premium_yearly';   // $29.99/yr
+  static const premiumMonthly = 'spellbee_premium_monthly'; // $4.99/mo
+  static const premiumYearly = 'spellbee_premium_yearly'; // $29.99/yr
   static const premiumLifetime = 'spellbee_premium_lifetime'; // $49.99 one-time
 
   static const subscriptionIds = <String>{premiumMonthly, premiumYearly};

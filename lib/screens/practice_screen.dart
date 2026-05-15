@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
-import 'package:spellbee/core/utils/parent_gate.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
 
 /// AI word-pack generator. Free users get 1 generation/day. Premium =
-/// unlimited. Purchase prompts are parent-gated and never interrupt a test.
+/// unlimited. Purchase prompts never interrupt a test.
 class PracticeScreen extends ConsumerStatefulWidget {
   const PracticeScreen({super.key});
 
@@ -63,8 +63,8 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Out of word packs'),
         content: const Text(
-          'Free practice includes 1 custom word pack each day. Ask a parent '
-          'about Premium for unlimited themed lessons and studio voice.',
+          'Free practice includes 1 custom word pack each day. Premium unlocks '
+          'unlimited themed lessons and studio voice.',
         ),
         actions: [
           TextButton(
@@ -75,9 +75,11 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             style: FilledButton.styleFrom(backgroundColor: AppTheme.violet),
             onPressed: () async {
               Navigator.pop(ctx);
-              await openPaywallAfterParentGate(context);
+              await Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
             },
-            child: const Text('Ask parent'),
+            child: const Text('See Premium'),
           ),
         ],
       ),
@@ -264,7 +266,11 @@ class _LabPanel extends StatelessWidget {
           _CreditsCard(isPremium: isPremium, credits: credits),
           if (!isPremium) ...[
             SizedBox(height: context.s(10)),
-            _UpgradeReminder(onTap: () => openPaywallAfterParentGate(context)),
+            _UpgradeReminder(
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
+            ),
           ],
           SizedBox(height: context.s(14)),
           SizedBox(

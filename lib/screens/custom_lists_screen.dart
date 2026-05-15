@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/models/word_list.dart';
-import 'package:spellbee/core/utils/parent_gate.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
 import 'package:spellbee/screens/word_list_editor_screen.dart';
 
@@ -203,7 +203,9 @@ class CustomListsScreen extends ConsumerWidget {
             style: FilledButton.styleFrom(backgroundColor: AppTheme.violet),
             onPressed: () async {
               Navigator.pop(ctx);
-              await openPaywallAfterParentGate(c);
+              await Navigator.of(
+                c,
+              ).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
             },
             child: const Text('See Premium'),
           ),
