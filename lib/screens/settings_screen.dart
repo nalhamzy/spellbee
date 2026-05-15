@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/constants/theme.dart';
+import 'package:spellbee/core/utils/parent_gate.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
-import 'package:spellbee/screens/paywall_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -40,9 +40,7 @@ class SettingsScreen extends ConsumerWidget {
                   hasStudioVoice: hasStudioVoice,
                   onChanged: (value) =>
                       ref.read(voiceQualityProvider.notifier).set(value),
-                  onPremiumTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
-                  ),
+                  onPremiumTap: () => openPaywallAfterParentGate(context),
                 ),
                 if (AwsPollyTtsService.hasKey) ...[
                   const Divider(height: 0),
@@ -63,19 +61,25 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(isPremium ? 'Premium active' : 'Go Premium'),
                   subtitle: Text(
                     isPremium
-                        ? 'Studio voice, unlimited word packs, and no ads.'
-                        : 'Unlock studio voice, unlimited packs, and no ads.',
+                        ? 'Studio voice and unlimited word packs.'
+                        : 'Unlock studio voice and unlimited packs.',
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
-                  ),
+                  onTap: () => openPaywallAfterParentGate(context),
                 ),
                 const Divider(height: 0),
                 ListTile(
                   leading: const Icon(Icons.restore_rounded),
                   title: const Text('Restore purchases'),
-                  onTap: () => ref.read(iapServiceProvider).restore(),
+                  onTap: () async {
+                    final passed = await showParentGate(
+                      context,
+                      reason: 'Ask a parent before restoring store purchases.',
+                    );
+                    if (passed) {
+                      ref.read(iapServiceProvider).restore();
+                    }
+                  },
                 ),
               ],
             ),

@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,10 +19,12 @@ bool get _isMobile =>
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   final prefs = await SharedPreferences.getInstance();
   final storage = StorageService(prefs);
@@ -31,22 +34,14 @@ Future<void> main() async {
     iap.initialize().catchError((_) {});
   }
 
-  final container = ProviderContainer(overrides: [
-    storageServiceProvider.overrideWithValue(storage),
-    iapServiceProvider.overrideWithValue(iap),
-  ]);
-
-  // AdMob init — mobile only. Desktop/web have no AdMob plugin, and the
-  // BannerAd widget in app.dart already silently renders nothing when
-  // no banner is loaded.
-  if (_isMobile) {
-    container.read(adServiceProvider).initialize().catchError((_) {});
-  }
+  final container = ProviderContainer(
+    overrides: [
+      storageServiceProvider.overrideWithValue(storage),
+      iapServiceProvider.overrideWithValue(iap),
+    ],
+  );
 
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const SpellBeeApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const SpellBeeApp()),
   );
 }

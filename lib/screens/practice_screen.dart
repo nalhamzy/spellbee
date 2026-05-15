@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
+import 'package:spellbee/core/utils/parent_gate.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
-import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
 
-/// AI word-pack generator. Free users get 1 generation/day; rewarded ad
-/// grants +5 on demand. Premium = unlimited.
+/// AI word-pack generator. Free users get 1 generation/day. Premium =
+/// unlimited. Purchase prompts are parent-gated and never interrupt a test.
 class PracticeScreen extends ConsumerStatefulWidget {
   const PracticeScreen({super.key});
 
@@ -31,7 +31,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     final isPremium = ref.read(isPremiumProvider);
     final credits = ref.read(aiCreditsProvider);
     if (!isPremium && credits <= 0) {
-      _offerRewardedAd();
+      _offerPremiumUpgrade();
       return;
     }
 
@@ -57,25 +57,14 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     }
   }
 
-  void _offerRewardedAd() {
-    final ads = ref.read(adServiceProvider);
-    if (!ads.hasRewardedAd) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'No credits left today. Come back tomorrow or unlock premium.',
-          ),
-          duration: Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
+  void _offerPremiumUpgrade() {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Out of word packs'),
         content: const Text(
-          'Watch a short ad to unlock 5 more packs today, or go Premium for unlimited.',
+          'Free practice includes 1 custom word pack each day. Ask a parent '
+          'about Premium for unlimited themed lessons and studio voice.',
         ),
         actions: [
           TextButton(
@@ -83,28 +72,12 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             child: const Text('Not now'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.honey),
-            onPressed: () {
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.violet),
+            onPressed: () async {
               Navigator.pop(ctx);
-              ads.showRewardedAd(
-                onRewarded: () async {
-                  await ref.read(aiCreditsProvider.notifier).grant(5);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('+5 word packs unlocked')),
-                    );
-                  }
-                },
-                onUnavailable: () {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Ad not ready yet.')),
-                    );
-                  }
-                },
-              );
+              await openPaywallAfterParentGate(context);
             },
-            child: const Text('Watch ad'),
+            child: const Text('Ask parent'),
           ),
         ],
       ),
@@ -291,11 +264,7 @@ class _LabPanel extends StatelessWidget {
           _CreditsCard(isPremium: isPremium, credits: credits),
           if (!isPremium) ...[
             SizedBox(height: context.s(10)),
-            _UpgradeReminder(
-              onTap: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
-            ),
+            _UpgradeReminder(onTap: () => openPaywallAfterParentGate(context)),
           ],
           SizedBox(height: context.s(14)),
           SizedBox(

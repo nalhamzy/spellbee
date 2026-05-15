@@ -69,7 +69,7 @@ PREMIUM
 Unlock everything for less than one coffee a month:
 • Unlimited AI-generated word packs
 • Unlimited parent-made word lists (free tier: 3)
-• No ads, ever
+• No ads in the learning flow
 • Enhanced voice pronunciation
 
 Monthly, yearly (save 44%), or a one-time lifetime. Cancel any time.
@@ -86,7 +86,7 @@ Initial release.
 • Type or spell-aloud modes (speech-to-text)
 • AI-generated themed word packs (Gemini)
 • Parent-curated custom lists
-• Premium: no ads, unlimited AI word packs
+• Premium: unlimited AI word packs and parent-made lists
 ```
 
 ### Support URL
@@ -113,7 +113,7 @@ https://nalhamzy.github.io/spellbee/privacy.html
 
 ### App Review — Review Notes
 ```
-SpellBee is a local-first spelling-bee practice app for students. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). Ads: Google AdMob banner + rewarded only (no interstitials — kids need focused practice). No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
+SpellBee is a local-first spelling-bee practice app for students. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). Premium and Restore are behind an in-app parent gate. Ads are not shown in the learning flow. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
 ```
 
 ---
@@ -130,7 +130,7 @@ SpellBee is a local-first spelling-bee practice app for students. All data (cust
 | Duration | 1 Month |
 | Price | $2.99 |
 | Display Name | `Premium Monthly` |
-| Description | `Unlimited AI word packs, unlimited custom lists, no ads. Renews monthly.` |
+| Description | `Unlimited AI word packs, unlimited custom lists, and studio voice. Renews monthly.` |
 
 ### Product 2 — Premium Yearly
 | Field | Value |
@@ -156,7 +156,7 @@ SpellBee is a local-first spelling-bee practice app for students. All data (cust
 
 **IAP review notes (same for all three):**
 ```
-Premium upgrade for SpellBee. To reproduce: launch app → tap "Go Premium" from Home or Settings → select this tier → confirm. Validate in sandbox with any tester account. No login or external API required.
+Premium upgrade for SpellBee. To reproduce: launch app → tap "Go Premium" from Home or Settings → pass the parent gate by entering 12 for 7 + 5 → select this tier → confirm. Validate in sandbox with any tester account. No login or external API required.
 ```
 
 Review screenshot: `store_assets/ios/05_premium.png` (1290×2796).
@@ -218,7 +218,7 @@ treatment; leaving it off gives you full ad inventory.
 | Product ID | `spellbee_premium_monthly` |
 |---|---|
 | Name | `Premium Monthly` |
-| Description | `Unlimited AI word packs, unlimited custom lists, no ads.` |
+| Description | `Unlimited AI word packs, unlimited custom lists, and studio voice.` |
 | Base plan | 1 month auto-renewing, $2.99 USD |
 | Free trial (optional) | 7 days |
 
@@ -247,7 +247,7 @@ treatment; leaving it off gives you full ad inventory.
 | 02_listen | `Hear every word in a clear voice.` |
 | 03_typing | `Type the word or spell it aloud.` |
 | 04_correct | `Build streaks. Master the tricky ones.` |
-| 05_premium | `Unlimited AI packs. No ads. Go Premium.` |
+| 05_premium | `Unlimited AI packs. Studio voice. Go Premium.` |
 
 ---
 
@@ -267,6 +267,6 @@ treatment; leaving it off gives you full ad inventory.
 | Shares user location | No |
 | Targets children under 13 | **Yes** (primary audience), but NOT Kids Category on App Store (see above) |
 | Digital purchases (IAPs) | Yes |
-| Includes ads | Yes — banner + rewarded |
+| Includes ads | No |
 
 Expected rating: **4+ / Everyone / PEGI 3**.

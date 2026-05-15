@@ -5,6 +5,7 @@ import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/custom_lists_screen.dart';
 import 'package:spellbee/screens/dashboard_screen.dart';
 import 'package:spellbee/screens/practice_screen.dart';
+import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/settings_screen.dart';
 import 'package:spellbee/screens/stats_screen.dart';
 
@@ -47,6 +48,7 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       scaffoldMessengerKey: _scaffoldMessenger,
+      routes: {'/paywall': (_) => const PaywallScreen()},
       home: const _AppShell(),
     );
   }
@@ -74,10 +76,7 @@ class _AppShell extends ConsumerWidget {
         ),
         child: KeyedSubtree(key: ValueKey(tab), child: _screenFor(tab)),
       ),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [_BannerAdSlot(), _BottomNav()],
-      ),
+      bottomNavigationBar: const _BottomNav(),
     );
   }
 
@@ -94,19 +93,6 @@ class _AppShell extends ConsumerWidget {
       case AppTab.settings:
         return const SettingsScreen();
     }
-  }
-}
-
-class _BannerAdSlot extends ConsumerWidget {
-  const _BannerAdSlot();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isPremium = ref.watch(isPremiumProvider);
-    if (isPremium) return const SizedBox.shrink();
-    final ad = ref.watch(adServiceProvider).buildBanner();
-    if (ad == null) return const SizedBox.shrink();
-    return Center(child: ad);
   }
 }
 
