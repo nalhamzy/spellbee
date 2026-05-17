@@ -52,6 +52,13 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
           ),
         ),
       );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not make that word pack. Please try again.'),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _generating = false);
     }
@@ -354,7 +361,14 @@ class _ThemeChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const suggestions = ['animals', 'space', 'sports', 'dinosaurs'];
+    const suggestions = [
+      'space',
+      'animals',
+      'sports',
+      'dinosaurs',
+      'ocean',
+      'cooking',
+    ];
     return Wrap(
       spacing: 8,
       runSpacing: 8,

@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:http/http.dart' as http;
+import 'package:spellbee/core/data/themed_word_packs.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/word.dart';
 
@@ -24,24 +26,101 @@ class AiWordGenerator {
     required int level,
     String theme = '',
   }) async {
-    if (canCallRemote && theme.trim().isNotEmpty) {
+    final cleanTheme = theme.trim();
+    final pack = findThemedWordPack(cleanTheme);
+
+    if (canCallRemote && cleanTheme.isNotEmpty) {
       try {
         final remote = await _callGateway(
           count: count,
           level: level,
-          theme: theme.trim(),
+          theme: cleanTheme,
         );
-        if (remote.isNotEmpty) return remote;
+        final vetted = _sanitizeWords(remote, count: count, pack: pack);
+        if (vetted.length >= count) return _remember(vetted.take(count));
+        if (pack != null) {
+          return _topUpThemed(
+            picked: vetted,
+            count: count,
+            level: level,
+            pack: pack,
+          );
+        }
+        if (vetted.isNotEmpty) {
+          return _topUpGeneric(picked: vetted, count: count, level: level);
+        }
       } catch (_) {
         // Gracefully fall back to local words if the gateway is unavailable.
       }
     }
+
+    if (pack != null) {
+      return _sampleLocalTheme(count: count, level: level, pack: pack);
+    }
+
     return _sampleLocal(count: count, level: level);
+  }
+
+  List<Word> _topUpGeneric({
+    required List<Word> picked,
+    required int count,
+    required int level,
+  }) {
+    final seen = picked.map((w) => w.text).toSet();
+    final result = [...picked];
+    for (final word in _rankedLocalCandidates(level)) {
+      if (result.length >= count) break;
+      if (seen.add(word.text)) result.add(word);
+    }
+    return _remember(result.take(count));
   }
 
   static final Set<String> _recentlyShown = {};
 
+  List<Word> _sampleLocalTheme({
+    required int count,
+    required int level,
+    required ThemedWordPack pack,
+  }) {
+    return _topUpThemed(
+      picked: const [],
+      count: count,
+      level: level,
+      pack: pack,
+    );
+  }
+
+  List<Word> _topUpThemed({
+    required List<Word> picked,
+    required int count,
+    required int level,
+    required ThemedWordPack pack,
+  }) {
+    final seen = picked.map((w) => w.text).toSet();
+    final source = pack.words.where((w) => !seen.contains(w.text)).toList();
+    final fresh = source
+        .where((w) => !_recentlyShown.contains(w.text))
+        .toList();
+    final candidates = fresh.length >= count - picked.length ? fresh : source;
+    candidates.shuffle();
+    candidates.sort((a, b) {
+      final aScore = _difficultyDistance(a, level);
+      final bScore = _difficultyDistance(b, level);
+      return aScore.compareTo(bScore);
+    });
+    final result = [...picked];
+    for (final word in candidates) {
+      if (result.length >= count) break;
+      if (seen.add(word.text)) result.add(word);
+    }
+    return _remember(result.take(count));
+  }
+
   List<Word> _sampleLocal({required int count, required int level}) {
+    return _remember(_rankedLocalCandidates(level).take(count));
+  }
+
+  List<Word> _rankedLocalCandidates(int level) {
     final pool = <Word>[];
     for (final l in {level - 2, level - 1, level + 1}) {
       if (kWordsCatalog.containsKey(l)) {
@@ -60,8 +139,11 @@ class AiWordGenerator {
         .toList();
     final source = filtered.isNotEmpty ? filtered : pool;
     source.shuffle();
-    final picked = source.take(count).toList();
+    return source;
+  }
 
+  List<Word> _remember(Iterable<Word> words) {
+    final picked = words.toList();
     for (final w in picked) {
       _recentlyShown.add(w.text);
     }
@@ -71,7 +153,6 @@ class AiWordGenerator {
         _recentlyShown.remove(t);
       }
     }
-
     return picked;
   }
 
@@ -94,6 +175,13 @@ class AiWordGenerator {
             'level_hint': _levelHint(level),
             'theme': theme,
             'purpose': 'spellbee-word-pack',
+            'constraints': const {
+              'single_words_only': true,
+              'kid_safe': true,
+              'must_match_theme': true,
+              'include_definition_and_example': true,
+            },
+            'avoid_words': _recentlyShown.take(40).toList(),
           }),
         )
         .timeout(const Duration(seconds: 25));
@@ -119,6 +207,45 @@ class AiWordGenerator {
         .where((w) => w.text.isNotEmpty)
         .take(count)
         .toList();
+  }
+
+  List<Word> _sanitizeWords(
+    Iterable<Word> raw, {
+    required int count,
+    required ThemedWordPack? pack,
+  }) {
+    final seen = <String>{};
+    final clean = <Word>[];
+    for (final word in raw) {
+      final text = word.text.toLowerCase().trim();
+      if (!RegExp(r'^[a-z]{2,24}$').hasMatch(text)) continue;
+      if (!seen.add(text)) continue;
+      final normalized = Word(
+        text,
+        word.definition.trim(),
+        word.example.trim(),
+      );
+      if (pack != null && !pack.matchesWord(normalized)) continue;
+      clean.add(normalized);
+      if (clean.length >= count) break;
+    }
+    return clean;
+  }
+
+  int _difficultyDistance(Word word, int level) {
+    final target = switch (level.clamp(1, 8)) {
+      1 => 3,
+      2 => 5,
+      3 => 6,
+      4 => 8,
+      5 => 9,
+      6 => 11,
+      7 => 12,
+      _ => 14,
+    };
+    final lengthDistance = (word.text.length - target).abs();
+    final complexityBonus = math.max(0, word.text.length - 12);
+    return lengthDistance + complexityBonus;
   }
 
   String _levelHint(int l) {

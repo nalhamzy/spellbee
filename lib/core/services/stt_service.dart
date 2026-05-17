@@ -47,16 +47,45 @@ class SttService {
   /// spelled word. Accepts space-separated letters, phonetic letter names,
   /// and direct spellings.
   static String normalize(String transcript) {
-    final lower = transcript.trim().toLowerCase();
+    var lower = transcript.trim().toLowerCase();
     if (lower.isEmpty) return '';
+
+    lower = lower
+        .replaceAll(RegExp(r'\bdouble\s+you\b'), 'w')
+        .replaceAll(RegExp(r'\bdub(?:le)?\s+you\b'), 'w');
 
     // Letter-name fallbacks (covers "ay bee see" etc.)
     const names = {
-      'ay': 'a', 'bee': 'b', 'see': 'c', 'dee': 'd', 'ee': 'e', 'ef': 'f',
-      'gee': 'g', 'aitch': 'h', 'eye': 'i', 'jay': 'j', 'kay': 'k', 'el': 'l',
-      'em': 'm', 'en': 'n', 'oh': 'o', 'pee': 'p', 'cue': 'q', 'ar': 'r',
-      'es': 's', 'tee': 't', 'you': 'u', 'vee': 'v',
-      'double you': 'w', 'ex': 'x', 'why': 'y', 'zee': 'z', 'zed': 'z',
+      'ay': 'a',
+      'bee': 'b',
+      'see': 'c',
+      'dee': 'd',
+      'ee': 'e',
+      'ef': 'f',
+      'gee': 'g',
+      'aitch': 'h',
+      'eye': 'i',
+      'jay': 'j',
+      'kay': 'k',
+      'el': 'l',
+      'em': 'm',
+      'en': 'n',
+      'oh': 'o',
+      'pee': 'p',
+      'cue': 'q',
+      'ar': 'r',
+      'es': 's',
+      'tee': 't',
+      'you': 'u',
+      'vee': 'v',
+      'be': 'b',
+      'sea': 'c',
+      'tea': 't',
+      'queue': 'q',
+      'ex': 'x',
+      'why': 'y',
+      'zee': 'z',
+      'zed': 'z',
     };
 
     final tokens = lower.split(RegExp(r'\s+'));

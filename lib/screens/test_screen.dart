@@ -33,7 +33,7 @@ class TestScreen extends ConsumerStatefulWidget {
   /// Optional callback invoked after stats are saved and the test completes
   /// successfully (all words answered). Used by the daily-word flow to
   /// trigger streak tracking.
-  final VoidCallback? onComplete;
+  final FutureOr<void> Function()? onComplete;
 
   const TestScreen({
     super.key,
@@ -164,7 +164,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   void _submit() {
     if (_s.revealed) return;
     final typed = _mode == InputMode.keyboard
-        ? _ctrl.text.trim().toLowerCase()
+        ? _normalizeTyped(_ctrl.text)
         : SttService.normalize(_s.sttTranscript).toLowerCase();
 
     if (typed.isEmpty) {
@@ -278,7 +278,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final it = _items[i];
       final target = widget.words[i].text;
       final submitted = it.typed.isNotEmpty
-          ? it.typed.toLowerCase()
+          ? _normalizeTyped(it.typed)
           : SttService.normalize(it.sttTranscript).toLowerCase();
       items.add(
         AskedItem(
@@ -302,7 +302,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
             longestStreak: _longestStreak,
           );
     }
-    widget.onComplete?.call();
+    await widget.onComplete?.call();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -310,6 +310,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       ),
     );
   }
+
+  String _normalizeTyped(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
 
   // ── Hints ──────────────────────────────────────────────────────────
 

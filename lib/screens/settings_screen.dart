@@ -4,9 +4,14 @@ import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  static final _privacyUrl = Uri.parse(
+    'https://nalhamzy.github.io/spellbee/privacy.html',
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,11 +85,24 @@ class SettingsScreen extends ConsumerWidget {
             SizedBox(height: context.s(12)),
             _SettingsCard(
               children: [
-                const ListTile(
-                  leading: Icon(Icons.privacy_tip_outlined),
-                  title: Text('Privacy policy'),
-                  subtitle: Text('Progress stays local on this device.'),
-                  trailing: Icon(Icons.open_in_new_rounded, size: 18),
+                ListTile(
+                  leading: const Icon(Icons.privacy_tip_outlined),
+                  title: const Text('Privacy policy'),
+                  subtitle: const Text('Progress stays local on this device.'),
+                  trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                  onTap: () async {
+                    final ok = await launchUrl(
+                      _privacyUrl,
+                      mode: LaunchMode.externalApplication,
+                    );
+                    if (!ok && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Could not open privacy policy.'),
+                        ),
+                      );
+                    }
+                  },
                 ),
                 const Divider(height: 0),
                 ListTile(
