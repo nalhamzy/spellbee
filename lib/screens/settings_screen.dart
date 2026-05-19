@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spellbee/core/constants/legal_urls.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
@@ -8,10 +9,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
-
-  static final _privacyUrl = Uri.parse(
-    'https://nalhamzy.github.io/spellbee/privacy.html',
-  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,13 +89,35 @@ class SettingsScreen extends ConsumerWidget {
                   trailing: const Icon(Icons.open_in_new_rounded, size: 18),
                   onTap: () async {
                     final ok = await launchUrl(
-                      _privacyUrl,
+                      LegalUrls.privacy,
                       mode: LaunchMode.externalApplication,
                     );
                     if (!ok && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Could not open privacy policy.'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const Divider(height: 0),
+                ListTile(
+                  leading: const Icon(Icons.gavel_outlined),
+                  title: const Text('Terms of Use (EULA)'),
+                  subtitle: const Text(
+                    'Apple standard terms for subscriptions.',
+                  ),
+                  trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                  onTap: () async {
+                    final ok = await launchUrl(
+                      LegalUrls.terms,
+                      mode: LaunchMode.externalApplication,
+                    );
+                    if (!ok && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Could not open Terms of Use.'),
                         ),
                       );
                     }

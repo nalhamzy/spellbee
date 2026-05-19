@@ -1,6 +1,6 @@
 # SpellBee — Store listing copy
 
-SEO-tuned for the spelling-bee / kids-education niche. Every field under its
+SEO-tuned for the spelling-bee / student-education niche. Every field under its
 platform limit.
 
 ---
@@ -9,9 +9,9 @@ platform limit.
 
 ### App Name (30 char — primary SEO)
 ```
-SpellBee: Spelling Bee Kids
+SpellBee: Spelling Bee Tutor
 ```
-**27 chars** — trimmed from 31-char original ("for" dropped) to satisfy Apple's 30-char cap. Use this in ASC.
+**28 chars.** Removes "Kids" for App Review 2.3.8 while keeping spelling-bee SEO. Use this in ASC.
 
 ### Subtitle (30 char)
 ```
@@ -21,9 +21,9 @@ Practice with voice & AI packs
 
 ### Keywords (100 char — comma-separated, no spaces, singular)
 ```
-spelling,word,dictation,phonics,vocabulary,bee,test,practice,tutor,homework,kids,school,parent,study
+spelling,word,dictation,phonics,vocabulary,bee,test,practice,tutor,homework,student,school,parent
 ```
-**98 chars.** Avoids title/subtitle words ("spellbee", "voice", "AI") —
+**97 chars.** Avoids title/subtitle words ("spellbee", "voice", "AI") —
 Apple auto-indexes those.
 
 ### Promotional Text (170 chars)
@@ -57,7 +57,7 @@ Every test tracks correct words, longest streak, and accuracy. Perfect tests ext
 
 WHO IT'S FOR
 • Elementary students prepping for weekly spelling tests
-• Kids training for school or regional spelling bees
+• Learners training for school or regional spelling bees
 • Homeschool families
 • ESL learners building vocabulary
 • Anyone rebuilding a reading habit
@@ -74,7 +74,10 @@ Unlock everything for less than one coffee a month:
 
 Monthly, yearly (save 44%), or a one-time lifetime. Cancel any time.
 
-Free to start. Premium when your bee-er is ready.
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
+
+Free to start. Premium when your practice routine is ready.
 ```
 
 ### What's New in This Version (v1.0.0)
@@ -113,7 +116,7 @@ https://nalhamzy.github.io/spellbee/privacy.html
 
 ### App Review — Review Notes
 ```
-SpellBee is a local-first spelling-bee practice app for students. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). Ads are not shown in the learning flow. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
+SpellBee is a local-first spelling-bee practice app for students and families. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). The paywall includes functional Privacy Policy and Terms of Use (EULA) links. Ads are not shown in the learning flow. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
 ```
 
 ---

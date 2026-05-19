@@ -88,7 +88,7 @@ samples the bundled 200-word catalog — still useful but no themed packs.
 
 <https://appstoreconnect.apple.com/apps>
 
-1. **+ New App** → iOS, Name `SpellBee: Spelling Bee for Kids`, bundle
+1. **+ New App** → iOS, Name `SpellBee: Spelling Bee Tutor`, bundle
    `com.idealai.spellbee`, SKU `spellbee-ios-001`.
 2. App Information → Category primary **Education**, secondary **Games →
    Word**. Age rating **4+**. **Made for Kids = NO**.

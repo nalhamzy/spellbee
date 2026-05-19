@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
+import 'package:spellbee/core/constants/legal_urls.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaywallScreen extends ConsumerStatefulWidget {
-  const PaywallScreen({super.key});
+  final bool screenshotMode;
+  const PaywallScreen({super.key, this.screenshotMode = false});
 
   @override
   ConsumerState<PaywallScreen> createState() => _PaywallScreenState();
@@ -28,9 +31,20 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     }
   }
 
+  Future<void> _openUrl(Uri url) async {
+    final opened = await launchUrl(url, mode: LaunchMode.externalApplication);
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open that link.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final productsAsync = ref.watch(iapProductsProvider);
+    final productsAsync = widget.screenshotMode
+        ? null
+        : ref.watch(iapProductsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,59 +56,102 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         ],
       ),
       body: SafeArea(
-        child: ResponsiveContentBox(
+        child: SizedBox(
+          width: responsiveViewportWidth(context),
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(context.s(20)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _hero(context),
-                SizedBox(height: context.s(14)),
-                _perks(context),
-                SizedBox(height: context.s(14)),
-                _ValueNudge(context),
-                SizedBox(height: context.s(22)),
-                productsAsync.when(
-                  data: (products) => _tiers(context, products),
-                  error: (_, _) => _tiers(context, const []),
-                  loading: () => Padding(
-                    padding: EdgeInsets.all(context.s(24)),
-                    child: const Center(child: CircularProgressIndicator()),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: responsiveMaxContentWidth(context),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(context.s(20)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _hero(context),
+                      SizedBox(height: context.s(14)),
+                      _perks(context),
+                      SizedBox(height: context.s(14)),
+                      _ValueNudge(context),
+                      SizedBox(height: context.s(22)),
+                      if (productsAsync == null)
+                        _tiers(context, _screenshotProducts)
+                      else
+                        productsAsync.when(
+                          data: (products) => _tiers(context, products),
+                          error: (_, _) => _tiers(context, const []),
+                          loading: () => Padding(
+                            padding: EdgeInsets.all(context.s(24)),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        ),
+                      SizedBox(height: context.s(18)),
+                      SizedBox(
+                        width: double.infinity,
+                        height: context.s(56),
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppTheme.violet,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                context.s(18),
+                              ),
+                            ),
+                          ),
+                          onPressed: _buy,
+                          child: Text(
+                            _selected == IapProductIds.premiumLifetime
+                                ? 'Pay Once & Unlock'
+                                : 'Start Premium',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: context.s(8)),
+                      _SubscriptionDisclosure(
+                        selectedProductId: _selected,
+                        products: productsAsync == null
+                            ? _screenshotProducts
+                            : productsAsync.maybeWhen(
+                                data: (products) => products,
+                                orElse: () => const <IapProduct>[],
+                              ),
+                      ),
+                      SizedBox(height: context.s(8)),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4,
+                        runSpacing: 0,
+                        children: [
+                          TextButton(
+                            onPressed: () => _openUrl(LegalUrls.privacy),
+                            child: const Text('Privacy Policy'),
+                          ),
+                          TextButton(
+                            onPressed: () => _openUrl(LegalUrls.terms),
+                            child: const Text('Terms of Use (EULA)'),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Manage or cancel subscriptions in your App Store account settings.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppTheme.mute,
+                          fontSize: context.s(10).clamp(10, 12),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: context.s(18)),
-                SizedBox(
-                  width: double.infinity,
-                  height: context.s(56),
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppTheme.violet,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(context.s(18)),
-                      ),
-                    ),
-                    onPressed: _buy,
-                    child: Text(
-                      _selected == IapProductIds.premiumLifetime
-                          ? 'Pay Once & Unlock'
-                          : 'Start Premium',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: context.s(8)),
-                Text(
-                  _selected == IapProductIds.premiumLifetime
-                      ? 'One-time purchase. No subscription renewal.'
-                      : 'Subscriptions renew automatically until cancelled. Lifetime is a one-time payment.',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppTheme.mute, fontSize: 11),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -180,7 +237,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       children: [
         _tile(
           id: IapProductIds.premiumYearly,
-          title: 'Yearly',
+          title: 'Premium Yearly',
           subtitle: 'Best value for steady school practice',
           price: yearly?.price ?? '\$29.99',
           period: '/year',
@@ -189,7 +246,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         SizedBox(height: c.s(8)),
         _tile(
           id: IapProductIds.premiumLifetime,
-          title: 'Lifetime',
+          title: 'Premium Lifetime',
           subtitle: 'Pay once for this family',
           price: lifetime?.price ?? '\$49.99',
           period: 'one-time',
@@ -197,7 +254,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         SizedBox(height: c.s(8)),
         _tile(
           id: IapProductIds.premiumMonthly,
-          title: 'Monthly',
+          title: 'Premium Monthly',
           subtitle: 'Try premium month-to-month',
           price: monthly?.price ?? '\$4.99',
           period: '/month',
@@ -304,6 +361,68 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       ),
     );
   }
+}
+
+const _screenshotProducts = <IapProduct>[
+  IapProduct(
+    id: IapProductIds.premiumYearly,
+    title: 'Premium Yearly',
+    price: '\$29.99',
+    description: 'Best value for steady school practice',
+  ),
+  IapProduct(
+    id: IapProductIds.premiumLifetime,
+    title: 'Premium Lifetime',
+    price: '\$49.99',
+    description: 'Pay once for this family',
+  ),
+  IapProduct(
+    id: IapProductIds.premiumMonthly,
+    title: 'Premium Monthly',
+    price: '\$4.99',
+    description: 'Try premium month-to-month',
+  ),
+];
+
+class _SubscriptionDisclosure extends StatelessWidget {
+  final String selectedProductId;
+  final List<IapProduct> products;
+
+  const _SubscriptionDisclosure({
+    required this.selectedProductId,
+    required this.products,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final product = products
+        .where((p) => p.id == selectedProductId)
+        .cast<IapProduct?>()
+        .firstOrNull;
+    final price = product?.price ?? _fallbackPrice(selectedProductId);
+    final text = switch (selectedProductId) {
+      IapProductIds.premiumMonthly =>
+        'SpellBee Premium Monthly: $price per month. Auto-renews monthly until cancelled.',
+      IapProductIds.premiumYearly =>
+        'SpellBee Premium Yearly: $price per year. Auto-renews yearly until cancelled.',
+      IapProductIds.premiumLifetime =>
+        'SpellBee Premium Lifetime: $price one-time purchase. No subscription renewal.',
+      _ => 'Review the selected purchase before confirming in the App Store.',
+    };
+
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: const TextStyle(color: AppTheme.mute, fontSize: 11, height: 1.35),
+    );
+  }
+
+  String _fallbackPrice(String id) => switch (id) {
+    IapProductIds.premiumMonthly => '\$4.99',
+    IapProductIds.premiumYearly => '\$29.99',
+    IapProductIds.premiumLifetime => '\$49.99',
+    _ => '',
+  };
 }
 
 class _ValueNudge extends StatelessWidget {
