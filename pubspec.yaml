@@ -1,7 +1,7 @@
 name: spellbee
 description: "SpellBee — Spelling-bee practice with AI-generated word packs and voice feedback."
 publish_to: 'none'
-version: 1.0.8+9
+version: 1.0.9+10
 environment:
   sdk: ^3.11.0
 
@@ -18,6 +18,9 @@ dependencies:
   # Monetization
   google_mobile_ads: ^5.3.1
   in_app_purchase: ^3.2.0
+  # google_mobile_ads depends on this iOS plugin pod; keeping it direct makes
+  # Codemagic's CocoaPods install resolve the local Flutter podspec reliably.
+  webview_flutter_wkwebview: ^3.24.3
 
   # Voice + speech
   flutter_tts: ^4.2.0
