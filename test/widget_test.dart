@@ -1,10 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/core/data/themed_word_packs.dart';
+import 'package:spellbee/core/data/voice_phrase_bank.dart';
+import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/services/stt_service.dart';
 import 'package:spellbee/core/services/ai_word_generator.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
+import 'package:spellbee/core/services/tts_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -59,6 +62,7 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     final storage = StorageService(prefs);
 
+    expect(storage.getVoiceSpeedIndex(), VoiceSpeed.calm.index);
     expect(storage.getVoiceQualityIndex(), 0);
 
     await storage.setVoiceQualityIndex(1);
@@ -66,7 +70,99 @@ void main() {
     expect(storage.getVoiceQualityIndex(), 1);
   });
 
+  test('player stats persist missed word coach data', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final storage = StorageService(prefs);
+
+    await storage.saveStats(
+      const PlayerStats(
+        totalTests: 1,
+        totalWordsAsked: 3,
+        totalWordsCorrect: 2,
+        missedWordCounts: {'bridge': 2, 'giraffe': 1},
+      ),
+    );
+
+    final stats = storage.loadStats();
+
+    expect(stats.missedWordCounts['bridge'], 2);
+    expect(stats.missedWordCounts['giraffe'], 1);
+  });
+
+  test('device voice picker prefers natural English voices', () {
+    final best = TtsService.chooseBestDeviceVoice([
+      {'name': 'com.samsung.SMT.lang_en_us_l03', 'locale': 'en-US'},
+      {'name': 'en-gb-x-gbb-local', 'locale': 'en-GB'},
+      {
+        'name': 'en-us-x-iom-network',
+        'locale': 'en-US',
+        'quality': 'network neural',
+      },
+    ]);
+
+    expect(best?['name'], 'en-us-x-iom-network');
+    expect(
+      TtsService.deviceVoiceScore({
+        'name': 'en-us-x-iom-network',
+        'locale': 'en-US',
+        'quality': 'network neural',
+      }),
+      greaterThan(
+        TtsService.deviceVoiceScore({
+          'name': 'com.samsung.SMT.lang_en_us_l03',
+          'locale': 'en-US',
+        }),
+      ),
+    );
+  });
+
+  test('device voice label explains bundled natural clips', () {
+    expect(VoiceQuality.device.description, contains('Natural bundled clips'));
+  });
+
+  test('spoken word prompt is only the target word', () {
+    final prompts = [
+      for (var i = 0; i < TtsService.wordPromptVariantCount; i++)
+        TtsService.buildWordPrompt('rocket', variant: i),
+    ];
+
+    expect(prompts, ['rocket']);
+  });
+
+  test('definition, example, and spell-out prompts remain clear', () {
+    final definition = TtsService.buildDefinitionPrompt(
+      'bridge',
+      'A structure that crosses water.',
+      variant: 2,
+    );
+    final example = TtsService.buildExamplePrompt(
+      'bridge',
+      'We crossed the bridge slowly.',
+      variant: 1,
+    );
+    final spellOut = TtsService.buildSpellOutPrompt(
+      'bridge',
+      'B, R, I, D, G, E',
+      variant: 0,
+    );
+
+    expect(definition, contains('bridge'));
+    expect(definition, contains('crosses water'));
+    expect(example, contains('bridge'));
+    expect(example, contains('crossed the bridge'));
+    expect(spellOut, contains('bridge'));
+    expect(spellOut, contains('B, R, I, D, G, E'));
+  });
+
   test('IAP service can dispose when the store was never initialized', () {
     expect(() => IapService().dispose(), returnsNormally);
+  });
+
+  test('feedback picker can avoid immediate repeats', () {
+    const stubs = ['great', 'excellent', 'wonderful'];
+    for (var i = 0; i < 20; i++) {
+      expect(VoicePhraseBank.pick(stubs, avoid: 'great'), isNot('great'));
+    }
   });
 }

@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
+import 'package:spellbee/core/data/voice_phrase_bank.dart';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/services/stt_service.dart';
@@ -56,6 +56,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   final _focus = FocusNode();
   int _longestStreak = 0;
   DateTime? _startedAt;
+  String? _lastFeedbackStub;
 
   Word get _w => widget.words[_idx];
   _ItemState get _s => _items[_idx];
@@ -153,8 +154,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     if (_mode == InputMode.keyboard) {
       _focus.requestFocus();
     }
+    await _playFeedback(VoicePhraseBank.retry);
     // Re-speak the word so they hear it fresh.
-    Future.delayed(const Duration(milliseconds: 200), _speak);
+    Future.delayed(const Duration(milliseconds: 1000), _speak);
   }
 
   void _onTyped(String v) {
@@ -194,29 +196,15 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     } catch (_) {}
 
     // Voice feedback + auto-advance.
-    final tts = ref.read(ttsServiceProvider);
     if (correct) {
-      final stubs = _runStreak >= 3
-          ? const ['on_fire', 'three_row', 'unstoppable']
-          : const [
-              'great',
-              'nice_work',
-              'perfect',
-              'amazing',
-              'you_got_it',
-              'wonderful',
-            ];
-      final stub = stubs[math.Random().nextInt(stubs.length)];
-      tts.playPhrase(stub, premium: _premium);
+      _playFeedback(
+        _runStreak >= 3 ? VoicePhraseBank.streak : VoicePhraseBank.correct,
+      );
       _s.autoAdvance = Timer(const Duration(milliseconds: 1800), () {
         if (mounted && _s.revealed) _next();
       });
     } else {
-      const misses = ['not_quite', 'almost', 'close_one'];
-      tts.playPhrase(
-        misses[math.Random().nextInt(misses.length)],
-        premium: _premium,
-      );
+      _playFeedback(VoicePhraseBank.miss);
       // Spell it out 0.9s in.
       Future.delayed(const Duration(milliseconds: 900), () {
         if (mounted && _s.revealed) _speakSpellOut();
@@ -224,6 +212,12 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       // On a miss, do NOT auto-advance — let the kid read the reveal
       // and optionally tap "Try again" to redo, or "Next" to move on.
     }
+  }
+
+  Future<void> _playFeedback(List<String> stubs) async {
+    final stub = VoicePhraseBank.pick(stubs, avoid: _lastFeedbackStub);
+    _lastFeedbackStub = stub;
+    await ref.read(ttsServiceProvider).playPhrase(stub, premium: _premium);
   }
 
   // ── Navigation ─────────────────────────────────────────────────────
@@ -283,6 +277,8 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       items.add(
         AskedItem(
           target: target,
+          definition: widget.words[i].definition,
+          example: widget.words[i].example,
           submitted: submitted,
           isCorrect: it.correct ?? false,
         ),
@@ -300,6 +296,12 @@ class _TestScreenState extends ConsumerState<TestScreen> {
             asked: result.total,
             correct: result.correct,
             longestStreak: _longestStreak,
+            missedWords: result.items
+                .where((item) => !item.isCorrect)
+                .map((item) => item.target),
+            masteredWords: result.items
+                .where((item) => item.isCorrect)
+                .map((item) => item.target),
           );
     }
     await widget.onComplete?.call();
@@ -387,44 +389,47 @@ class _TestScreenState extends ConsumerState<TestScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: ResponsiveContentBox(
-          child: Padding(
-            padding: EdgeInsets.all(context.s(20)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _topBar(progress),
-                        SizedBox(height: context.s(14)),
-                        _HearCard(
-                          onHearWord: _speak,
-                          onHearDefinition: _speakDefinition,
-                          onHearExample: _speakExample,
-                        ),
-                        SizedBox(height: context.s(16)),
-                        _modeToggle(),
-                        SizedBox(height: context.s(16)),
-                        _mode == InputMode.keyboard
-                            ? _keyboardInput()
-                            : _micInput(),
-                        SizedBox(height: context.s(10)),
-                        _inputRetryRow(),
-                        SizedBox(height: context.s(14)),
-                        if (_s.revealed) _revealCard(),
-                      ],
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.pageGradient),
+        child: SafeArea(
+          child: ResponsiveContentBox(
+            child: Padding(
+              padding: EdgeInsets.all(context.s(20)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _topBar(progress),
+                          SizedBox(height: context.s(14)),
+                          _HearCard(
+                            onHearWord: _speak,
+                            onHearDefinition: _speakDefinition,
+                            onHearExample: _speakExample,
+                          ),
+                          SizedBox(height: context.s(16)),
+                          _modeToggle(),
+                          SizedBox(height: context.s(16)),
+                          _mode == InputMode.keyboard
+                              ? _keyboardInput()
+                              : _micInput(),
+                          SizedBox(height: context.s(10)),
+                          _inputRetryRow(),
+                          SizedBox(height: context.s(14)),
+                          if (_s.revealed) _revealCard(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: context.s(12)),
-                _bottomActions(),
-              ],
+                  SizedBox(height: context.s(12)),
+                  _bottomActions(),
+                ],
+              ),
             ),
           ),
         ),
@@ -435,7 +440,11 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   Widget _topBar(double progress) {
     return Container(
       padding: EdgeInsets.all(context.s(12)),
-      decoration: AppTheme.card(radius: context.s(20), shadow: false),
+      decoration: AppTheme.card(
+        gradient: AppTheme.surfaceLiftGradient,
+        radius: context.s(20),
+        shadow: false,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -494,8 +503,10 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       padding: EdgeInsets.all(context.s(4)),
       decoration: BoxDecoration(
         color: AppTheme.surface,
+        gradient: AppTheme.surfaceLiftGradient,
         border: Border.all(color: AppTheme.outline),
         borderRadius: BorderRadius.circular(context.s(18)),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Row(
         children: [
@@ -574,6 +585,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
             height: context.s(110),
             decoration: BoxDecoration(
               color: stt.listening ? AppTheme.coral : AppTheme.honey,
+              gradient: stt.listening
+                  ? AppTheme.errorGradient
+                  : AppTheme.ctaGradient,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
@@ -635,12 +649,13 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       padding: EdgeInsets.all(context.s(16)),
       decoration: BoxDecoration(
         color: ok ? AppTheme.mint : AppTheme.rose,
+        gradient: ok ? AppTheme.successGradient : AppTheme.errorGradient,
         border: Border.all(
           color: ok ? AppTheme.sage : AppTheme.coral,
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(context.s(20)),
-        boxShadow: AppTheme.softShadow,
+        boxShadow: AppTheme.tintedShadow(ok ? AppTheme.sage : AppTheme.coral),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -808,7 +823,11 @@ class _HearCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(context.s(18)),
-      decoration: AppTheme.card(color: AppTheme.aqua, radius: context.s(26)),
+      decoration: AppTheme.card(
+        color: AppTheme.aqua,
+        gradient: AppTheme.voiceGradient,
+        radius: context.s(26),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -816,9 +835,10 @@ class _HearCard extends StatelessWidget {
             child: Container(
               width: context.s(96),
               height: context.s(96),
-              decoration: const BoxDecoration(
-                color: AppTheme.honey,
+              decoration: BoxDecoration(
+                gradient: AppTheme.ctaGradient,
                 shape: BoxShape.circle,
+                boxShadow: AppTheme.tintedShadow(AppTheme.honeyDark),
               ),
               child: IconButton(
                 tooltip: 'Hear the word',
@@ -899,7 +919,11 @@ class _ModeChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
         decoration: BoxDecoration(
           color: selected ? AppTheme.honey : Colors.transparent,
+          gradient: selected ? AppTheme.selectedNavGradient : null,
           borderRadius: BorderRadius.circular(12),
+          boxShadow: selected
+              ? AppTheme.tintedShadow(AppTheme.honeyDark)
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -944,7 +968,7 @@ class _HintSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppTheme.bg,
+        gradient: AppTheme.pageGradient,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
@@ -1022,10 +1046,10 @@ class _HintTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.outline),
+        decoration: AppTheme.card(
+          gradient: AppTheme.surfaceLiftGradient,
+          radius: 14,
+          shadow: false,
         ),
         child: Row(
           children: [

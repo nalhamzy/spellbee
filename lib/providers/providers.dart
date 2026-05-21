@@ -15,7 +15,15 @@ export 'package:spellbee/core/services/aws_polly_tts_service.dart'
 export 'package:spellbee/core/services/openai_tts_service.dart'
     show OpenAiTtsService;
 export 'package:spellbee/core/services/tts_service.dart'
-    show VoiceQuality, VoiceQualityLabel, VoiceSpeed;
+    show
+        StudioVoiceOption,
+        StudioVoiceProvider,
+        StudioVoiceProviderLabel,
+        VoiceQuality,
+        VoiceQualityLabel,
+        VoiceSpeed,
+        kOpenAiStudioVoices,
+        kPollyStudioVoices;
 
 // ─── Service providers (overridden in main.dart) ───────────────────────
 
@@ -42,12 +50,19 @@ final ttsServiceProvider = Provider<TtsService>((ref) {
   s.setQuality(
     VoiceQuality.values[qualityIdx.clamp(0, VoiceQuality.values.length - 1)],
   );
+  s.setStudioProvider(storage.getStudioVoiceProvider());
+  s.setOpenAiVoice(storage.getOpenAiVoice());
   s.setPollyVoice(storage.getPollyVoice());
   ref.listen<VoiceSpeed>(voiceSpeedProvider, (_, next) => s.setSpeed(next));
   ref.listen<VoiceQuality>(
     voiceQualityProvider,
     (_, next) => s.setQuality(next),
   );
+  ref.listen<StudioVoiceProvider>(
+    studioVoiceSourceProvider,
+    (_, next) => s.setStudioProvider(next),
+  );
+  ref.listen<String>(openAiVoiceProvider, (_, next) => s.setOpenAiVoice(next));
   ref.listen<String>(pollyVoiceProvider, (_, next) => s.setPollyVoice(next));
   ref.onDispose(s.dispose);
   return s;
@@ -85,6 +100,36 @@ class VoiceQualityNotifier extends Notifier<VoiceQuality> {
   Future<void> set(VoiceQuality quality) async {
     state = quality;
     await ref.read(storageServiceProvider).setVoiceQualityIndex(quality.index);
+  }
+}
+
+final studioVoiceSourceProvider =
+    NotifierProvider<StudioVoiceSourceNotifier, StudioVoiceProvider>(
+      StudioVoiceSourceNotifier.new,
+    );
+
+class StudioVoiceSourceNotifier extends Notifier<StudioVoiceProvider> {
+  @override
+  StudioVoiceProvider build() =>
+      ref.read(storageServiceProvider).getStudioVoiceProvider();
+
+  Future<void> set(StudioVoiceProvider provider) async {
+    state = provider;
+    await ref.read(storageServiceProvider).setStudioVoiceProvider(provider);
+  }
+}
+
+final openAiVoiceProvider = NotifierProvider<OpenAiVoiceNotifier, String>(
+  OpenAiVoiceNotifier.new,
+);
+
+class OpenAiVoiceNotifier extends Notifier<String> {
+  @override
+  String build() => ref.read(storageServiceProvider).getOpenAiVoice();
+
+  Future<void> set(String voice) async {
+    state = voice;
+    await ref.read(storageServiceProvider).setOpenAiVoice(voice);
   }
 }
 
@@ -165,11 +210,29 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
     required int asked,
     required int correct,
     required int longestStreak,
+    Iterable<String> missedWords = const [],
+    Iterable<String> masteredWords = const [],
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     final bestStreak = longestStreak > state.bestStreak
         ? longestStreak
         : state.bestStreak;
+    final missedCounts = Map<String, int>.from(state.missedWordCounts);
+    for (final word in missedWords) {
+      final key = word.toLowerCase().trim();
+      if (key.isEmpty) continue;
+      missedCounts[key] = (missedCounts[key] ?? 0) + 1;
+    }
+    for (final word in masteredWords) {
+      final key = word.toLowerCase().trim();
+      if (key.isEmpty || !missedCounts.containsKey(key)) continue;
+      final next = missedCounts[key]! - 1;
+      if (next <= 0) {
+        missedCounts.remove(key);
+      } else {
+        missedCounts[key] = next;
+      }
+    }
     state = state.copyWith(
       totalTests: state.totalTests + 1,
       totalWordsAsked: state.totalWordsAsked + asked,
@@ -179,6 +242,7 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
           ? state.currentStreak + 1
           : 0, // reset streak if the test wasn't perfect
       lastPlayedEpochMs: now,
+      missedWordCounts: missedCounts,
     );
     await ref.read(storageServiceProvider).saveStats(state);
   }

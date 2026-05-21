@@ -6,11 +6,16 @@ class PlayerStats extends Equatable {
   final int totalTests;
   final int totalWordsAsked;
   final int totalWordsCorrect;
-  final int bestStreak;       // longest correct streak within a test
+  final int bestStreak; // longest correct streak within a test
   final int currentStreak;
   final int? lastPlayedEpochMs;
+
+  /// Lowercase word -> number of recent misses. Used to recommend retry packs.
+  final Map<String, int> missedWordCounts;
+
   /// Days since Unix epoch on which the user last completed a daily word.
   final int? lastDailyEpochDay;
+
   /// Consecutive days the user has completed a daily word or any test.
   final int dailyStreak;
 
@@ -21,6 +26,7 @@ class PlayerStats extends Equatable {
     this.bestStreak = 0,
     this.currentStreak = 0,
     this.lastPlayedEpochMs,
+    this.missedWordCounts = const {},
     this.lastDailyEpochDay,
     this.dailyStreak = 0,
   });
@@ -35,41 +41,48 @@ class PlayerStats extends Equatable {
     int? bestStreak,
     int? currentStreak,
     int? lastPlayedEpochMs,
+    Map<String, int>? missedWordCounts,
     int? lastDailyEpochDay,
     int? dailyStreak,
-  }) =>
-      PlayerStats(
-        totalTests: totalTests ?? this.totalTests,
-        totalWordsAsked: totalWordsAsked ?? this.totalWordsAsked,
-        totalWordsCorrect: totalWordsCorrect ?? this.totalWordsCorrect,
-        bestStreak: bestStreak ?? this.bestStreak,
-        currentStreak: currentStreak ?? this.currentStreak,
-        lastPlayedEpochMs: lastPlayedEpochMs ?? this.lastPlayedEpochMs,
-        lastDailyEpochDay: lastDailyEpochDay ?? this.lastDailyEpochDay,
-        dailyStreak: dailyStreak ?? this.dailyStreak,
-      );
+  }) => PlayerStats(
+    totalTests: totalTests ?? this.totalTests,
+    totalWordsAsked: totalWordsAsked ?? this.totalWordsAsked,
+    totalWordsCorrect: totalWordsCorrect ?? this.totalWordsCorrect,
+    bestStreak: bestStreak ?? this.bestStreak,
+    currentStreak: currentStreak ?? this.currentStreak,
+    lastPlayedEpochMs: lastPlayedEpochMs ?? this.lastPlayedEpochMs,
+    missedWordCounts: missedWordCounts ?? this.missedWordCounts,
+    lastDailyEpochDay: lastDailyEpochDay ?? this.lastDailyEpochDay,
+    dailyStreak: dailyStreak ?? this.dailyStreak,
+  );
 
   Map<String, dynamic> toJson() => {
-        'totalTests': totalTests,
-        'totalWordsAsked': totalWordsAsked,
-        'totalWordsCorrect': totalWordsCorrect,
-        'bestStreak': bestStreak,
-        'currentStreak': currentStreak,
-        'lastPlayedEpochMs': lastPlayedEpochMs,
-        'lastDailyEpochDay': lastDailyEpochDay,
-        'dailyStreak': dailyStreak,
-      };
+    'totalTests': totalTests,
+    'totalWordsAsked': totalWordsAsked,
+    'totalWordsCorrect': totalWordsCorrect,
+    'bestStreak': bestStreak,
+    'currentStreak': currentStreak,
+    'lastPlayedEpochMs': lastPlayedEpochMs,
+    'missedWordCounts': missedWordCounts,
+    'lastDailyEpochDay': lastDailyEpochDay,
+    'dailyStreak': dailyStreak,
+  };
 
   factory PlayerStats.fromJson(Map<String, dynamic> j) => PlayerStats(
-        totalTests: j['totalTests'] as int? ?? 0,
-        totalWordsAsked: j['totalWordsAsked'] as int? ?? 0,
-        totalWordsCorrect: j['totalWordsCorrect'] as int? ?? 0,
-        bestStreak: j['bestStreak'] as int? ?? 0,
-        currentStreak: j['currentStreak'] as int? ?? 0,
-        lastPlayedEpochMs: j['lastPlayedEpochMs'] as int?,
-        lastDailyEpochDay: j['lastDailyEpochDay'] as int?,
-        dailyStreak: j['dailyStreak'] as int? ?? 0,
-      );
+    totalTests: j['totalTests'] as int? ?? 0,
+    totalWordsAsked: j['totalWordsAsked'] as int? ?? 0,
+    totalWordsCorrect: j['totalWordsCorrect'] as int? ?? 0,
+    bestStreak: j['bestStreak'] as int? ?? 0,
+    currentStreak: j['currentStreak'] as int? ?? 0,
+    lastPlayedEpochMs: j['lastPlayedEpochMs'] as int?,
+    missedWordCounts:
+        (j['missedWordCounts'] as Map<String, dynamic>?)?.map(
+          (key, value) => MapEntry(key, value as int? ?? 0),
+        ) ??
+        const {},
+    lastDailyEpochDay: j['lastDailyEpochDay'] as int?,
+    dailyStreak: j['dailyStreak'] as int? ?? 0,
+  );
 
   String encode() => jsonEncode(toJson());
   factory PlayerStats.decode(String raw) =>
@@ -77,13 +90,14 @@ class PlayerStats extends Equatable {
 
   @override
   List<Object?> get props => [
-        totalTests,
-        totalWordsAsked,
-        totalWordsCorrect,
-        bestStreak,
-        currentStreak,
-        lastPlayedEpochMs,
-        lastDailyEpochDay,
-        dailyStreak,
-      ];
+    totalTests,
+    totalWordsAsked,
+    totalWordsCorrect,
+    bestStreak,
+    currentStreak,
+    lastPlayedEpochMs,
+    missedWordCounts,
+    lastDailyEpochDay,
+    dailyStreak,
+  ];
 }

@@ -21,66 +21,64 @@ class DashboardScreen extends ConsumerWidget {
 
     return SafeArea(
       child: ResponsiveContentBox(
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.s(20),
-            context.s(16),
-            context.s(20),
-            context.s(120),
-          ),
-          children: [
-            _Header(streak: stats.dailyStreak),
-            SizedBox(height: context.s(16)),
-            _StartTrailButton(
-              level: level,
-              onPressed: () => _start(context, level),
-            ),
-            SizedBox(height: context.s(14)),
-            _HeroPanel(
-              word: dailyWord,
-              done: dailyDone,
-              onStart: dailyDone
-                  ? null
-                  : () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => TestScreen(
-                            words: [dailyWord],
-                            title: 'Daily word',
-                            onComplete: () => ref
-                                .read(playerStatsProvider.notifier)
-                                .recordDailyWordComplete(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: context.s(20)),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(0, context.s(16), 0, context.s(120)),
+            children: [
+              _Header(streak: stats.dailyStreak),
+              SizedBox(height: context.s(16)),
+              _StartTrialButton(
+                level: level,
+                onPressed: () => _start(context, level),
+              ),
+              SizedBox(height: context.s(14)),
+              _HeroPanel(
+                word: dailyWord,
+                done: dailyDone,
+                onStart: dailyDone
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => TestScreen(
+                              words: [dailyWord],
+                              title: 'Daily word',
+                              onComplete: () => ref
+                                  .read(playerStatsProvider.notifier)
+                                  .recordDailyWordComplete(),
+                            ),
                           ),
-                        ),
-                      );
-                    },
-            ),
-            SizedBox(height: context.s(22)),
-            _SectionTitle(
-              title: 'Practice level',
-              subtitle: kLevelLabels[level] ?? 'Level $level',
-            ),
-            SizedBox(height: context.s(10)),
-            _levelPicker(context, ref, level),
-            SizedBox(height: context.s(18)),
-            _SimpleChoices(ref: ref),
-            if (!ref.watch(isPremiumProvider)) ...[
+                        );
+                      },
+              ),
               SizedBox(height: context.s(22)),
-              _PremiumBanner(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const PaywallScreen()),
+              _SectionTitle(
+                title: 'Practice level',
+                subtitle: kLevelLabels[level] ?? 'Level $level',
+              ),
+              SizedBox(height: context.s(10)),
+              _levelPicker(context, ref, level),
+              SizedBox(height: context.s(18)),
+              _SimpleChoices(ref: ref),
+              if (!ref.watch(isPremiumProvider)) ...[
+                SizedBox(height: context.s(22)),
+                _PremiumBanner(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                  ),
                 ),
+              ],
+              SizedBox(height: context.s(22)),
+              _SectionTitle(title: 'Parent view', subtitle: 'Progress'),
+              SizedBox(height: context.s(10)),
+              _StatsRail(
+                tests: stats.totalTests,
+                accuracy: accPct,
+                bestStreak: stats.bestStreak,
               ),
             ],
-            SizedBox(height: context.s(22)),
-            _SectionTitle(title: 'Parent view', subtitle: 'Progress'),
-            SizedBox(height: context.s(10)),
-            _StatsRail(
-              tests: stats.totalTests,
-              accuracy: accPct,
-              bestStreak: stats.bestStreak,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -94,7 +92,7 @@ class DashboardScreen extends ConsumerWidget {
       MaterialPageRoute(
         builder: (_) => TestScreen(
           words: sampled.take(10).toList(),
-          title: 'Level $level trail',
+          title: 'Level $level trial',
         ),
       ),
     );
@@ -124,37 +122,54 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   Widget _levelPicker(BuildContext c, WidgetRef ref, int level) {
+    final screenshotMode = Uri.base.queryParameters['screenshot'] == '1';
+    final levels = screenshotMode ? const [1, 2, 3, 4] : kLevelLabels.keys;
+
+    Widget chip(int lvl) {
+      return GestureDetector(
+        onTap: () => ref.read(selectedLevelProvider.notifier).set(lvl),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: EdgeInsets.symmetric(horizontal: c.s(15)),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: lvl == level ? AppTheme.ink : AppTheme.surface,
+            border: Border.all(
+              color: lvl == level ? AppTheme.ink : AppTheme.outline,
+            ),
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: lvl == level ? AppTheme.softShadow : null,
+          ),
+          child: Text(
+            _chipLabel(lvl),
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              color: lvl == level ? Colors.white : AppTheme.mute,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (screenshotMode) {
+      return SizedBox(
+        height: c.s(44),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [for (final lvl in levels) chip(lvl)],
+        ),
+      );
+    }
+
     return SizedBox(
       height: c.s(44),
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          for (final lvl in kLevelLabels.keys)
+          for (final lvl in levels)
             Padding(
               padding: EdgeInsets.only(right: c.s(8)),
-              child: GestureDetector(
-                onTap: () => ref.read(selectedLevelProvider.notifier).set(lvl),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 160),
-                  padding: EdgeInsets.symmetric(horizontal: c.s(15)),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: lvl == level ? AppTheme.ink : AppTheme.surface,
-                    border: Border.all(
-                      color: lvl == level ? AppTheme.ink : AppTheme.outline,
-                    ),
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: lvl == level ? AppTheme.softShadow : null,
-                  ),
-                  child: Text(
-                    _chipLabel(lvl),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      color: lvl == level ? Colors.white : AppTheme.mute,
-                    ),
-                  ),
-                ),
-              ),
+              child: chip(lvl),
             ),
         ],
       ),
@@ -212,14 +227,10 @@ class _HeroPanel extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.s(18)),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.surface2, AppTheme.aqua],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppTheme.heroGradient,
         borderRadius: BorderRadius.circular(context.s(28)),
         border: Border.all(color: AppTheme.outline),
-        boxShadow: AppTheme.softShadow,
+        boxShadow: AppTheme.liftedShadow,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -472,31 +483,52 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-class _StartTrailButton extends StatelessWidget {
+class _StartTrialButton extends StatelessWidget {
   final int level;
   final VoidCallback onPressed;
 
-  const _StartTrailButton({required this.level, required this.onPressed});
+  const _StartTrialButton({required this.level, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: context.s(58),
-      child: FilledButton.icon(
-        style: FilledButton.styleFrom(
-          backgroundColor: AppTheme.honey,
-          foregroundColor: AppTheme.ink,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.s(20)),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(context.s(20)),
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: AppTheme.ctaGradient,
+              borderRadius: BorderRadius.circular(context.s(20)),
+              border: Border.all(
+                color: AppTheme.honeyDark.withValues(alpha: 0.36),
+              ),
+              boxShadow: AppTheme.softShadow,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.play_arrow_rounded,
+                  size: 30,
+                  color: AppTheme.ink,
+                ),
+                SizedBox(width: context.s(6)),
+                Text(
+                  'Start level $level trial',
+                  style: const TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        icon: const Icon(Icons.play_arrow_rounded, size: 30),
-        label: Text(
-          'Start level $level trail',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
-        ),
-        onPressed: onPressed,
       ),
     );
   }
@@ -612,7 +644,11 @@ class _PremiumBanner extends StatelessWidget {
       borderRadius: BorderRadius.circular(context.s(24)),
       child: Container(
         padding: EdgeInsets.all(context.s(16)),
-        decoration: AppTheme.card(color: AppTheme.lilac, radius: context.s(24)),
+        decoration: AppTheme.card(
+          color: AppTheme.lilac,
+          gradient: AppTheme.premiumGradient,
+          radius: context.s(24),
+        ),
         child: Row(
           children: [
             Container(

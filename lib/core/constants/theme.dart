@@ -26,22 +26,135 @@ class AppTheme {
   static const rose = Color(0xFFFFE2E7);
   static const aqua = Color(0xFFD9F4FF);
 
+  static const pageGradient = LinearGradient(
+    colors: [Color(0xFFFFFBF1), bg, Color(0xFFEFFAFF)],
+    stops: [0.0, 0.56, 1.0],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const heroGradient = LinearGradient(
+    colors: [Color(0xFFFFF1B6), Color(0xFFE0F7FF), Color(0xFFE9E1FF)],
+    stops: [0.0, 0.58, 1.0],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const ctaGradient = LinearGradient(
+    colors: [honey, Color(0xFFFFD977), peach],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const surfaceLiftGradient = LinearGradient(
+    colors: [surface, Color(0xFFFFFBF2)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const voiceGradient = LinearGradient(
+    colors: [aqua, Color(0xFFEAF7FF), lilac],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const successGradient = LinearGradient(
+    colors: [mint, Color(0xFFEFFFF5)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const errorGradient = LinearGradient(
+    colors: [rose, Color(0xFFFFF3E8)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const darkActionGradient = LinearGradient(
+    colors: [ink, Color(0xFF4A3723)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const calmActionGradient = LinearGradient(
+    colors: [sage, Color(0xFF65D59D)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const navGradient = LinearGradient(
+    colors: [surface, Color(0xFFFFF8E6)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const selectedNavGradient = LinearGradient(
+    colors: [honey, Color(0xFFFFE08B)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const premiumGradient = LinearGradient(
+    colors: [lilac, Color(0xFFE3F6FF), Color(0xFFFFEAF0)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const cardSheen = LinearGradient(
+    colors: [Color(0x99FFFFFF), Color(0x00FFFFFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   static List<BoxShadow> get softShadow => [
     BoxShadow(
-      color: const Color(0xFF6F552B).withValues(alpha: 0.09),
-      blurRadius: 24,
-      offset: const Offset(0, 12),
+      color: const Color(0xFF7C5A1E).withValues(alpha: 0.10),
+      blurRadius: 30,
+      offset: const Offset(0, 16),
+    ),
+    BoxShadow(
+      color: honeyDark.withValues(alpha: 0.08),
+      blurRadius: 10,
+      offset: const Offset(0, 4),
+    ),
+  ];
+
+  static List<BoxShadow> get liftedShadow => [
+    BoxShadow(
+      color: const Color(0xFF5B4215).withValues(alpha: 0.16),
+      blurRadius: 34,
+      offset: const Offset(0, 18),
+    ),
+    BoxShadow(
+      color: sky.withValues(alpha: 0.14),
+      blurRadius: 18,
+      offset: const Offset(0, 6),
+    ),
+  ];
+
+  static List<BoxShadow> tintedShadow(Color color) => [
+    BoxShadow(
+      color: color.withValues(alpha: 0.20),
+      blurRadius: 28,
+      offset: const Offset(0, 14),
+    ),
+    BoxShadow(
+      color: const Color(0xFF5B4215).withValues(alpha: 0.08),
+      blurRadius: 10,
+      offset: const Offset(0, 4),
     ),
   ];
 
   static BoxDecoration card({
     Color color = surface,
     Color border = outline,
+    Gradient? gradient,
     double radius = 22,
     bool shadow = true,
   }) {
     return BoxDecoration(
       color: color,
+      gradient: gradient ?? cardSheen,
       borderRadius: BorderRadius.circular(radius),
       border: Border.all(color: border),
       boxShadow: shadow ? softShadow : null,

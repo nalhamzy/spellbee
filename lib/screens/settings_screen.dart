@@ -14,126 +14,134 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremium = ref.watch(isPremiumProvider);
     final quality = ref.watch(voiceQualityProvider);
-    final hasStudioVoice = ref.read(ttsServiceProvider).hasPremiumVoice;
+    final ttsService = ref.read(ttsServiceProvider);
+    final hasStudioVoice = ttsService.hasPremiumVoice;
+    final hasRemoteStudioVoice = ttsService.hasRemoteStudioVoice;
 
     return SafeArea(
       child: ResponsiveContentBox(
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.s(20),
-            context.s(16),
-            context.s(20),
-            context.s(120),
-          ),
-          children: [
-            Text('Settings', style: Theme.of(context).textTheme.headlineLarge),
-            SizedBox(height: context.s(16)),
-            const _SectionLabel('Voice'),
-            SizedBox(height: context.s(7)),
-            _SettingsCard(
-              children: [
-                _SpeedPicker(ref: ref),
-                const Divider(height: 0),
-                _QualityPicker(
-                  quality: quality,
-                  isPremium: isPremium,
-                  hasStudioVoice: hasStudioVoice,
-                  onChanged: (value) =>
-                      ref.read(voiceQualityProvider.notifier).set(value),
-                  onPremiumTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
-                  ),
-                ),
-                if (AwsPollyTtsService.hasKey) ...[
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: context.s(20)),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(0, context.s(16), 0, context.s(120)),
+            children: [
+              Text(
+                'Settings',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+              SizedBox(height: context.s(16)),
+              const _SectionLabel('Voice'),
+              SizedBox(height: context.s(7)),
+              _SettingsCard(
+                children: [
+                  _SpeedPicker(ref: ref),
                   const Divider(height: 0),
-                  _PollyPicker(ref: ref),
+                  _QualityPicker(
+                    quality: quality,
+                    isPremium: isPremium,
+                    hasStudioVoice: hasStudioVoice,
+                    onChanged: (value) =>
+                        ref.read(voiceQualityProvider.notifier).set(value),
+                    onPremiumTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                    ),
+                  ),
+                  if (quality == VoiceQuality.studio) ...[
+                    const Divider(height: 0),
+                    _StudioVoicePicker(
+                      ref: ref,
+                      hasRemoteStudioVoice: hasRemoteStudioVoice,
+                    ),
+                  ],
                 ],
-              ],
-            ),
-            SizedBox(height: context.s(16)),
-            _SettingsCard(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    isPremium
-                        ? Icons.workspace_premium_rounded
-                        : Icons.lock_outline_rounded,
-                    color: isPremium ? AppTheme.violet : AppTheme.mute,
+              ),
+              SizedBox(height: context.s(16)),
+              _SettingsCard(
+                children: [
+                  ListTile(
+                    leading: Icon(
+                      isPremium
+                          ? Icons.workspace_premium_rounded
+                          : Icons.lock_outline_rounded,
+                      color: isPremium ? AppTheme.violet : AppTheme.mute,
+                    ),
+                    title: Text(isPremium ? 'Premium active' : 'Go Premium'),
+                    subtitle: Text(
+                      isPremium
+                          ? 'Studio voice and unlimited word packs.'
+                          : 'Unlock studio voice and unlimited packs.',
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                    ),
                   ),
-                  title: Text(isPremium ? 'Premium active' : 'Go Premium'),
-                  subtitle: Text(
-                    isPremium
-                        ? 'Studio voice and unlimited word packs.'
-                        : 'Unlock studio voice and unlimited packs.',
+                  const Divider(height: 0),
+                  ListTile(
+                    leading: const Icon(Icons.restore_rounded),
+                    title: const Text('Restore purchases'),
+                    onTap: () => ref.read(iapServiceProvider).restore(),
                   ),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const PaywallScreen()),
-                  ),
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.restore_rounded),
-                  title: const Text('Restore purchases'),
-                  onTap: () => ref.read(iapServiceProvider).restore(),
-                ),
-              ],
-            ),
-            SizedBox(height: context.s(12)),
-            _SettingsCard(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.privacy_tip_outlined),
-                  title: const Text('Privacy policy'),
-                  subtitle: const Text('Progress stays local on this device.'),
-                  trailing: const Icon(Icons.open_in_new_rounded, size: 18),
-                  onTap: () async {
-                    final ok = await launchUrl(
-                      LegalUrls.privacy,
-                      mode: LaunchMode.externalApplication,
-                    );
-                    if (!ok && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Could not open privacy policy.'),
-                        ),
+                ],
+              ),
+              SizedBox(height: context.s(12)),
+              _SettingsCard(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    title: const Text('Privacy policy'),
+                    subtitle: const Text(
+                      'Progress stays local on this device.',
+                    ),
+                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                    onTap: () async {
+                      final ok = await launchUrl(
+                        LegalUrls.privacy,
+                        mode: LaunchMode.externalApplication,
                       );
-                    }
-                  },
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.gavel_outlined),
-                  title: const Text('Terms of Use (EULA)'),
-                  subtitle: const Text(
-                    'Apple standard terms for subscriptions.',
+                      if (!ok && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Could not open privacy policy.'),
+                          ),
+                        );
+                      }
+                    },
                   ),
-                  trailing: const Icon(Icons.open_in_new_rounded, size: 18),
-                  onTap: () async {
-                    final ok = await launchUrl(
-                      LegalUrls.terms,
-                      mode: LaunchMode.externalApplication,
-                    );
-                    if (!ok && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Could not open Terms of Use.'),
-                        ),
+                  const Divider(height: 0),
+                  ListTile(
+                    leading: const Icon(Icons.gavel_outlined),
+                    title: const Text('Terms of Use (EULA)'),
+                    subtitle: const Text(
+                      'Apple standard terms for subscriptions.',
+                    ),
+                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                    onTap: () async {
+                      final ok = await launchUrl(
+                        LegalUrls.terms,
+                        mode: LaunchMode.externalApplication,
                       );
-                    }
-                  },
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.info_outline_rounded),
-                  title: const Text('About SpellBee'),
-                  subtitle: Text(
-                    'Studio voice: ${hasStudioVoice ? "ready" : "not configured"}',
+                      if (!ok && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Could not open Terms of Use.'),
+                          ),
+                        );
+                      }
+                    },
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const Divider(height: 0),
+                  ListTile(
+                    leading: const Icon(Icons.info_outline_rounded),
+                    title: const Text('About SpellBee'),
+                    subtitle: Text(
+                      'Studio voice: ${hasStudioVoice ? "ready" : "not configured"}',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -257,12 +265,39 @@ class _QualityPicker extends StatelessWidget {
   }
 }
 
-class _PollyPicker extends StatelessWidget {
+class _StudioVoicePicker extends StatelessWidget {
   final WidgetRef ref;
-  const _PollyPicker({required this.ref});
+  final bool hasRemoteStudioVoice;
+
+  const _StudioVoicePicker({
+    required this.ref,
+    required this.hasRemoteStudioVoice,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final source = ref.watch(studioVoiceSourceProvider);
+    final openAiVoice = ref.watch(openAiVoiceProvider);
+    final pollyVoice = ref.watch(pollyVoiceProvider);
+    final hasSelectedProviderKey = source == StudioVoiceProvider.openAi
+        ? OpenAiTtsService.hasKey
+        : AwsPollyTtsService.hasKey;
+    final voices = source == StudioVoiceProvider.openAi
+        ? kOpenAiStudioVoices
+        : kPollyStudioVoices;
+    final selectedVoice =
+        voices.any(
+          (voice) =>
+              voice.id ==
+              (source == StudioVoiceProvider.openAi ? openAiVoice : pollyVoice),
+        )
+        ? (source == StudioVoiceProvider.openAi ? openAiVoice : pollyVoice)
+        : voices.first.id;
+    final selectedOption = voices.firstWhere(
+      (voice) => voice.id == selectedVoice,
+      orElse: () => voices.first,
+    );
+
     return Padding(
       padding: EdgeInsets.all(context.s(14)),
       child: Column(
@@ -270,24 +305,83 @@ class _PollyPicker extends StatelessWidget {
         children: [
           const _TileHeader(
             icon: Icons.mic_rounded,
-            title: 'Legacy Polly voice',
+            title: 'Studio voice',
             color: AppTheme.sky,
           ),
           SizedBox(height: context.s(12)),
-          SegmentedButton<String>(
+          SegmentedButton<StudioVoiceProvider>(
             style: SegmentedButton.styleFrom(
               selectedBackgroundColor: AppTheme.aqua,
               selectedForegroundColor: AppTheme.ink,
             ),
             segments: const [
-              ButtonSegment(value: 'Kevin', label: Text('Kevin')),
-              ButtonSegment(value: 'Joanna', label: Text('Joanna')),
-              ButtonSegment(value: 'Matthew', label: Text('Matthew')),
+              ButtonSegment(
+                value: StudioVoiceProvider.openAi,
+                icon: Icon(Icons.auto_awesome_rounded),
+                label: Text('OpenAI'),
+              ),
+              ButtonSegment(
+                value: StudioVoiceProvider.polly,
+                icon: Icon(Icons.cloud_queue_rounded),
+                label: Text('Polly'),
+              ),
             ],
-            selected: {ref.watch(pollyVoiceProvider)},
+            selected: {source},
             onSelectionChanged: (s) =>
-                ref.read(pollyVoiceProvider.notifier).set(s.first),
+                ref.read(studioVoiceSourceProvider.notifier).set(s.first),
           ),
+          SizedBox(height: context.s(12)),
+          DropdownButtonFormField<String>(
+            initialValue: selectedVoice,
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: AppTheme.surface2,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(context.s(16)),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: context.s(14),
+                vertical: context.s(12),
+              ),
+            ),
+            items: [
+              for (final voice in voices)
+                DropdownMenuItem(value: voice.id, child: Text(voice.label)),
+            ],
+            onChanged: (value) {
+              if (value == null) return;
+              if (source == StudioVoiceProvider.openAi) {
+                ref.read(openAiVoiceProvider.notifier).set(value);
+              } else {
+                ref.read(pollyVoiceProvider.notifier).set(value);
+              }
+            },
+          ),
+          SizedBox(height: context.s(8)),
+          Text(
+            '${source.label}: ${selectedOption.description}',
+            style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+          ),
+          if (!hasRemoteStudioVoice) ...[
+            SizedBox(height: context.s(10)),
+            const _Notice(
+              icon: Icons.key_off_rounded,
+              color: AppTheme.honeyDark,
+              text:
+                  'No OpenAI or AWS key is in this tester build yet. Bundled and device voice will play until a key is provided.',
+            ),
+          ],
+          if (hasRemoteStudioVoice && !hasSelectedProviderKey) ...[
+            SizedBox(height: context.s(10)),
+            _Notice(
+              icon: Icons.sync_rounded,
+              color: AppTheme.honeyDark,
+              text:
+                  '${source.label} is not configured in this build. The other available studio provider will be used as fallback.',
+            ),
+          ],
         ],
       ),
     );
@@ -301,7 +395,10 @@ class _SettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: AppTheme.card(radius: context.s(24)),
+      decoration: AppTheme.card(
+        gradient: AppTheme.surfaceLiftGradient,
+        radius: context.s(24),
+      ),
       child: Column(children: children),
     );
   }
@@ -357,6 +454,11 @@ class _Notice extends StatelessWidget {
       padding: EdgeInsets.all(context.s(12)),
       decoration: AppTheme.card(
         color: color.withValues(alpha: 0.12),
+        gradient: color == AppTheme.sage
+            ? AppTheme.successGradient
+            : color == AppTheme.honeyDark
+            ? AppTheme.ctaGradient
+            : AppTheme.premiumGradient,
         border: color.withValues(alpha: 0.28),
         shadow: false,
       ),

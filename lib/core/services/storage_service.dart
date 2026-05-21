@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
 import 'package:spellbee/core/models/word_list.dart';
+import 'package:spellbee/core/services/tts_service.dart';
 
 /// SharedPreferences-backed, on-device only. No cloud, no account.
 class StorageService {
@@ -71,20 +72,39 @@ class StorageService {
   static const _kParentPin = 'sb.settings.pin';
   static const _kVoiceSpeed = 'sb.settings.voiceSpeed';
   static const _kVoiceQuality = 'sb.settings.voiceQuality';
+  static const _kStudioVoiceProvider = 'sb.settings.studioVoiceProvider';
+  static const _kOpenAiVoice = 'sb.settings.openAiVoice';
   static const _kPollyVoice = 'polly_voice';
 
   int getSelectedLevel() => _prefs.getInt(_kSelectedLevel) ?? 3;
   Future<void> setSelectedLevel(int v) => _prefs.setInt(_kSelectedLevel, v);
 
-  /// Returns 0 (calm), 1 (normal) or 2 (fast). Defaults to calm so the
-  /// voice is kid-friendly out of the box.
+  /// Returns 0 (calm), 1 (normal) or 2 (fast). Defaults to calm for early
+  /// readers who need extra spacing between sounds.
   int getVoiceSpeedIndex() => _prefs.getInt(_kVoiceSpeed) ?? 0;
   Future<void> setVoiceSpeedIndex(int v) => _prefs.setInt(_kVoiceSpeed, v);
 
   int getVoiceQualityIndex() => _prefs.getInt(_kVoiceQuality) ?? 0;
   Future<void> setVoiceQualityIndex(int v) => _prefs.setInt(_kVoiceQuality, v);
 
-  String getPollyVoice() => _prefs.getString(_kPollyVoice) ?? 'Kevin';
+  StudioVoiceProvider getStudioVoiceProvider() {
+    final raw = _prefs.getString(_kStudioVoiceProvider);
+    return StudioVoiceProvider.values.firstWhere(
+      (provider) => provider.name == raw,
+      orElse: () => StudioVoiceProvider.openAi,
+    );
+  }
+
+  Future<void> setStudioVoiceProvider(StudioVoiceProvider provider) =>
+      _prefs.setString(_kStudioVoiceProvider, provider.name);
+
+  String getOpenAiVoice() =>
+      _prefs.getString(_kOpenAiVoice) ?? kOpenAiStudioVoices.first.id;
+  Future<void> setOpenAiVoice(String voice) =>
+      _prefs.setString(_kOpenAiVoice, voice);
+
+  String getPollyVoice() =>
+      _prefs.getString(_kPollyVoice) ?? kPollyStudioVoices.first.id;
   Future<void> setPollyVoice(String voice) =>
       _prefs.setString(_kPollyVoice, voice);
 

@@ -6,23 +6,24 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-/// Premium voice via the studio TTS gateway.
+/// Premium voice through the SpellBee Firebase TTS gateway.
 ///
-/// The mobile app must never ship an OpenAI/AWS provider key. Instead, pass a
-/// studio gateway URL and optional short-lived client token at build time:
+/// The OpenAI key lives in Firebase Secret Manager, never in the mobile app.
+/// The default URL points at the studio Firebase project; use TTS_GATEWAY_URL
+/// only when testing a different backend:
 ///   flutter run --dart-define=TTS_GATEWAY_URL=https://.../spellbeeTts
-///   flutter run --dart-define=TTS_GATEWAY_TOKEN=...
-///
-/// The gateway should call OpenAI's Speech endpoint server-side, enforce
-/// entitlement/quota/rate limits, and return MP3 bytes. Every method degrades
-/// gracefully; if the gateway fails, callers fall back to on-device TTS.
 class OpenAiTtsService {
-  static const _gatewayUrl = String.fromEnvironment('TTS_GATEWAY_URL');
+  static const _defaultGatewayUrl =
+      'https://us-central1-rhyme-aa29b.cloudfunctions.net/spellbeeTts';
+  static const _gatewayUrlOverride = String.fromEnvironment('TTS_GATEWAY_URL');
   static const _gatewayToken = String.fromEnvironment('TTS_GATEWAY_TOKEN');
+  static String get _gatewayUrl =>
+      _gatewayUrlOverride.isNotEmpty ? _gatewayUrlOverride : _defaultGatewayUrl;
   static bool get hasKey => _gatewayUrl.isNotEmpty;
 
   static const String _model = 'gpt-4o-mini-tts';
   static const String _defaultVoice = 'marin';
+  static const String defaultVoice = _defaultVoice;
 
   final _player = AudioPlayer();
   Directory? _cacheDir;

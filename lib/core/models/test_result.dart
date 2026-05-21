@@ -22,15 +22,25 @@ class TestResult extends Equatable {
 
 class AskedItem extends Equatable {
   final String target;
+  final String definition;
+  final String example;
   final String submitted;
   final bool isCorrect;
 
   const AskedItem({
     required this.target,
+    this.definition = '',
+    this.example = '',
     required this.submitted,
     required this.isCorrect,
   });
 
   @override
-  List<Object?> get props => [target, submitted, isCorrect];
+  List<Object?> get props => [
+    target,
+    definition,
+    example,
+    submitted,
+    isCorrect,
+  ];
 }

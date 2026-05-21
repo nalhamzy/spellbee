@@ -101,30 +101,28 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
 
     return SafeArea(
       child: ResponsiveContentBox(
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.s(20),
-            context.s(16),
-            context.s(20),
-            context.s(120),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: context.s(20)),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(0, context.s(16), 0, context.s(120)),
+            children: [
+              _Header(level: level),
+              SizedBox(height: context.s(16)),
+              _LabPanel(
+                controller: _themeCtrl,
+                generating: _generating,
+                isPremium: isPremium,
+                credits: credits,
+                onGenerate: _generate,
+                onPick: (value) {
+                  _themeCtrl.text = value;
+                  _themeCtrl.selection = TextSelection.collapsed(
+                    offset: value.length,
+                  );
+                },
+              ),
+            ],
           ),
-          children: [
-            _Header(level: level),
-            SizedBox(height: context.s(16)),
-            _LabPanel(
-              controller: _themeCtrl,
-              generating: _generating,
-              isPremium: isPremium,
-              credits: credits,
-              onGenerate: _generate,
-              onPick: (value) {
-                _themeCtrl.text = value;
-                _themeCtrl.selection = TextSelection.collapsed(
-                  offset: value.length,
-                );
-              },
-            ),
-          ],
         ),
       ),
     );
@@ -142,9 +140,10 @@ class _Header extends StatelessWidget {
         Container(
           width: context.s(54),
           height: context.s(54),
-          decoration: const BoxDecoration(
-            color: AppTheme.lilac,
+          decoration: BoxDecoration(
+            gradient: AppTheme.premiumGradient,
             shape: BoxShape.circle,
+            boxShadow: AppTheme.tintedShadow(AppTheme.violet),
           ),
           child: const Icon(Icons.auto_awesome_rounded, color: AppTheme.violet),
         ),
@@ -190,7 +189,11 @@ class _LabPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(context.s(18)),
-      decoration: AppTheme.card(color: AppTheme.surface, radius: context.s(28)),
+      decoration: AppTheme.card(
+        color: AppTheme.surface,
+        gradient: AppTheme.surfaceLiftGradient,
+        radius: context.s(28),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -198,7 +201,10 @@ class _LabPanel extends StatelessWidget {
             padding: EdgeInsets.all(context.s(16)),
             decoration: BoxDecoration(
               color: AppTheme.aqua,
+              gradient: AppTheme.voiceGradient,
               borderRadius: BorderRadius.circular(context.s(22)),
+              border: Border.all(color: AppTheme.sky.withValues(alpha: 0.20)),
+              boxShadow: AppTheme.tintedShadow(AppTheme.sky),
             ),
             child: Row(
               children: [
@@ -225,9 +231,10 @@ class _LabPanel extends StatelessWidget {
                 Container(
                   width: context.s(54),
                   height: context.s(54),
-                  decoration: const BoxDecoration(
-                    color: AppTheme.honey,
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.ctaGradient,
                     shape: BoxShape.circle,
+                    boxShadow: AppTheme.tintedShadow(AppTheme.honeyDark),
                   ),
                   child: const Icon(Icons.school_rounded, color: AppTheme.ink),
                 ),
@@ -283,30 +290,45 @@ class _LabPanel extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             height: context.s(58),
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.honey,
-                foregroundColor: AppTheme.ink,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(context.s(20)),
-                ),
-              ),
-              onPressed: generating ? null : onGenerate,
-              icon: generating
-                  ? SizedBox(
-                      width: context.s(18),
-                      height: context.s(18),
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppTheme.ink,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: generating ? null : onGenerate,
+                borderRadius: BorderRadius.circular(context.s(20)),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.ctaGradient,
+                    borderRadius: BorderRadius.circular(context.s(20)),
+                    border: Border.all(
+                      color: AppTheme.honeyDark.withValues(alpha: 0.32),
+                    ),
+                    boxShadow: AppTheme.softShadow,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (generating)
+                        SizedBox(
+                          width: context.s(18),
+                          height: context.s(18),
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppTheme.ink,
+                          ),
+                        )
+                      else
+                        const Icon(Icons.auto_awesome_rounded),
+                      SizedBox(width: context.s(8)),
+                      Text(
+                        generating ? 'Building pack...' : 'Make 10 words',
+                        style: const TextStyle(
+                          color: AppTheme.ink,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                    )
-                  : const Icon(Icons.auto_awesome_rounded),
-              label: Text(
-                generating ? 'Building pack...' : 'Make 10 words',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -330,6 +352,7 @@ class _UpgradeReminder extends StatelessWidget {
         padding: EdgeInsets.all(context.s(13)),
         decoration: AppTheme.card(
           color: AppTheme.lilac,
+          gradient: AppTheme.premiumGradient,
           border: AppTheme.violet.withValues(alpha: 0.32),
           shadow: false,
         ),
@@ -397,6 +420,7 @@ class _CreditsCard extends StatelessWidget {
       padding: EdgeInsets.all(context.s(13)),
       decoration: AppTheme.card(
         color: isPremium ? AppTheme.lilac : AppTheme.peach,
+        gradient: isPremium ? AppTheme.premiumGradient : AppTheme.ctaGradient,
         shadow: false,
       ),
       child: Row(
