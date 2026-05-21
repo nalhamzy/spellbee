@@ -29,6 +29,7 @@ class TestScreen extends ConsumerStatefulWidget {
   final List<Word> words;
   final String title;
   final bool savesStats;
+  final String? sourceListId;
 
   /// Optional callback invoked after stats are saved and the test completes
   /// successfully (all words answered). Used by the daily-word flow to
@@ -40,6 +41,7 @@ class TestScreen extends ConsumerStatefulWidget {
     required this.words,
     required this.title,
     this.savesStats = true,
+    this.sourceListId,
     this.onComplete,
   });
 
@@ -302,6 +304,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
             masteredWords: result.items
                 .where((item) => item.isCorrect)
                 .map((item) => item.target),
+            listId: widget.sourceListId,
           );
     }
     await widget.onComplete?.call();

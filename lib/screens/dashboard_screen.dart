@@ -130,8 +130,8 @@ class DashboardScreen extends ConsumerWidget {
         onTap: () => ref.read(selectedLevelProvider.notifier).set(lvl),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
-          padding: EdgeInsets.symmetric(horizontal: c.s(15)),
-          alignment: Alignment.center,
+          padding: EdgeInsets.symmetric(horizontal: c.s(15), vertical: c.s(10)),
+          constraints: BoxConstraints(minHeight: c.s(44)),
           decoration: BoxDecoration(
             color: lvl == level ? AppTheme.ink : AppTheme.surface,
             border: Border.all(
@@ -140,39 +140,25 @@ class DashboardScreen extends ConsumerWidget {
             borderRadius: BorderRadius.circular(999),
             boxShadow: lvl == level ? AppTheme.softShadow : null,
           ),
-          child: Text(
-            _chipLabel(lvl),
-            style: TextStyle(
-              fontWeight: FontWeight.w900,
-              color: lvl == level ? Colors.white : AppTheme.mute,
+          child: Center(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: Text(
+              _chipLabel(lvl),
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                color: lvl == level ? Colors.white : AppTheme.mute,
+              ),
             ),
           ),
         ),
       );
     }
 
-    if (screenshotMode) {
-      return SizedBox(
-        height: c.s(44),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [for (final lvl in levels) chip(lvl)],
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: c.s(44),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          for (final lvl in levels)
-            Padding(
-              padding: EdgeInsets.only(right: c.s(8)),
-              child: chip(lvl),
-            ),
-        ],
-      ),
+    return Wrap(
+      spacing: c.s(8),
+      runSpacing: c.s(8),
+      children: [for (final lvl in levels) chip(lvl)],
     );
   }
 }

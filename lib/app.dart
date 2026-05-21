@@ -98,7 +98,7 @@ class _AppShell extends ConsumerWidget {
           decoration: const BoxDecoration(gradient: AppTheme.pageGradient),
           child: screen,
         ),
-        bottomNavigationBar: const _BottomNav(),
+        bottomNavigationBar: _BottomNav(forcedTab: forcedTab),
       );
     }
 
@@ -142,11 +142,13 @@ class _AppShell extends ConsumerWidget {
 }
 
 class _BottomNav extends ConsumerWidget {
-  const _BottomNav();
+  final AppTab? forcedTab;
+
+  const _BottomNav({this.forcedTab});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tab = ref.watch(tabProvider);
+    final tab = forcedTab ?? ref.watch(tabProvider);
     final nav = Container(
       margin: const EdgeInsets.fromLTRB(14, 0, 14, 12),
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),

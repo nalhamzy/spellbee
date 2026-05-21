@@ -90,6 +90,46 @@ void main() {
     expect(stats.missedWordCounts['giraffe'], 1);
   });
 
+  test('player stats persist custom list score summaries', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final storage = StorageService(prefs);
+
+    const score = ListScoreSummary(
+      attempts: 2,
+      lastCorrect: 4,
+      lastTotal: 5,
+      bestCorrect: 5,
+      bestTotal: 5,
+      lastPlayedEpochMs: 12345,
+    );
+
+    await storage.saveStats(
+      const PlayerStats(listScores: {'school-list': score}),
+    );
+
+    final stats = storage.loadStats();
+
+    expect(stats.listScores['school-list'], score);
+    expect(stats.listScores['school-list']?.bestAccuracy, 1);
+  });
+
+  test('list score summary keeps the strongest result', () {
+    final first = const ListScoreSummary().record(
+      correct: 4,
+      total: 5,
+      playedAtEpochMs: 100,
+    );
+    final second = first.record(correct: 3, total: 5, playedAtEpochMs: 200);
+
+    expect(second.attempts, 2);
+    expect(second.lastCorrect, 3);
+    expect(second.lastTotal, 5);
+    expect(second.bestCorrect, 4);
+    expect(second.bestTotal, 5);
+    expect(second.lastPlayedEpochMs, 200);
+  });
+
   test('device voice picker prefers natural English voices', () {
     final best = TtsService.chooseBestDeviceVoice([
       {'name': 'com.samsung.SMT.lang_en_us_l03', 'locale': 'en-US'},

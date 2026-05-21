@@ -68,6 +68,22 @@ Future<void> _seedScreenshotDataIfNeeded(StorageService storage) async {
         'thunder': 2,
         'castle': 1,
       },
+      listScores: const {
+        'screenshot-school': ListScoreSummary(
+          attempts: 3,
+          lastCorrect: 7,
+          lastTotal: 8,
+          bestCorrect: 8,
+          bestTotal: 8,
+        ),
+        'screenshot-bee': ListScoreSummary(
+          attempts: 2,
+          lastCorrect: 8,
+          lastTotal: 10,
+          bestCorrect: 9,
+          bestTotal: 10,
+        ),
+      },
       lastPlayedEpochMs: DateTime.now().millisecondsSinceEpoch,
       lastDailyEpochDay:
           DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay,

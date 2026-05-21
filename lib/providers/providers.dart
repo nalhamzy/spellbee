@@ -212,6 +212,7 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
     required int longestStreak,
     Iterable<String> missedWords = const [],
     Iterable<String> masteredWords = const [],
+    String? listId,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     final bestStreak = longestStreak > state.bestStreak
@@ -233,6 +234,16 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
         missedCounts[key] = next;
       }
     }
+    final listScores = Map<String, ListScoreSummary>.from(state.listScores);
+    final trimmedListId = listId?.trim();
+    if (trimmedListId != null && trimmedListId.isNotEmpty) {
+      listScores[trimmedListId] =
+          (listScores[trimmedListId] ?? const ListScoreSummary()).record(
+            correct: correct,
+            total: asked,
+            playedAtEpochMs: now,
+          );
+    }
     state = state.copyWith(
       totalTests: state.totalTests + 1,
       totalWordsAsked: state.totalWordsAsked + asked,
@@ -243,6 +254,7 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
           : 0, // reset streak if the test wasn't perfect
       lastPlayedEpochMs: now,
       missedWordCounts: missedCounts,
+      listScores: listScores,
     );
     await ref.read(storageServiceProvider).saveStats(state);
   }

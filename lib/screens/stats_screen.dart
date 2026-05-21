@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
+import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/word.dart';
+import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/test_screen.dart';
@@ -13,8 +15,10 @@ class StatsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(playerStatsProvider);
+    final lists = ref.watch(wordListsProvider);
     final accPct = (s.accuracy * 100).round();
     final focusWords = _focusWords(s.missedWordCounts).take(8).toList();
+    final listProgress = _listProgress(s.listScores, lists).take(3).toList();
 
     return SafeArea(
       child: ResponsiveContentBox(
@@ -40,6 +44,8 @@ class StatsScreen extends ConsumerWidget {
               ),
               SizedBox(height: context.s(16)),
               _FocusPanel(words: focusWords),
+              SizedBox(height: context.s(16)),
+              _ListProgressPanel(entries: listProgress),
               SizedBox(height: context.s(16)),
               Wrap(
                 spacing: context.s(8),
@@ -74,6 +80,32 @@ class StatsScreen extends ConsumerWidget {
     );
   }
 
+  List<_ListProgressEntry> _listProgress(
+    Map<String, ListScoreSummary> scores,
+    List<WordList> lists,
+  ) {
+    final byId = {for (final list in lists) list.id: list};
+    final entries = <_ListProgressEntry>[];
+    for (final scoreEntry in scores.entries) {
+      final score = scoreEntry.value;
+      if (score.lastTotal == 0) continue;
+      final list = byId[scoreEntry.key];
+      entries.add(
+        _ListProgressEntry(
+          name: list?.name ?? 'Saved list',
+          wordCount: list?.size ?? score.lastTotal,
+          score: score,
+        ),
+      );
+    }
+    entries.sort((a, b) {
+      final byBest = b.score.bestAccuracy.compareTo(a.score.bestAccuracy);
+      if (byBest != 0) return byBest;
+      return b.score.attempts.compareTo(a.score.attempts);
+    });
+    return entries;
+  }
+
   List<Word> _focusWords(Map<String, int> counts) {
     final entries = counts.entries.toList()
       ..sort((a, b) {
@@ -98,6 +130,18 @@ class StatsScreen extends ConsumerWidget {
     }
     return null;
   }
+}
+
+class _ListProgressEntry {
+  final String name;
+  final int wordCount;
+  final ListScoreSummary score;
+
+  const _ListProgressEntry({
+    required this.name,
+    required this.wordCount,
+    required this.score,
+  });
 }
 
 class _SummaryPanel extends StatelessWidget {
@@ -318,6 +362,166 @@ class _FocusPanel extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ListProgressPanel extends StatelessWidget {
+  final List<_ListProgressEntry> entries;
+
+  const _ListProgressPanel({required this.entries});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(context.s(16)),
+      decoration: AppTheme.card(
+        gradient: AppTheme.surfaceLiftGradient,
+        radius: context.s(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: context.s(42),
+                height: context.s(42),
+                decoration: BoxDecoration(
+                  color: AppTheme.aqua,
+                  borderRadius: BorderRadius.circular(context.s(14)),
+                ),
+                child: const Icon(
+                  Icons.library_books_rounded,
+                  color: AppTheme.sky,
+                ),
+              ),
+              SizedBox(width: context.s(10)),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'List progress',
+                      style: TextStyle(
+                        color: AppTheme.ink,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Last score and best score for saved lists.',
+                      style: TextStyle(color: AppTheme.mute, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.s(12)),
+          if (entries.isEmpty)
+            Container(
+              padding: EdgeInsets.all(context.s(13)),
+              decoration: AppTheme.card(
+                color: AppTheme.aqua,
+                gradient: AppTheme.voiceGradient,
+                shadow: false,
+              ),
+              child: const Text(
+                'Practice a custom list once and its score history will appear here.',
+                style: TextStyle(
+                  color: AppTheme.ink,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            )
+          else
+            for (var i = 0; i < entries.length; i++) ...[
+              if (i > 0) SizedBox(height: context.s(10)),
+              _ListProgressRow(entry: entries[i]),
+            ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ListProgressRow extends StatelessWidget {
+  final _ListProgressEntry entry;
+
+  const _ListProgressRow({required this.entry});
+
+  @override
+  Widget build(BuildContext context) {
+    final score = entry.score;
+    final bestPct = (score.bestAccuracy * 100).round();
+    return Container(
+      padding: EdgeInsets.all(context.s(12)),
+      decoration: AppTheme.card(
+        color: AppTheme.mint.withValues(alpha: 0.42),
+        gradient: AppTheme.successGradient,
+        radius: context.s(16),
+        shadow: false,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  entry.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              Text(
+                'Best $bestPct%',
+                style: const TextStyle(
+                  color: AppTheme.sage,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.s(7)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: score.bestAccuracy.clamp(0, 1),
+              minHeight: context.s(8),
+              color: AppTheme.sage,
+              backgroundColor: AppTheme.surface.withValues(alpha: 0.72),
+            ),
+          ),
+          SizedBox(height: context.s(7)),
+          Row(
+            children: [
+              Text(
+                'Last ${score.lastCorrect}/${score.lastTotal}',
+                style: const TextStyle(
+                  color: AppTheme.ink,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${entry.wordCount} words - ${score.attempts} ${score.attempts == 1 ? 'try' : 'tries'}',
+                style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+              ),
+            ],
+          ),
         ],
       ),
     );

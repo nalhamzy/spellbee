@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
+import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
@@ -14,6 +15,7 @@ class CustomListsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lists = ref.watch(wordListsProvider);
+    final listScores = ref.watch(playerStatsProvider).listScores;
     final isPremium = ref.watch(isPremiumProvider);
     final freeCap = 3;
 
@@ -30,12 +32,16 @@ class CustomListsScreen extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  Text(
-                    'My word lists',
-                    style: Theme.of(context).textTheme.headlineLarge,
+                  Expanded(
+                    child: Text(
+                      'My word lists',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
                   ),
-                  const Spacer(),
-                  FilledButton.icon(
+                  SizedBox(width: context.s(8)),
+                  IconButton.filled(
                     onPressed: () {
                       if (!isPremium && lists.length >= freeCap) {
                         _showUpsell(context);
@@ -47,11 +53,12 @@ class CustomListsScreen extends ConsumerWidget {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.add, size: 20),
-                    label: const Text('New'),
-                    style: FilledButton.styleFrom(
+                    icon: const Icon(Icons.add_rounded, size: 22),
+                    tooltip: 'New list',
+                    style: IconButton.styleFrom(
                       backgroundColor: AppTheme.honey,
                       foregroundColor: AppTheme.ink,
+                      fixedSize: Size(context.s(48), context.s(48)),
                     ),
                   ),
                 ],
@@ -84,7 +91,12 @@ class CustomListsScreen extends ConsumerWidget {
                       itemCount: lists.length,
                       separatorBuilder: (_, _) =>
                           SizedBox(height: context.s(10)),
-                      itemBuilder: (_, i) => _listCard(context, ref, lists[i]),
+                      itemBuilder: (_, i) => _listCard(
+                        context,
+                        ref,
+                        lists[i],
+                        listScores[lists[i].id],
+                      ),
                     ),
             ),
           ],
@@ -100,7 +112,7 @@ class CustomListsScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('🐝', style: TextStyle(fontSize: c.s(56))),
+            Icon(Icons.hive_rounded, size: c.s(60), color: AppTheme.honeyDark),
             SizedBox(height: c.s(14)),
             Text(
               'No custom lists yet',
@@ -119,7 +131,12 @@ class CustomListsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _listCard(BuildContext c, WidgetRef ref, WordList list) {
+  Widget _listCard(
+    BuildContext c,
+    WidgetRef ref,
+    WordList list,
+    ListScoreSummary? score,
+  ) {
     return InkWell(
       borderRadius: BorderRadius.circular(c.s(16)),
       onTap: () => Navigator.of(c).push(
@@ -153,6 +170,8 @@ class CustomListsScreen extends ConsumerWidget {
                 children: [
                   Text(
                     list.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 15,
@@ -163,6 +182,36 @@ class CustomListsScreen extends ConsumerWidget {
                     '${list.size} words',
                     style: const TextStyle(color: AppTheme.mute, fontSize: 12),
                   ),
+                  SizedBox(height: c.s(8)),
+                  if (score == null || score.lastTotal == 0)
+                    const Text(
+                      'No score yet',
+                      style: TextStyle(
+                        color: AppTheme.mute,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )
+                  else
+                    Wrap(
+                      spacing: c.s(6),
+                      runSpacing: c.s(6),
+                      children: [
+                        _ScorePill(
+                          icon: Icons.history_rounded,
+                          label: 'Last ${score.lastCorrect}/${score.lastTotal}',
+                        ),
+                        _ScorePill(
+                          icon: Icons.emoji_events_rounded,
+                          label: 'Best ${(score.bestAccuracy * 100).round()}%',
+                        ),
+                        _ScorePill(
+                          icon: Icons.repeat_rounded,
+                          label:
+                              '${score.attempts} ${score.attempts == 1 ? 'try' : 'tries'}',
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -174,8 +223,11 @@ class CustomListsScreen extends ConsumerWidget {
                   ? null
                   : () => Navigator.of(c).push(
                       MaterialPageRoute(
-                        builder: (_) =>
-                            TestScreen(words: list.words, title: list.name),
+                        builder: (_) => TestScreen(
+                          words: list.words,
+                          title: list.name,
+                          sourceListId: list.id,
+                        ),
                       ),
                     ),
             ),
@@ -208,6 +260,40 @@ class CustomListsScreen extends ConsumerWidget {
               ).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
             },
             child: const Text('See Premium'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScorePill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _ScorePill({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppTheme.mint.withValues(alpha: 0.45),
+        border: Border.all(color: AppTheme.outline),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppTheme.sage),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppTheme.ink,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
