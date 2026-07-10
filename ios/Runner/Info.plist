@@ -66,16 +66,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-2199673102027930~9041599307</string>
-	<key>SKAdNetworkItems</key>
-	<array>
-		<dict>
-			<key>SKAdNetworkIdentifier</key>
-			<string>cstr6suwn9.skadnetwork</string>
-		</dict>
-	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 
@@ -84,11 +74,5 @@
 	<string>SpellBee lets you spell words aloud into the mic for voice-first practice.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>SpellBee listens to what you say so it can check your spelling.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>SpellBee does not use the camera in normal practice, but this permission string is included for platform compatibility.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>SpellBee does not use your location in normal practice, but this permission string is included for platform compatibility.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>SpellBee does not use your location in normal practice, but this permission string is included for platform compatibility.</string>
 </dict>
 </plist>

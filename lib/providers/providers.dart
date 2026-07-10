@@ -4,26 +4,20 @@ import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
-import 'package:spellbee/core/services/ad_service.dart';
 import 'package:spellbee/core/services/ai_word_generator.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/core/services/stt_service.dart';
 import 'package:spellbee/core/services/tts_service.dart';
-export 'package:spellbee/core/services/aws_polly_tts_service.dart'
-    show AwsPollyTtsService;
 export 'package:spellbee/core/services/openai_tts_service.dart'
     show OpenAiTtsService;
 export 'package:spellbee/core/services/tts_service.dart'
     show
         StudioVoiceOption,
-        StudioVoiceProvider,
-        StudioVoiceProviderLabel,
         VoiceQuality,
         VoiceQualityLabel,
         VoiceSpeed,
-        kOpenAiStudioVoices,
-        kPollyStudioVoices;
+        kOpenAiStudioVoices;
 
 // ─── Service providers (overridden in main.dart) ───────────────────────
 
@@ -35,12 +29,6 @@ final iapServiceProvider = Provider<IapService>((ref) {
   throw UnimplementedError('Override iapServiceProvider in main.dart');
 });
 
-final adServiceProvider = Provider<AdService>((ref) {
-  final s = AdService();
-  ref.onDispose(s.dispose);
-  return s;
-});
-
 final ttsServiceProvider = Provider<TtsService>((ref) {
   final s = TtsService();
   final storage = ref.read(storageServiceProvider);
@@ -50,20 +38,13 @@ final ttsServiceProvider = Provider<TtsService>((ref) {
   s.setQuality(
     VoiceQuality.values[qualityIdx.clamp(0, VoiceQuality.values.length - 1)],
   );
-  s.setStudioProvider(storage.getStudioVoiceProvider());
   s.setOpenAiVoice(storage.getOpenAiVoice());
-  s.setPollyVoice(storage.getPollyVoice());
   ref.listen<VoiceSpeed>(voiceSpeedProvider, (_, next) => s.setSpeed(next));
   ref.listen<VoiceQuality>(
     voiceQualityProvider,
     (_, next) => s.setQuality(next),
   );
-  ref.listen<StudioVoiceProvider>(
-    studioVoiceSourceProvider,
-    (_, next) => s.setStudioProvider(next),
-  );
   ref.listen<String>(openAiVoiceProvider, (_, next) => s.setOpenAiVoice(next));
-  ref.listen<String>(pollyVoiceProvider, (_, next) => s.setPollyVoice(next));
   ref.onDispose(s.dispose);
   return s;
 });
@@ -103,22 +84,6 @@ class VoiceQualityNotifier extends Notifier<VoiceQuality> {
   }
 }
 
-final studioVoiceSourceProvider =
-    NotifierProvider<StudioVoiceSourceNotifier, StudioVoiceProvider>(
-      StudioVoiceSourceNotifier.new,
-    );
-
-class StudioVoiceSourceNotifier extends Notifier<StudioVoiceProvider> {
-  @override
-  StudioVoiceProvider build() =>
-      ref.read(storageServiceProvider).getStudioVoiceProvider();
-
-  Future<void> set(StudioVoiceProvider provider) async {
-    state = provider;
-    await ref.read(storageServiceProvider).setStudioVoiceProvider(provider);
-  }
-}
-
 final openAiVoiceProvider = NotifierProvider<OpenAiVoiceNotifier, String>(
   OpenAiVoiceNotifier.new,
 );
@@ -130,20 +95,6 @@ class OpenAiVoiceNotifier extends Notifier<String> {
   Future<void> set(String voice) async {
     state = voice;
     await ref.read(storageServiceProvider).setOpenAiVoice(voice);
-  }
-}
-
-final pollyVoiceProvider = NotifierProvider<PollyVoiceNotifier, String>(
-  PollyVoiceNotifier.new,
-);
-
-class PollyVoiceNotifier extends Notifier<String> {
-  @override
-  String build() => ref.read(storageServiceProvider).getPollyVoice();
-
-  Future<void> set(String voice) async {
-    state = voice;
-    await ref.read(storageServiceProvider).setPollyVoice(voice);
   }
 }
 

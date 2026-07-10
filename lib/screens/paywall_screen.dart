@@ -217,9 +217,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
     return Column(
       children: [
-        row(Icons.all_inclusive_rounded, 'Unlimited AI-generated word packs'),
+        row(Icons.all_inclusive_rounded, 'Unlimited themed word packs — no daily cap'),
         row(Icons.list_alt_rounded, 'Unlimited parent-made word lists'),
-        row(Icons.verified_user_rounded, 'No ads in the learning flow'),
         row(Icons.record_voice_over_rounded, 'Studio voice pronunciation'),
       ],
     );

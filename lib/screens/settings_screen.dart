@@ -276,22 +276,10 @@ class _StudioVoicePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final source = ref.watch(studioVoiceSourceProvider);
     final openAiVoice = ref.watch(openAiVoiceProvider);
-    final pollyVoice = ref.watch(pollyVoiceProvider);
-    final hasSelectedProviderKey = source == StudioVoiceProvider.openAi
-        ? OpenAiTtsService.hasKey
-        : AwsPollyTtsService.hasKey;
-    final voices = source == StudioVoiceProvider.openAi
-        ? kOpenAiStudioVoices
-        : kPollyStudioVoices;
-    final selectedVoice =
-        voices.any(
-          (voice) =>
-              voice.id ==
-              (source == StudioVoiceProvider.openAi ? openAiVoice : pollyVoice),
-        )
-        ? (source == StudioVoiceProvider.openAi ? openAiVoice : pollyVoice)
+    const voices = kOpenAiStudioVoices;
+    final selectedVoice = voices.any((voice) => voice.id == openAiVoice)
+        ? openAiVoice
         : voices.first.id;
     final selectedOption = voices.firstWhere(
       (voice) => voice.id == selectedVoice,
@@ -307,28 +295,6 @@ class _StudioVoicePicker extends StatelessWidget {
             icon: Icons.mic_rounded,
             title: 'Studio voice',
             color: AppTheme.sky,
-          ),
-          SizedBox(height: context.s(12)),
-          SegmentedButton<StudioVoiceProvider>(
-            style: SegmentedButton.styleFrom(
-              selectedBackgroundColor: AppTheme.aqua,
-              selectedForegroundColor: AppTheme.ink,
-            ),
-            segments: const [
-              ButtonSegment(
-                value: StudioVoiceProvider.openAi,
-                icon: Icon(Icons.auto_awesome_rounded),
-                label: Text('OpenAI'),
-              ),
-              ButtonSegment(
-                value: StudioVoiceProvider.polly,
-                icon: Icon(Icons.cloud_queue_rounded),
-                label: Text('Polly'),
-              ),
-            ],
-            selected: {source},
-            onSelectionChanged: (s) =>
-                ref.read(studioVoiceSourceProvider.notifier).set(s.first),
           ),
           SizedBox(height: context.s(12)),
           DropdownButtonFormField<String>(
@@ -352,16 +318,12 @@ class _StudioVoicePicker extends StatelessWidget {
             ],
             onChanged: (value) {
               if (value == null) return;
-              if (source == StudioVoiceProvider.openAi) {
-                ref.read(openAiVoiceProvider.notifier).set(value);
-              } else {
-                ref.read(pollyVoiceProvider.notifier).set(value);
-              }
+              ref.read(openAiVoiceProvider.notifier).set(value);
             },
           ),
           SizedBox(height: context.s(8)),
           Text(
-            '${source.label}: ${selectedOption.description}',
+            selectedOption.description,
             style: const TextStyle(color: AppTheme.mute, fontSize: 12),
           ),
           if (!hasRemoteStudioVoice) ...[
@@ -370,16 +332,7 @@ class _StudioVoicePicker extends StatelessWidget {
               icon: Icons.key_off_rounded,
               color: AppTheme.honeyDark,
               text:
-                  'No OpenAI or AWS key is in this tester build yet. Bundled and device voice will play until a key is provided.',
-            ),
-          ],
-          if (hasRemoteStudioVoice && !hasSelectedProviderKey) ...[
-            SizedBox(height: context.s(10)),
-            _Notice(
-              icon: Icons.sync_rounded,
-              color: AppTheme.honeyDark,
-              text:
-                  '${source.label} is not configured in this build. The other available studio provider will be used as fallback.',
+                  'No studio voice gateway is configured in this tester build yet. Bundled and device voice will play until it is provided.',
             ),
           ],
         ],

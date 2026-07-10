@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:spellbee/core/services/aws_polly_tts_service.dart';
 import 'package:spellbee/core/services/bundled_tts_service.dart';
 import 'package:spellbee/core/services/openai_tts_service.dart';
 
@@ -27,20 +26,7 @@ extension VoiceQualityLabel on VoiceQuality {
       case VoiceQuality.device:
         return 'Natural bundled clips with enhanced device fallback.';
       case VoiceQuality.studio:
-        return 'Premium OpenAI or Polly voices, with bundled and device fallback.';
-    }
-  }
-}
-
-enum StudioVoiceProvider { openAi, polly }
-
-extension StudioVoiceProviderLabel on StudioVoiceProvider {
-  String get label {
-    switch (this) {
-      case StudioVoiceProvider.openAi:
-        return 'OpenAI';
-      case StudioVoiceProvider.polly:
-        return 'AWS Polly';
+        return 'Premium studio voice, with bundled and device fallback.';
     }
   }
 }
@@ -85,39 +71,6 @@ const kOpenAiStudioVoices = <StudioVoiceOption>[
   ),
 ];
 
-const kPollyStudioVoices = <StudioVoiceOption>[
-  StudioVoiceOption(
-    id: 'Kevin',
-    label: 'Kevin',
-    description: 'US child voice.',
-  ),
-  StudioVoiceOption(
-    id: 'Joanna',
-    label: 'Joanna',
-    description: 'US female voice.',
-  ),
-  StudioVoiceOption(
-    id: 'Matthew',
-    label: 'Matthew',
-    description: 'US male voice.',
-  ),
-  StudioVoiceOption(
-    id: 'Ruth',
-    label: 'Ruth',
-    description: 'Conversational US female voice.',
-  ),
-  StudioVoiceOption(
-    id: 'Stephen',
-    label: 'Stephen',
-    description: 'Conversational US male voice.',
-  ),
-  StudioVoiceOption(
-    id: 'Danielle',
-    label: 'Danielle',
-    description: 'Warm US female voice.',
-  ),
-];
-
 extension VoiceSpeedRate on VoiceSpeed {
   /// flutter_tts engine rate (0.0-1.0 on all platforms).
   double get ttsRate {
@@ -156,8 +109,8 @@ extension VoiceSpeedRate on VoiceSpeed {
   }
 }
 
-/// Thin TTS wrapper that routes between the studio voice gateway, legacy
-/// Polly fallback, bundled MP3s, and on-device TTS. Callers pass [premium] on
+/// Thin TTS wrapper that routes between the studio voice gateway,
+/// bundled MP3s, and on-device TTS. Callers pass [premium] on
 /// every call so an expiring subscription silently falls back without the
 /// service having to watch Riverpod.
 class TtsService {
@@ -165,31 +118,19 @@ class TtsService {
 
   final _tts = FlutterTts();
   final _openai = OpenAiTtsService();
-  final _polly = AwsPollyTtsService();
   final _bundled = BundledTtsService();
   final _promptRandom = math.Random();
   bool _ready = false;
   bool _deviceVoiceConfigured = false;
   VoiceSpeed _speed = VoiceSpeed.calm;
   VoiceQuality _quality = VoiceQuality.device;
-  StudioVoiceProvider _studioProvider = StudioVoiceProvider.openAi;
   String _openAiVoice = OpenAiTtsService.defaultVoice;
-  String _pollyVoice = AwsPollyTtsService.defaultVoice;
 
   bool get hasPremiumVoice => true;
-  bool get hasRemoteStudioVoice =>
-      OpenAiTtsService.hasKey || AwsPollyTtsService.hasKey;
-
-  void setStudioProvider(StudioVoiceProvider provider) {
-    _studioProvider = provider;
-  }
+  bool get hasRemoteStudioVoice => OpenAiTtsService.hasKey;
 
   void setOpenAiVoice(String voice) {
     _openAiVoice = voice;
-  }
-
-  void setPollyVoice(String voice) {
-    _pollyVoice = voice;
   }
 
   void setQuality(VoiceQuality quality) {
@@ -316,7 +257,7 @@ class TtsService {
     return mapped;
   }
 
-  Future<bool> _tryOpenAi(String sentence) async {
+  Future<bool> _tryStudio(String sentence) async {
     if (!OpenAiTtsService.hasKey) return false;
     return _openai.speak(
       sentence,
@@ -325,22 +266,7 @@ class TtsService {
     );
   }
 
-  Future<bool> _tryPolly(String sentence) async {
-    if (!AwsPollyTtsService.hasKey) return false;
-    return _polly.speak(sentence, voice: _pollyVoice);
-  }
-
-  Future<bool> _tryStudio(String sentence) async {
-    if (_studioProvider == StudioVoiceProvider.openAi) {
-      if (await _tryOpenAi(sentence)) return true;
-      return _tryPolly(sentence);
-    }
-    if (await _tryPolly(sentence)) return true;
-    return _tryOpenAi(sentence);
-  }
-
-  /// Say [sentence]. Studio priority: selected cloud voice, alternate cloud
-  /// voice, then device TTS.
+  /// Say [sentence]. Studio priority: cloud voice, then device TTS.
   Future<void> _sayWithFallback(
     String sentence, {
     required bool premium,
@@ -479,9 +405,7 @@ class TtsService {
   /// device TTS stay as graceful fallback.
   Future<void> speakWord(String word, {bool premium = false}) async {
     final useRemoteStudio =
-        premium &&
-        _quality == VoiceQuality.studio &&
-        (OpenAiTtsService.hasKey || AwsPollyTtsService.hasKey);
+        premium && _quality == VoiceQuality.studio && OpenAiTtsService.hasKey;
     final prompt = _wordPrompt(word);
     if (useRemoteStudio && await _tryStudio(prompt)) return;
 
@@ -522,7 +446,6 @@ class TtsService {
   }
 
   Future<void> stop() async {
-    await _polly.stop();
     await _openai.stop();
     await _bundled.stop();
     if (!_ready) return;
@@ -531,7 +454,6 @@ class TtsService {
 
   void dispose() {
     _tts.stop();
-    _polly.dispose();
     _openai.dispose();
     _bundled.dispose();
   }

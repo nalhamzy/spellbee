@@ -12,8 +12,8 @@ import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/providers/providers.dart';
 
-/// True only on phones — google_mobile_ads and in_app_purchase have no
-/// desktop/web implementation and throw MissingPluginException when called.
+/// True only on phones because in_app_purchase has no desktop/web
+/// implementation and throws MissingPluginException when called.
 bool get _isMobile =>
     !kIsWeb &&
     (defaultTargetPlatform == TargetPlatform.android ||

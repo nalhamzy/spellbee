@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         applicationId = "com.idealai.spellbee"
-        // Google Mobile Ads SDK requires min 21; speech_to_text needs 21+ too.
+        // speech_to_text needs API 21+.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

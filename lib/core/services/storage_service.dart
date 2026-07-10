@@ -72,9 +72,7 @@ class StorageService {
   static const _kParentPin = 'sb.settings.pin';
   static const _kVoiceSpeed = 'sb.settings.voiceSpeed';
   static const _kVoiceQuality = 'sb.settings.voiceQuality';
-  static const _kStudioVoiceProvider = 'sb.settings.studioVoiceProvider';
   static const _kOpenAiVoice = 'sb.settings.openAiVoice';
-  static const _kPollyVoice = 'polly_voice';
 
   int getSelectedLevel() => _prefs.getInt(_kSelectedLevel) ?? 3;
   Future<void> setSelectedLevel(int v) => _prefs.setInt(_kSelectedLevel, v);
@@ -87,26 +85,10 @@ class StorageService {
   int getVoiceQualityIndex() => _prefs.getInt(_kVoiceQuality) ?? 0;
   Future<void> setVoiceQualityIndex(int v) => _prefs.setInt(_kVoiceQuality, v);
 
-  StudioVoiceProvider getStudioVoiceProvider() {
-    final raw = _prefs.getString(_kStudioVoiceProvider);
-    return StudioVoiceProvider.values.firstWhere(
-      (provider) => provider.name == raw,
-      orElse: () => StudioVoiceProvider.openAi,
-    );
-  }
-
-  Future<void> setStudioVoiceProvider(StudioVoiceProvider provider) =>
-      _prefs.setString(_kStudioVoiceProvider, provider.name);
-
   String getOpenAiVoice() =>
       _prefs.getString(_kOpenAiVoice) ?? kOpenAiStudioVoices.first.id;
   Future<void> setOpenAiVoice(String voice) =>
       _prefs.setString(_kOpenAiVoice, voice);
-
-  String getPollyVoice() =>
-      _prefs.getString(_kPollyVoice) ?? kPollyStudioVoices.first.id;
-  Future<void> setPollyVoice(String voice) =>
-      _prefs.setString(_kPollyVoice, voice);
 
   String? getParentPin() => _prefs.getString(_kParentPin);
   Future<void> setParentPin(String? pin) async {
@@ -117,7 +99,7 @@ class StorageService {
     }
   }
 
-  // ── Daily-rewarded-ad tracking (free-tier AI limits) ────────────────
+  // ── Daily AI credit tracking (free-tier AI limits) ────────────────
 
   static const _kAiCreditsPrefix = 'sb.ai.credits.';
   String _todayKey() {
