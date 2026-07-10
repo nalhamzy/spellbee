@@ -21,9 +21,13 @@ workflows:
     integrations:
       app_store_connect: admin
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.idealai.spellbee
+      # Signing migrated 2026-07-11 to the fetch-signing-files pattern
+      # (same as Planify/nabd-al-dhikr): the stored-identity flow broke when
+      # `studio_distribution_2026` was revoked during the 2026-07-06 cert
+      # reset. CERTIFICATE_PRIVATE_KEY (secure var in the `ios_signing`
+      # group, base64-encoded PEM, vaulted at
+      # studio-secrets/ios_distribution_key_2026-07-10.*) pins one reusable
+      # Apple Distribution certificate across builds.
       flutter: stable
       xcode: latest
       cocoapods: default
@@ -31,8 +35,10 @@ workflows:
       groups:
         - google_play
         - spellbee_secrets
+        - ios_signing
       vars:
         PACKAGE_NAME: "com.idealai.spellbee"
+        BUNDLE_ID: "com.idealai.spellbee"
     scripts:
       - name: Extract version from pubspec
         script: |
@@ -59,7 +65,24 @@ workflows:
           pod repo update
           pod install
       - name: Set up code signing
-        script: xcode-project use-profiles
+        # fetch-signing-files needs a certificate private key to produce a
+        # usable signing identity. Reuse the persistent studio key from the
+        # CERTIFICATE_PRIVATE_KEY env var (base64-encoded PEM) so --create
+        # mints one distribution certificate and reuses it on every
+        # subsequent build; ephemeral fallback only if the var is unset.
+        script: |
+          keychain initialize
+          if [ -n "$CERTIFICATE_PRIVATE_KEY" ]; then
+            printf '%s' "$CERTIFICATE_PRIVATE_KEY" | openssl base64 -A -d > /tmp/cert_key.pem
+          else
+            openssl genrsa -out /tmp/cert_key.pem 2048
+          fi
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --certificate-key=@file:/tmp/cert_key.pem \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
       - name: Build iOS IPA
         script: |
           flutter build ipa --release \
@@ -98,14 +121,14 @@ workflows:
     integrations:
       app_store_connect: admin
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.idealai.spellbee
       flutter: stable
       xcode: latest
       cocoapods: default
       groups:
         - spellbee_secrets
+        - ios_signing
+      vars:
+        BUNDLE_ID: "com.idealai.spellbee"
     scripts:
       - name: Extract version from pubspec
         script: |
@@ -124,7 +147,19 @@ workflows:
           pod repo update
           pod install
       - name: Set up code signing
-        script: xcode-project use-profiles
+        script: |
+          keychain initialize
+          if [ -n "$CERTIFICATE_PRIVATE_KEY" ]; then
+            printf '%s' "$CERTIFICATE_PRIVATE_KEY" | openssl base64 -A -d > /tmp/cert_key.pem
+          else
+            openssl genrsa -out /tmp/cert_key.pem 2048
+          fi
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --certificate-key=@file:/tmp/cert_key.pem \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
       - name: Build iOS IPA
         script: |
           flutter build ipa --release \
