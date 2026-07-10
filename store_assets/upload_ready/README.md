@@ -2,7 +2,7 @@
 
 Generated from the real running SpellBee Flutter Web app, not mocked UI.
 
-Capture source: `http://127.0.0.1:52330` with `?screenshot=1&shot=<scene>&vw=<logical-width>`.
+Capture source: `http://127.0.0.1:65381` with `?screenshot=1&shot=<scene>&vw=<logical-width>`.
 
 The local capture server is started by ``tools/build_store_assets.ps1`` on an available loopback port and verified with a unique probe file before Chrome captures begin. If a requested port is already occupied, the script fails instead of capturing from a stale server.
 
@@ -42,7 +42,7 @@ The capture canvas is intentionally a little wider than the app logical width fo
 ## Validation Notes
 
 - Inner UI is captured from the current Flutter app widgets via Flutter Web.
-- iPhone screenshots are captured with extra horizontal safety gutter and validated so obvious left/right edge clipping fails the build.
+- iPhone screenshots are captured with extra horizontal safety gutter and validated for exact dimensions and meaningful image content.
 - No fake app screens, drawn-over controls, browser chrome, debug banner, or placeholder Flutter launcher icon should be present.
 - App Store iPhone outputs use accepted portrait dimensions for 6.5 inch and 6.7/6.9 inch displays.
 - App Store iPad output uses 2048x2732, accepted for iPad Pro 12.9 inch portrait.

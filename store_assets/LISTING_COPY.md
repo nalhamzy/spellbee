@@ -15,7 +15,7 @@ SpellBee: Spelling Bee Tutor
 
 ### Subtitle (30 char)
 ```
-Practice with voice & AI packs
+Practice with voice & word packs
 ```
 **30 chars exactly.** Hits "practice", "voice", "AI".
 
@@ -28,13 +28,13 @@ Apple auto-indexes those.
 
 ### Promotional Text (170 chars)
 ```
-Bee-ready spelling practice. AI voice reads every word, two input modes (type or speak aloud), parent-curated lists, and endless AI-generated packs by grade level.
+Bee-ready spelling practice. Clear voice prompts read every word, with type-or-speak practice, parent-curated lists, and themed packs by grade level.
 ```
 **163 chars.**
 
 ### Description (4000 chars)
 ```
-SpellBee is the fastest way to get spelling-bee ready. Pick a grade level, hit start, and the AI pronouncer does the rest — reading each word aloud, offering the definition, and using it in a sentence on request, just like a real bee.
+SpellBee is the fastest way to get spelling-bee ready. Pick a grade level, hit start, and the pronouncer does the rest — reading each word aloud, offering the definition, and using it in a sentence on request, just like a real bee.
 
 Built by a spelling-bee parent who was tired of drill apps that feel like worksheets.
 
@@ -46,8 +46,8 @@ TWO WAYS TO PRACTICE
 EIGHT DIFFICULTY LEVELS
 From K-1 starter words to championship-tier stumpers like "pneumonoultramicroscopicsilicovolcanoconiosis". Every word ships with a definition and an example sentence so the context lands.
 
-AI WORD PACKS
-Give SpellBee a theme — dinosaurs, space, baking, cooking, mythology — and it generates a fresh 10-word pack at your level. Powered by on-device sampling as a fallback when you're offline, and Gemini for themed packs when connected.
+THEMED WORD PACKS
+Give SpellBee a theme — dinosaurs, space, baking, cooking, mythology — and it builds a fresh 10-word pack at your level. Built-in themed packs work offline, with a studio gateway available for expanded packs when configured.
 
 PARENT-MADE LISTS
 Copy this week's school words into a saved list. Tap "practice" and the same words read aloud with optional definitions you wrote yourself. Great for weekly spelling tests, pre-bee warm-ups, and ESL families who want their own word set.
@@ -67,9 +67,8 @@ All lists, stats, and purchases live on your device. No account. No cloud sync. 
 
 PREMIUM
 Unlock everything for less than one coffee a month:
-• Unlimited AI-generated word packs
+• Unlimited themed word packs — no daily cap
 • Unlimited parent-made word lists (free tier: 3)
-• No ads in the learning flow
 • Enhanced voice pronunciation
 
 Monthly, yearly (save 44%), or a one-time lifetime. Cancel any time.
@@ -80,16 +79,26 @@ Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
 Free to start. Premium when your practice routine is ready.
 ```
 
-### What's New in This Version (v1.0.0)
+### What's New in This Version (v1.0.13)
+```
+SpellBee is now 100% ad-free — no banners, no videos, just spelling.
+
+• Removed all ads from the app, for everyone
+• Simpler voice settings with a single high-quality studio voice
+• Leaner app: fewer permissions and a smaller download
+• Polish and fixes across practice, settings, and the premium screen
+```
+
+### What's New archive (v1.0.0)
 ```
 Initial release.
 
 • 8 difficulty levels, K-1 to championship-tier
 • Voice pronunciation + sentence + definition
 • Type or spell-aloud modes (speech-to-text)
-• AI-generated themed word packs (Gemini)
+• Themed word packs by grade level
 • Parent-curated custom lists
-• Premium: unlimited AI word packs and parent-made lists
+• Premium: unlimited themed word packs and parent-made lists
 ```
 
 ### Support URL
@@ -116,7 +125,7 @@ https://nalhamzy.github.io/spellbee/privacy.html
 
 ### App Review — Review Notes
 ```
-SpellBee is a local-first spelling-bee practice app for students and families. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). The paywall includes functional Privacy Policy and Terms of Use (EULA) links. Ads are not shown in the learning flow. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
+SpellBee is a local-first spelling-bee practice app for students and families. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). The paywall includes functional Privacy Policy and Terms of Use (EULA) links. The app contains no ads. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
 ```
 
 ---
@@ -133,7 +142,7 @@ SpellBee is a local-first spelling-bee practice app for students and families. A
 | Duration | 1 Month |
 | Price | $4.99 |
 | Display Name | `Premium Monthly` |
-| Description | `Unlimited AI word packs, unlimited custom lists, and studio voice. Renews monthly.` |
+| Description | `Unlimited themed word packs, unlimited custom lists, and studio voice. Renews monthly.` |
 
 ### Product 2 — Premium Yearly
 | Field | Value |
@@ -175,7 +184,7 @@ SpellBee: Spelling Bee for Kids
 
 ### Short Description (80 char)
 ```
-Spelling bee practice with voice, AI word packs, and parent-made lists.
+Spelling bee practice with voice, themed word packs, and parent-made lists.
 ```
 **72 chars.**
 
@@ -221,7 +230,7 @@ treatment; leaving it off gives you full ad inventory.
 | Product ID | `spellbee_premium_monthly` |
 |---|---|
 | Name | `Premium Monthly` |
-| Description | `Unlimited AI word packs, unlimited custom lists, and studio voice.` |
+| Description | `Unlimited themed word packs, unlimited custom lists, and studio voice.` |
 | Base plan | 1 month auto-renewing, $4.99 USD |
 | Free trial | Not configured |
 
@@ -250,7 +259,7 @@ treatment; leaving it off gives you full ad inventory.
 | 02_listen | `Hear every word in a clear voice.` |
 | 03_typing | `Type the word or spell it aloud.` |
 | 04_correct | `Build streaks. Master the tricky ones.` |
-| 05_premium | `Unlimited AI packs. Studio voice. Go Premium.` |
+| 05_premium | `Unlimited word packs. Studio voice. Go Premium.` |
 
 ---
 
