@@ -10,6 +10,7 @@
     "lint": "node --check index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-polly": "^3.1084.0",
     "firebase-admin": "^13.6.0",
     "firebase-functions": "^6.4.0"
   }

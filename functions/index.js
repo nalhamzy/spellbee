@@ -9,6 +9,25 @@ const {onRequest} = require("firebase-functions/v2/https");
 initializeApp();
 
 const openAiApiKey = defineSecret("OPENAI_API_KEY");
+const pollyAccessKeyId = defineSecret("POLLY_AWS_ACCESS_KEY_ID");
+const pollySecretAccessKey = defineSecret("POLLY_AWS_SECRET_ACCESS_KEY");
+
+// OpenAI voice → Polly neural voice, used when OpenAI is unavailable
+// (quota/outage). Ivy and Joanna are kid-friendly US English neural voices.
+const pollyVoiceFor = {
+  alloy: "Matthew",
+  ash: "Stephen",
+  ballad: "Ruth",
+  coral: "Danielle",
+  echo: "Gregory",
+  fable: "Amy",
+  marin: "Joanna",
+  nova: "Ivy",
+  onyx: "Matthew",
+  sage: "Kendra",
+  shimmer: "Salli",
+  verse: "Joey",
+};
 
 const allowedVoices = new Set([
   "alloy",
@@ -32,7 +51,7 @@ exports.spellbeeTts = onRequest(
     region: "us-central1",
     timeoutSeconds: 30,
     memory: "256MiB",
-    secrets: [openAiApiKey],
+    secrets: [openAiApiKey, pollyAccessKeyId, pollySecretAccessKey],
     cors: true,
   },
   async (req, res) => {
@@ -86,18 +105,26 @@ exports.spellbeeTts = onRequest(
         }),
       });
 
-      if (!response.ok) {
+      let audio;
+      let provider = "openai";
+      if (response.ok) {
+        audio = Buffer.from(await response.arrayBuffer());
+      } else {
         const text = await response.text();
-        logger.warn("OpenAI TTS request failed", {
+        logger.warn("OpenAI TTS request failed, trying Polly", {
           status: response.status,
           body: text.slice(0, 240),
         });
-        res.status(502).json({error: "TTS provider failed"});
-        return;
+        audio = await pollySynthesize(input, voice, speed);
+        provider = "polly";
       }
 
-      const audio = Buffer.from(await response.arrayBuffer());
-      logUsage(req, {voice, model, inputLength: input.length}).catch((error) =>
+      logUsage(req, {
+        voice,
+        model,
+        provider,
+        inputLength: input.length,
+      }).catch((error) =>
         logger.warn("TTS usage log failed", {message: error.message}),
       );
 
@@ -111,6 +138,39 @@ exports.spellbeeTts = onRequest(
     }
   },
 );
+
+async function pollySynthesize(input, voice, speed) {
+  const {PollyClient, SynthesizeSpeechCommand} =
+    require("@aws-sdk/client-polly");
+  const client = new PollyClient({
+    region: "us-east-1",
+    credentials: {
+      accessKeyId: pollyAccessKeyId.value(),
+      secretAccessKey: pollySecretAccessKey.value(),
+    },
+  });
+  // Polly neural has no speed param; use SSML prosody when speed != 1.
+  const pct = Math.round(speed * 100);
+  const escaped = input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const useSsml = pct !== 100;
+  const result = await client.send(new SynthesizeSpeechCommand({
+    Engine: "neural",
+    VoiceId: pollyVoiceFor[voice] || "Joanna",
+    OutputFormat: "mp3",
+    TextType: useSsml ? "ssml" : "text",
+    Text: useSsml ?
+      `<speak><prosody rate="${pct}%">${escaped}</prosody></speak>` :
+      input,
+  }));
+  const chunks = [];
+  for await (const chunk of result.AudioStream) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
 
 function normalizeBody(body) {
   if (!body) return {};
