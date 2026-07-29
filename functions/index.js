@@ -148,6 +148,14 @@ exports.spellbeeTts = onRequest(
         audio = Buffer.from(await response.arrayBuffer());
       } else {
         const text = await response.text();
+        if (!pollyConfigured()) {
+          logger.error("OpenAI TTS failed and Polly fallback is disabled", {
+            status: response.status,
+            body: text.slice(0, 240),
+          });
+          res.status(502).json({error: "TTS provider failed"});
+          return;
+        }
         logger.warn("OpenAI TTS request failed, trying Polly", {
           status: response.status,
           body: text.slice(0, 240),
@@ -176,6 +184,22 @@ exports.spellbeeTts = onRequest(
     }
   },
 );
+
+/**
+ * Whether usable Polly credentials are present. Setting either secret to a
+ * placeholder (e.g. "unset") cleanly disables the fallback with no redeploy,
+ * and dropping a real key back in re-enables it the same way.
+ *
+ * These MUST be a scoped IAM user in the studio account 512009297350 —
+ * never root keys, and never another account's.
+ *
+ * @return {boolean} true when the fallback can be attempted
+ */
+function pollyConfigured() {
+  const id = `${pollyAccessKeyId.value() || ""}`.trim();
+  const secret = `${pollySecretAccessKey.value() || ""}`.trim();
+  return /^AKIA[0-9A-Z]{16}$/.test(id) && secret.length >= 32;
+}
 
 async function pollySynthesize(input, voice, speed) {
   const {PollyClient, SynthesizeSpeechCommand} =
