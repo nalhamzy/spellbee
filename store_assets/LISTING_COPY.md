@@ -79,7 +79,18 @@ Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
 Free to start. Premium when your practice routine is ready.
 ```
 
-### What's New in This Version (v1.0.13)
+### What's New in This Version (v1.0.14)
+```
+A smoother, more reliable SpellBee for every speller:
+
+• Fixed rare crashes when starting the voice or the microphone
+• Spell-aloud mode now accepts tricky words like "sea" and "bee"
+• Purchases and restores are more dependable
+• Daily word and free pack refresh right at midnight
+• Clearer microphone messages, faster typing between words, and many small fixes
+```
+
+### What's New archive (v1.0.13)
 ```
 SpellBee is now 100% ad-free — no banners, no videos, just spelling.
 
