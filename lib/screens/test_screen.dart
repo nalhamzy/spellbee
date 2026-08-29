@@ -22,6 +22,11 @@ class _ItemState {
   bool? correct;
   bool submitted = false;
   bool attempted = false;
+
+  /// True once ANY submission of this word was wrong — survives "Try again",
+  /// so the coach's missed-word counts see the words a kid struggled with
+  /// even when they eventually got them right.
+  bool missedOnce = false;
   Timer? autoAdvance;
 }
 
@@ -49,7 +54,8 @@ class TestScreen extends ConsumerStatefulWidget {
   ConsumerState<TestScreen> createState() => _TestScreenState();
 }
 
-class _TestScreenState extends ConsumerState<TestScreen> {
+class _TestScreenState extends ConsumerState<TestScreen>
+    with WidgetsBindingObserver {
   late final List<_ItemState> _items;
   int _idx = 0;
   InputMode _mode = InputMode.keyboard;
@@ -59,6 +65,12 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   int _longestStreak = 0;
   DateTime? _startedAt;
   String? _lastFeedbackStub;
+
+  /// Serializes navigation. _next/_previous await async stops before
+  /// mutating _idx; a kid's double-tap (or the auto-advance timer racing a
+  /// tap) used to run the body twice — skipping a word mid-list and
+  /// double-counting the whole test in stats on the last one.
+  bool _navigating = false;
 
   Word get _w => widget.words[_idx];
   _ItemState get _s => _items[_idx];
@@ -82,11 +94,33 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     super.initState();
     _items = List.generate(widget.words.length, (_) => _ItemState());
     _startedAt = DateTime.now();
+    WidgetsBinding.instance.addObserver(this);
+    // The mic state machine lives in SttService (silence timeouts and
+    // errors flip it without any call from us); mirror every change.
+    ref.read(sttServiceProvider).addListener(_onSttChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) => _speak());
+  }
+
+  void _onSttChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      // Backgrounding mid-test must release the microphone (a hot mic in a
+      // kids app is not acceptable) and freeze auto-advance.
+      _s.autoAdvance?.cancel();
+      ref.read(ttsServiceProvider).stop();
+      ref.read(sttServiceProvider).stop();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    ref.read(sttServiceProvider).removeListener(_onSttChanged);
     _ctrl.dispose();
     _focus.dispose();
     for (final it in _items) {
@@ -121,22 +155,41 @@ class _TestScreenState extends ConsumerState<TestScreen> {
 
   // ── Input handling ─────────────────────────────────────────────────
 
+  bool _micBusy = false;
+
   Future<void> _toggleMic() async {
+    if (_micBusy) return; // ignore taps while init/permission is pending
     final stt = ref.read(sttServiceProvider);
     if (stt.listening) {
       await stt.stop();
-      setState(() {});
+      if (mounted) setState(() {});
       return;
     }
-    await stt.start(
+    setState(() => _micBusy = true);
+    final started = await stt.start(
       onResult: (transcript, isFinal) {
+        if (!mounted) return;
         setState(() => _s.sttTranscript = transcript);
         if (isFinal) {
-          stt.stop().then((_) => setState(() {}));
+          stt.stop().then((_) {
+            if (mounted) setState(() {});
+          });
         }
       },
     );
-    setState(() {});
+    if (!mounted) return;
+    setState(() => _micBusy = false);
+    if (!started && stt.status == SttStatus.denied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "We can't hear you yet — ask a grown-up to allow the "
+            'microphone in Settings, or switch to typing.',
+          ),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   /// Clear the current word's input and go back to "not attempted" state.
@@ -158,21 +211,41 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     }
     await _playFeedback(VoicePhraseBank.retry);
     // Re-speak the word so they hear it fresh.
-    Future.delayed(const Duration(milliseconds: 1000), _speak);
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (mounted) _speak();
+    });
   }
 
   void _onTyped(String v) {
-    _s.typed = v;
+    // setState so text-dependent chrome (the "Clear & redo" row, the enabled
+    // look of the check button) tracks every keystroke.
+    setState(() => _s.typed = v);
   }
 
   void _submit() {
     if (_s.revealed) return;
     final typed = _mode == InputMode.keyboard
         ? _normalizeTyped(_ctrl.text)
-        : SttService.normalize(_s.sttTranscript).toLowerCase();
+        : SttService.normalize(
+            _s.sttTranscript,
+            target: _w.text,
+          ).toLowerCase();
 
     if (typed.isEmpty) {
-      // Don't submit an empty answer.
+      // An empty submit must not read as "the app is broken" to a child:
+      // nudge with words, not silence.
+      HapticFeedback.mediumImpact();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _mode == InputMode.keyboard
+                ? 'Type the word first, then check it!'
+                : 'Tap the mic and spell the word out loud first!',
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      if (_mode == InputMode.keyboard) _focus.requestFocus();
       return;
     }
 
@@ -182,6 +255,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       _s.correct = correct;
       _s.submitted = true;
       _s.attempted = true;
+      if (!correct) _s.missedOnce = true;
     });
 
     // Update longest streak tracker.
@@ -225,7 +299,8 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   // ── Navigation ─────────────────────────────────────────────────────
 
   void _previous() {
-    if (_isFirst) return;
+    if (_isFirst || _navigating) return;
+    _navigating = true;
     _s.autoAdvance?.cancel();
     ref.read(ttsServiceProvider).stop();
     setState(() {
@@ -233,26 +308,44 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       _ctrl.text = _s.typed;
       _ctrl.selection = TextSelection.collapsed(offset: _s.typed.length);
     });
-    Future.delayed(const Duration(milliseconds: 200), _speak);
+    _navigating = false;
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _speak();
+    });
   }
 
   Future<void> _next() async {
-    _s.autoAdvance?.cancel();
-    await ref.read(ttsServiceProvider).stop();
-    await ref.read(sttServiceProvider).stop();
-    if (_isLast) {
-      await _finish();
-      return;
+    if (_navigating) return;
+    _navigating = true;
+    try {
+      _s.autoAdvance?.cancel();
+      await ref.read(ttsServiceProvider).stop();
+      await ref.read(sttServiceProvider).stop();
+      if (!mounted) return;
+      if (_isLast) {
+        await _finish();
+        return;
+      }
+      setState(() {
+        _idx += 1;
+        _ctrl.text = _s.typed;
+        _ctrl.selection = TextSelection.collapsed(offset: _s.typed.length);
+      });
+      // Bring the keyboard straight back for the new word — a 10-word test
+      // should not cost nine extra taps on the text field.
+      if (_mode == InputMode.keyboard && !_s.revealed) {
+        _focus.requestFocus();
+      }
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) _speak();
+      });
+    } finally {
+      _navigating = false;
     }
-    setState(() {
-      _idx += 1;
-      _ctrl.text = _s.typed;
-      _ctrl.selection = TextSelection.collapsed(offset: _s.typed.length);
-    });
-    Future.delayed(const Duration(milliseconds: 200), _speak);
   }
 
   void _skip() {
+    if (_navigating) return;
     if (_s.revealed) {
       _next();
       return;
@@ -262,6 +355,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       _s.correct = false;
       _s.submitted = true;
       _s.attempted = true;
+      _s.missedOnce = true;
       _s.typed = '';
       _s.sttTranscript = '';
     });
@@ -275,7 +369,10 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final target = widget.words[i].text;
       final submitted = it.typed.isNotEmpty
           ? _normalizeTyped(it.typed)
-          : SttService.normalize(it.sttTranscript).toLowerCase();
+          : SttService.normalize(
+              it.sttTranscript,
+              target: target,
+            ).toLowerCase();
       items.add(
         AskedItem(
           target: target,
@@ -292,22 +389,37 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       endedAt: DateTime.now(),
     );
     if (widget.savesStats) {
+      // A word counts as missed if ANY attempt on it was wrong, even when
+      // "Try again" ended in success — those are exactly the words the
+      // coach's focus round exists for. Mastery only decrements the counter
+      // for words that were clean on the first try.
+      final struggled = <String>[];
+      final clean = <String>[];
+      for (var i = 0; i < widget.words.length; i++) {
+        final it = _items[i];
+        final target = widget.words[i].text;
+        if (it.missedOnce || !(it.correct ?? false)) {
+          struggled.add(target);
+        } else {
+          clean.add(target);
+        }
+      }
       await ref
           .read(playerStatsProvider.notifier)
           .recordTestComplete(
             asked: result.total,
             correct: result.correct,
             longestStreak: _longestStreak,
-            missedWords: result.items
-                .where((item) => !item.isCorrect)
-                .map((item) => item.target),
-            masteredWords: result.items
-                .where((item) => item.isCorrect)
-                .map((item) => item.target),
+            missedWords: struggled,
+            masteredWords: clean,
             listId: widget.sourceListId,
           );
     }
-    await widget.onComplete?.call();
+    // The daily-word streak is for SPELLING the word, not for opening the
+    // test — a skip or a miss keeps the card active so the kid can retry.
+    if (result.correct == result.total) {
+      await widget.onComplete?.call();
+    }
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -344,11 +456,13 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   }
 
   Future<void> _slowRepeat() async {
-    // Temporarily force Calm speed for this single read.
+    // Temporarily force Calm speed for this single read. Skip the bundled
+    // MP3s — they are recorded at one fixed speed, so routing through them
+    // made "say it slower" audibly identical for the ~60 most common words.
     final tts = ref.read(ttsServiceProvider);
     final previous = ref.read(voiceSpeedProvider);
     await tts.setSpeed(VoiceSpeed.calm);
-    await tts.speakWord(_w.text, premium: _premium);
+    await tts.speakWord(_w.text, premium: _premium, skipBundled: true);
     // Restore user's chosen speed afterward.
     await tts.setSpeed(previous);
   }

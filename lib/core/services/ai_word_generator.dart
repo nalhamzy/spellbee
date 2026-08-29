@@ -18,6 +18,13 @@ class AiWordGenerator {
 
   static bool get canCallRemote => _gatewayUrl.isNotEmpty;
 
+  /// True when the most recent [generate] call actually reached the remote
+  /// gateway (as opposed to sampling the bundled catalog). The free tier's
+  /// daily credit should only be spent on rounds that cost something —
+  /// billing a locally-sampled pack was pure friction, especially since the
+  /// identical catalog content is unlimited on the Home tab.
+  bool lastGenerateUsedRemote = false;
+
   /// Produce [count] words at approximately [level] difficulty. If [theme]
   /// is non-empty and the gateway is present, asks the studio service for a
   /// thematic pack. Otherwise samples the local catalog.
@@ -28,6 +35,7 @@ class AiWordGenerator {
   }) async {
     final cleanTheme = theme.trim();
     final pack = findThemedWordPack(cleanTheme);
+    lastGenerateUsedRemote = false;
 
     if (canCallRemote && cleanTheme.isNotEmpty) {
       try {
@@ -36,6 +44,7 @@ class AiWordGenerator {
           level: level,
           theme: cleanTheme,
         );
+        lastGenerateUsedRemote = true;
         final vetted = _sanitizeWords(remote, count: count, pack: pack);
         if (vetted.length >= count) return _remember(vetted.take(count));
         if (pack != null) {

@@ -39,10 +39,17 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     final level = ref.read(selectedLevelProvider);
     final theme = _themeCtrl.text.trim();
     try {
-      final words = await ref
-          .read(aiGeneratorProvider)
-          .generate(count: 10, level: level, theme: theme);
-      if (!isPremium) await ref.read(aiCreditsProvider.notifier).consume();
+      final generator = ref.read(aiGeneratorProvider);
+      final words = await generator.generate(
+        count: 10,
+        level: level,
+        theme: theme,
+      );
+      // Only spend the daily credit on rounds that actually hit the remote
+      // gateway; locally-sampled packs are free content, not metered AI.
+      if (!isPremium && generator.lastGenerateUsedRemote) {
+        await ref.read(aiCreditsProvider.notifier).consume();
+      }
       if (!mounted) return;
       Navigator.of(context).push(
         MaterialPageRoute(

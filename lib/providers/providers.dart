@@ -98,7 +98,11 @@ class OpenAiVoiceNotifier extends Notifier<String> {
   }
 }
 
-final sttServiceProvider = Provider<SttService>((ref) => SttService());
+final sttServiceProvider = Provider<SttService>((ref) {
+  final s = SttService();
+  ref.onDispose(s.dispose);
+  return s;
+});
 
 final aiGeneratorProvider = Provider<AiWordGenerator>(
   (ref) => AiWordGenerator(),
@@ -118,6 +122,26 @@ class TabNotifier extends Notifier<AppTab> {
 
 // ─── Daily word ─────────────────────────────────────────────────────────
 
+/// The current epoch day, refreshed when the app returns to the foreground
+/// (see the lifecycle observer in app.dart). Kids' tablets keep apps
+/// resident for days; without this tick the daily word, its "done" flag,
+/// and the AI credit were all frozen at whatever day the process started.
+final dayTickProvider = NotifierProvider<DayTickNotifier, int>(
+  DayTickNotifier.new,
+);
+
+class DayTickNotifier extends Notifier<int> {
+  @override
+  int build() => _todayEpochDay();
+
+  /// Re-reads the clock; only changes state (and thus dependents) when the
+  /// date actually rolled over.
+  void refresh() {
+    final today = _todayEpochDay();
+    if (today != state) state = today;
+  }
+}
+
 /// All catalog words flattened into a single list, sorted deterministically.
 /// Computed once — same order every app session.
 List<Word> _allCatalogWords() {
@@ -132,8 +156,7 @@ List<Word> _allCatalogWords() {
 /// shows the same word. Uses epochDay % catalog-size.
 final dailyWordProvider = Provider<Word>((ref) {
   final allWords = _allCatalogWords();
-  final epochDay =
-      DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
+  final epochDay = ref.watch(dayTickProvider);
   return allWords[epochDay % allWords.length];
 });
 
@@ -144,7 +167,7 @@ int _todayEpochDay() =>
 /// True when the user has already completed today's daily word.
 final dailyWordDoneProvider = Provider<bool>((ref) {
   final stats = ref.watch(playerStatsProvider);
-  return stats.lastDailyEpochDay == _todayEpochDay();
+  return stats.lastDailyEpochDay == ref.watch(dayTickProvider);
 });
 
 // ─── Player stats ───────────────────────────────────────────────────────
@@ -315,7 +338,12 @@ final aiCreditsProvider = NotifierProvider<AiCreditsNotifier, int>(
 
 class AiCreditsNotifier extends Notifier<int> {
   @override
-  int build() => ref.read(storageServiceProvider).getAiCredits();
+  int build() {
+    // Re-read storage when the date rolls over so the daily credit renews
+    // without a process restart.
+    ref.watch(dayTickProvider);
+    return ref.read(storageServiceProvider).getAiCredits();
+  }
 
   Future<void> consume() async {
     if (state <= 0) return;

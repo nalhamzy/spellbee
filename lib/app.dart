@@ -19,10 +19,12 @@ class SpellBeeApp extends ConsumerStatefulWidget {
   ConsumerState<SpellBeeApp> createState() => _SpellBeeAppState();
 }
 
-class _SpellBeeAppState extends ConsumerState<SpellBeeApp> {
+class _SpellBeeAppState extends ConsumerState<SpellBeeApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(iapServiceProvider).onPurchaseSuccess = (productId) {
         ref.read(premiumProvider.notifier).activate(productId);
@@ -43,6 +45,22 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp> {
   }
 
   final _scaffoldMessenger = GlobalKey<ScaffoldMessengerState>();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Kids' tablets keep the app resident across midnights; refresh the day
+    // tick on every return to the foreground so the daily word, its done
+    // flag, and the AI credit roll over without a process restart.
+    if (state == AppLifecycleState.resumed) {
+      ref.read(dayTickProvider.notifier).refresh();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
