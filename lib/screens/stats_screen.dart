@@ -66,8 +66,11 @@ class StatsScreen extends ConsumerWidget {
                     value: '${s.bestStreak}',
                     color: AppTheme.coral,
                   ),
+                  // currentStreak is the RUN of consecutive perfect tests
+                  // (resets on any miss) — labelling it "Perfect tests"
+                  // showed a kid with 20 lifetime perfects a demoralizing 0.
                   _MetricChip(
-                    title: 'Perfect tests',
+                    title: 'Perfect streak',
                     value: '${s.currentStreak}',
                     color: AppTheme.violet,
                   ),

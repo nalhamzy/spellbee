@@ -40,15 +40,54 @@ class _WordListEditorScreenState
     super.dispose();
   }
 
+  bool _dirty = false;
+
   void _addWord() {
     final w = _wordCtrl.text.trim().toLowerCase();
     if (w.isEmpty) return;
+    if (_words.any((x) => x.text.toLowerCase() == w)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('"$w" is already in this list.')),
+      );
+      return;
+    }
     setState(() {
+      _dirty = true;
       _words.add(Word(w, _defCtrl.text.trim(), _exCtrl.text.trim()));
       _wordCtrl.clear();
       _defCtrl.clear();
       _exCtrl.clear();
     });
+  }
+
+  bool get _hasUnsavedWork =>
+      _dirty ||
+      _nameCtrl.text.trim() != (widget.existing?.name ?? '') ||
+      _wordCtrl.text.trim().isNotEmpty;
+
+  Future<bool> _confirmDiscard() async {
+    if (!_hasUnsavedWork) return true;
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Discard changes?'),
+        content: const Text(
+          "This list hasn't been saved. Leave without saving?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Keep editing'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.coral),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+    return leave ?? false;
   }
 
   Future<void> _save() async {
@@ -106,6 +145,21 @@ class _WordListEditorScreenState
 
   @override
   Widget build(BuildContext context) {
+    // A parent typing 15 words must never lose them to a stray back
+    // gesture; guard every pop with a discard confirmation.
+    return PopScope(
+      canPop: !_hasUnsavedWork,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        final leave = await _confirmDiscard();
+        if (leave && mounted) navigator.pop();
+      },
+      child: _buildScaffold(context),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppTheme.bg,
@@ -233,7 +287,10 @@ class _WordListEditorScreenState
           IconButton(
             icon: const Icon(Icons.close_rounded),
             color: AppTheme.mute,
-            onPressed: () => setState(() => _words.removeAt(i)),
+            onPressed: () => setState(() {
+              _dirty = true;
+              _words.removeAt(i);
+            }),
           ),
         ],
       ),
