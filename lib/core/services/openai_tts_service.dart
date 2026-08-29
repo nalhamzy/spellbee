@@ -27,10 +27,47 @@ class OpenAiTtsService {
 
   final _player = AudioPlayer();
   Directory? _cacheDir;
+  bool _swept = false;
+
+  /// Set from a gateway 429's Retry-After: while active, speak() short-
+  /// circuits straight to the fallback chain instead of paying a full POST
+  /// per utterance against an already-throttled function (a test fires ~4
+  /// of those per word).
+  DateTime? _cooldownUntil;
+
+  /// Monotonic token: only the latest speak() may start playback, so a slow
+  /// gateway response can't talk over the fallback audio a second tap
+  /// already started.
+  int _playToken = 0;
+
+  /// De-dupes concurrent fetches of the same utterance (triple-tapping the
+  /// speaker used to fire three POSTs racing three writes to one file).
+  final _inFlight = <String, Future<void>>{};
 
   Future<Directory> _dir() async {
     _cacheDir ??= await getTemporaryDirectory();
+    if (!_swept) {
+      _swept = true;
+      _sweepOldCache(_cacheDir!); // fire-and-forget
+    }
     return _cacheDir!;
+  }
+
+  /// Temp-dir cache files were written forever and never pruned; Android
+  /// only clears them under storage pressure. Cap age instead.
+  Future<void> _sweepOldCache(Directory dir) async {
+    try {
+      final cutoff = DateTime.now().subtract(const Duration(days: 30));
+      await for (final f in dir.list()) {
+        if (f is! File || !f.path.contains('sb_tts_')) continue;
+        final stat = await f.stat();
+        if (stat.modified.isBefore(cutoff)) {
+          await f.delete();
+        }
+      }
+    } catch (_) {
+      // Cache hygiene must never break speech.
+    }
   }
 
   String _keyFor(String text, String voice) {
@@ -43,32 +80,29 @@ class OpenAiTtsService {
   /// false means the caller should fall back to native TTS.
   Future<bool> speak(String text, {String? voice, double speed = 1.0}) async {
     if (!hasKey) return false;
+    final cooldown = _cooldownUntil;
+    if (cooldown != null && DateTime.now().isBefore(cooldown)) return false;
+    final token = ++_playToken;
     try {
       final v = voice ?? _defaultVoice;
       final dir = await _dir();
       final speedTag = (speed * 100).round();
       final file = File('${dir.path}/${_keyFor('${text}_$speedTag', v)}');
       if (!file.existsSync()) {
-        final resp = await http
-            .post(
-              Uri.parse(_gatewayUrl),
-              headers: {
-                'Content-Type': 'application/json',
-                if (_gatewayToken.isNotEmpty)
-                  'Authorization': 'Bearer $_gatewayToken',
-              },
-              body: jsonEncode({
-                'model': _model,
-                'voice': v,
-                'input': text,
-                'response_format': 'mp3',
-                'speed': speed,
-                'purpose': 'spellbee-pronunciation',
-              }),
-            )
-            .timeout(const Duration(seconds: 20));
-        if (resp.statusCode != 200) return false;
-        await file.writeAsBytes(resp.bodyBytes, flush: true);
+        final ok = await (_inFlight[file.path] ??= _fetch(
+          file: file,
+          text: text,
+          voice: v,
+          speed: speed,
+        ).whenComplete(() => _inFlight.remove(file.path))).then(
+          (_) => file.existsSync(),
+        );
+        if (!ok) return false;
+      }
+      if (token != _playToken) {
+        // A newer utterance superseded this one while we fetched; the bytes
+        // are cached for next time, but playing now would double-talk.
+        return true;
       }
       await _player.stop();
       await _player.play(DeviceFileSource(file.path));
@@ -76,6 +110,44 @@ class OpenAiTtsService {
     } catch (_) {
       return false;
     }
+  }
+
+  Future<void> _fetch({
+    required File file,
+    required String text,
+    required String voice,
+    required double speed,
+  }) async {
+    final resp = await http
+        .post(
+          Uri.parse(_gatewayUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            if (_gatewayToken.isNotEmpty)
+              'Authorization': 'Bearer $_gatewayToken',
+          },
+          body: jsonEncode({
+            'model': _model,
+            'voice': voice,
+            'input': text,
+            'response_format': 'mp3',
+            'speed': speed,
+            'purpose': 'spellbee-pronunciation',
+          }),
+        )
+        .timeout(const Duration(seconds: 20));
+    if (resp.statusCode == 429) {
+      // The gateway meters spend; honor its Retry-After (default 10 min)
+      // so a quota-exhausted day degrades to bundled/device voice silently
+      // instead of hammering the function on every word.
+      final retryAfter = int.tryParse(resp.headers['retry-after'] ?? '');
+      _cooldownUntil = DateTime.now().add(
+        Duration(seconds: retryAfter ?? 600),
+      );
+      return;
+    }
+    if (resp.statusCode != 200) return;
+    await file.writeAsBytes(resp.bodyBytes, flush: true);
   }
 
   Future<void> stop() async {

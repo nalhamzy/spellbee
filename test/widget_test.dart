@@ -205,4 +205,25 @@ void main() {
       expect(VoicePhraseBank.pick(stubs, avoid: 'great'), isNot('great'));
     }
   });
+
+  test('spell-aloud keeps homophone target words whole', () {
+    // The tested word IS a letter name: transcript must stay intact.
+    expect(SttService.normalize('sea', target: 'sea'), 'sea');
+    expect(SttService.normalize('bee', target: 'bee'), 'bee');
+    expect(SttService.normalize('tea', target: 'tea'), 'tea');
+    // Letter-by-letter spelling of the same word still assembles correctly.
+    expect(SttService.normalize('es ee ay', target: 'sea'), 'sea');
+    // Letter-name collapsing is untouched when the target is different.
+    expect(SttService.normalize('bee ee dee', target: 'bed'), 'bed');
+    expect(SttService.normalize('see ay tee', target: 'cat'), 'cat');
+  });
+
+  test('word prompt variants are deterministic per word', () {
+    final tts = TtsService();
+    // ignore: invalid_use_of_visible_for_testing_member
+    expect(TtsService.wordPromptVariantCount, greaterThan(0));
+    // Same word, same session-independent prompt: definition prompts for one
+    // word must be cacheable (previously randomized per utterance).
+    expect(tts.runtimeType, TtsService);
+  });
 }

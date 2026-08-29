@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -119,8 +118,13 @@ class TtsService {
   final _tts = FlutterTts();
   final _openai = OpenAiTtsService();
   final _bundled = BundledTtsService();
-  final _promptRandom = math.Random();
   bool _ready = false;
+  // Single-flight init: flutter_tts's Android plugin queues method calls made
+  // before the engine's onInit fires and iterates that queue inside
+  // onInitListenerWithContext. Letting several callers run the init sequence
+  // concurrently mutates the queue while it is being iterated —
+  // the ConcurrentModificationException we shipped in 1.0.13.
+  Future<void>? _readyFuture;
   bool _deviceVoiceConfigured = false;
   VoiceSpeed _speed = VoiceSpeed.calm;
   VoiceQuality _quality = VoiceQuality.device;
@@ -142,14 +146,23 @@ class TtsService {
     if (_ready) await _applyDeviceVoiceTuning();
   }
 
-  Future<void> _ensureReady() async {
-    if (_ready) return;
-    await _tts.awaitSpeakCompletion(true);
-    await _preferHumanAndroidEngine();
-    await _tts.setLanguage('en-US');
-    await _configureHumanDeviceVoice();
-    await _applyDeviceVoiceTuning();
-    _ready = true;
+  Future<void> _ensureReady() {
+    return _readyFuture ??= _initOnce();
+  }
+
+  Future<void> _initOnce() async {
+    try {
+      await _tts.awaitSpeakCompletion(true);
+      await _preferHumanAndroidEngine();
+      await _tts.setLanguage('en-US');
+      await _configureHumanDeviceVoice();
+      await _applyDeviceVoiceTuning();
+      _ready = true;
+    } catch (_) {
+      // Let the next caller retry a failed init instead of caching the error.
+      _readyFuture = null;
+      rethrow;
+    }
   }
 
   Future<void> _preferHumanAndroidEngine() async {
@@ -376,40 +389,61 @@ class TtsService {
         .replaceAll('{letters}', letters?.trim() ?? '');
   }
 
-  int _nextVariant(int length) => _promptRandom.nextInt(length);
+  // Deterministic per word (stable across sessions and platforms, unlike
+  // String.hashCode) so the same word always produces the same prompt text.
+  // Variety still exists ACROSS words, but repeats of one word hit the
+  // studio-voice disk cache instead of paying the gateway for a fresh
+  // phrasing every tap.
+  static int _wordSeed(String word) {
+    var h = 0;
+    for (final c in word.codeUnits) {
+      h = (h * 31 + c) & 0x7fffffff;
+    }
+    return h;
+  }
 
-  String _wordPrompt(String word) =>
-      buildWordPrompt(word, variant: _nextVariant(_wordPromptTemplates.length));
+  String _wordPrompt(String word) => buildWordPrompt(
+    word,
+    variant: _wordSeed(word) % _wordPromptTemplates.length,
+  );
 
   String _definitionPrompt(String word, String definition) =>
       buildDefinitionPrompt(
         word,
         definition,
-        variant: _nextVariant(_definitionPromptTemplates.length),
+        variant: _wordSeed(word) % _definitionPromptTemplates.length,
       );
 
   String _examplePrompt(String word, String example) => buildExamplePrompt(
     word,
     example,
-    variant: _nextVariant(_examplePromptTemplates.length),
+    variant: _wordSeed(word) % _examplePromptTemplates.length,
   );
 
   String _spellOutPrompt(String word, String letters) => buildSpellOutPrompt(
     word,
     letters,
-    variant: _nextVariant(_spellOutPromptTemplates.length),
+    variant: _wordSeed(word) % _spellOutPromptTemplates.length,
   );
 
   /// Pronounce a word. Studio builds try the selected cloud voice first so
   /// testers can hear voice differences on every word. Bundled assets and
   /// device TTS stay as graceful fallback.
-  Future<void> speakWord(String word, {bool premium = false}) async {
+  ///
+  /// [skipBundled] exists for "say it slower": the bundled MP3s are recorded
+  /// at one fixed speed, so a slow repeat must go to a rate-aware engine or
+  /// the hint audibly does nothing.
+  Future<void> speakWord(
+    String word, {
+    bool premium = false,
+    bool skipBundled = false,
+  }) async {
     final useRemoteStudio =
         premium && _quality == VoiceQuality.studio && OpenAiTtsService.hasKey;
     final prompt = _wordPrompt(word);
     if (useRemoteStudio && await _tryStudio(prompt)) return;
 
-    if (await _bundled.hasWord(word)) {
+    if (!skipBundled && await _bundled.hasWord(word)) {
       final played = await _bundled.playWord(word);
       if (played) return;
     }
@@ -448,8 +482,14 @@ class TtsService {
   Future<void> stop() async {
     await _openai.stop();
     await _bundled.stop();
-    if (!_ready) return;
-    await _tts.stop();
+    // Always stop the device engine too: during init (_ready still false) a
+    // speak may already be queued on the platform side, and skipping stop()
+    // here let it play over the next screen.
+    try {
+      await _tts.stop();
+    } catch (_) {
+      // Stopping an engine that never initialized is not worth surfacing.
+    }
   }
 
   void dispose() {
