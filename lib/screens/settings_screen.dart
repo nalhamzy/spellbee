@@ -80,7 +80,20 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.restore_rounded),
                     title: const Text('Restore purchases'),
-                    onTap: () => ref.read(iapServiceProvider).restore(),
+                    onTap: () {
+                      // Acknowledge the tap immediately; an empty restore
+                      // emits no store events, and dead silence here is a
+                      // classic App Review flag.
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Restoring purchases… Premium unlocks in a '
+                            'moment if a purchase is found.',
+                          ),
+                        ),
+                      );
+                      ref.read(iapServiceProvider).restore();
+                    },
                   ),
                 ],
               ),
@@ -135,7 +148,7 @@ class SettingsScreen extends ConsumerWidget {
                     leading: const Icon(Icons.info_outline_rounded),
                     title: const Text('About SpellBee'),
                     subtitle: Text(
-                      'Studio voice: ${hasStudioVoice ? "ready" : "not configured"}',
+                      'Spelling practice with voice, for ages 6 and up.',
                     ),
                   ),
                 ],
@@ -238,19 +251,23 @@ class _QualityPicker extends StatelessWidget {
             quality.description,
             style: const TextStyle(color: AppTheme.mute, fontSize: 12),
           ),
+          // One notice, never two: a free user picking Studio needs the
+          // unlock path (the setting persists but playback stays on device
+          // voice until Premium); a premium user gets the ready state.
           if (quality == VoiceQuality.studio && !isPremium) ...[
             SizedBox(height: context.s(10)),
             _Notice(
               icon: Icons.lock_open_rounded,
               color: AppTheme.violet,
-              text: 'Studio voice is a Premium option.',
+              text:
+                  'Studio voice is a Premium option — words keep playing '
+                  'with the device voice until you unlock it.',
               action: TextButton(
                 onPressed: onPremiumTap,
                 child: const Text('Unlock'),
               ),
             ),
-          ],
-          if (quality == VoiceQuality.studio && hasStudioVoice) ...[
+          ] else if (quality == VoiceQuality.studio && hasStudioVoice) ...[
             SizedBox(height: context.s(10)),
             const _Notice(
               icon: Icons.offline_bolt_rounded,
@@ -332,7 +349,7 @@ class _StudioVoicePicker extends StatelessWidget {
               icon: Icons.key_off_rounded,
               color: AppTheme.honeyDark,
               text:
-                  'No studio voice gateway is configured in this tester build yet. Bundled and device voice will play until it is provided.',
+                  'Studio voice needs an internet connection. Bundled and device voice play offline.',
             ),
           ],
         ],

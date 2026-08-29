@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/app.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
+import 'package:spellbee/core/models/premium_state.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
@@ -34,16 +35,37 @@ Future<void> main() async {
   await _seedScreenshotDataIfNeeded(storage);
 
   final iap = IapService();
-  if (_isMobile) {
-    iap.initialize().catchError((_) {});
-  }
 
   final container = ProviderContainer(
+    // Riverpod 3's default auto-retry turns a throwing provider into a
+    // loading<->error flicker loop (studio-wide rule after the Nabd
+    // incident): never retry automatically.
+    retry: (retryCount, error) => null,
     overrides: [
       storageServiceProvider.overrideWithValue(storage),
       iapServiceProvider.overrideWithValue(iap),
     ],
   );
+
+  // The money path must exist before the purchase stream is subscribed:
+  // launch-time transactions (Ask to Buy approvals, interrupted purchases,
+  // restores) can arrive before any screen wires its callbacks.
+  iap.persistEntitlement = (productId) async {
+    await storage.savePremium(
+      PremiumState(activeProductId: productId, activatedAt: DateTime.now()),
+    );
+    container.invalidate(premiumProvider);
+  };
+
+  if (_isMobile) {
+    await iap.initialize().catchError((_) {});
+    // Local subscription entitlements expire after their validity window;
+    // a silent restore renews anyone still subscribed (and heals lifetime
+    // buyers after reinstall) without any UI involvement.
+    if (storage.loadPremium().isSubscription) {
+      iap.restore(silent: true).catchError((_) {});
+    }
+  }
 
   runApp(
     UncontrolledProviderScope(container: container, child: const SpellBeeApp()),

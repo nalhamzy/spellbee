@@ -40,11 +40,42 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     }
   }
 
+  Widget _storeUnavailable(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(context.s(16)),
+      decoration: AppTheme.card(color: AppTheme.surface),
+      child: Column(
+        children: [
+          const Icon(Icons.cloud_off_rounded, color: AppTheme.mute, size: 32),
+          SizedBox(height: context.s(8)),
+          const Text(
+            "We couldn't reach the store to load prices. Check your "
+            'connection and try again.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppTheme.ink, fontSize: 13),
+          ),
+          SizedBox(height: context.s(10)),
+          OutlinedButton.icon(
+            onPressed: () => ref.invalidate(iapProductsProvider),
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Try again'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final productsAsync = widget.screenshotMode
         ? null
         : ref.watch(iapProductsProvider);
+    final hasProducts =
+        productsAsync == null ||
+        productsAsync.maybeWhen(
+          data: (products) => products.isNotEmpty,
+          orElse: () => false,
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -79,8 +110,15 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         _tiers(context, _screenshotProducts)
                       else
                         productsAsync.when(
-                          data: (products) => _tiers(context, products),
-                          error: (_, _) => _tiers(context, const []),
+                          // Never invent prices: a tier list built from
+                          // hardcoded USD fallbacks shows the wrong amount
+                          // on every non-US storefront and contradicts the
+                          // store's own payment sheet. If the store gave us
+                          // nothing, say so and offer a retry.
+                          data: (products) => products.isEmpty
+                              ? _storeUnavailable(context)
+                              : _tiers(context, products),
+                          error: (_, _) => _storeUnavailable(context),
                           loading: () => Padding(
                             padding: EdgeInsets.all(context.s(24)),
                             child: const Center(
@@ -102,7 +140,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                               ),
                             ),
                           ),
-                          onPressed: _buy,
+                          // No live products = nothing trustworthy to sell;
+                          // a dead CTA beats charging against a price the
+                          // user never saw.
+                          onPressed: hasProducts ? _buy : null,
                           child: Text(
                             _selected == IapProductIds.premiumLifetime
                                 ? 'Pay Once & Unlock'
@@ -238,7 +279,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           id: IapProductIds.premiumYearly,
           title: 'Premium Yearly',
           subtitle: 'Best value for steady school practice',
-          price: yearly?.price ?? '\$29.99',
+          price: yearly?.price ?? '—',
           period: '/year',
           highlight: true,
         ),
@@ -247,7 +288,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           id: IapProductIds.premiumLifetime,
           title: 'Premium Lifetime',
           subtitle: 'Pay once for this family',
-          price: lifetime?.price ?? '\$49.99',
+          price: lifetime?.price ?? '—',
           period: 'one-time',
         ),
         SizedBox(height: c.s(8)),
@@ -255,7 +296,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           id: IapProductIds.premiumMonthly,
           title: 'Premium Monthly',
           subtitle: 'Try premium month-to-month',
-          price: monthly?.price ?? '\$4.99',
+          price: monthly?.price ?? '—',
           period: '/month',
         ),
       ],
@@ -398,14 +439,23 @@ class _SubscriptionDisclosure extends StatelessWidget {
         .where((p) => p.id == selectedProductId)
         .cast<IapProduct?>()
         .firstOrNull;
-    final price = product?.price ?? _fallbackPrice(selectedProductId);
+    // Only ever state a price the store itself returned — a hardcoded USD
+    // amount in this legally load-bearing disclosure is wrong on every
+    // non-US storefront.
+    final price = product?.price;
     final text = switch (selectedProductId) {
-      IapProductIds.premiumMonthly =>
+      IapProductIds.premiumMonthly when price != null =>
         'SpellBee Premium Monthly: $price per month. Auto-renews monthly until cancelled.',
-      IapProductIds.premiumYearly =>
+      IapProductIds.premiumMonthly =>
+        'SpellBee Premium Monthly auto-renews monthly until cancelled. The price is shown at checkout.',
+      IapProductIds.premiumYearly when price != null =>
         'SpellBee Premium Yearly: $price per year. Auto-renews yearly until cancelled.',
-      IapProductIds.premiumLifetime =>
+      IapProductIds.premiumYearly =>
+        'SpellBee Premium Yearly auto-renews yearly until cancelled. The price is shown at checkout.',
+      IapProductIds.premiumLifetime when price != null =>
         'SpellBee Premium Lifetime: $price one-time purchase. No subscription renewal.',
+      IapProductIds.premiumLifetime =>
+        'SpellBee Premium Lifetime is a one-time purchase. No subscription renewal.',
       _ => 'Review the selected purchase before confirming in the App Store.',
     };
 
@@ -416,12 +466,6 @@ class _SubscriptionDisclosure extends StatelessWidget {
     );
   }
 
-  String _fallbackPrice(String id) => switch (id) {
-    IapProductIds.premiumMonthly => '\$4.99',
-    IapProductIds.premiumYearly => '\$29.99',
-    IapProductIds.premiumLifetime => '\$49.99',
-    _ => '',
-  };
 }
 
 class _ValueNudge extends StatelessWidget {
