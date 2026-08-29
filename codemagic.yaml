@@ -28,7 +28,12 @@ workflows:
       # group, base64-encoded PEM, vaulted at
       # studio-secrets/ios_distribution_key_2026-07-10.*) pins one reusable
       # Apple Distribution certificate across builds.
-      flutter: stable
+      # Pinned to the version the app is developed/tested against.
+      # `stable` floats: the 2026-08 stable bumped Flutter's minimum iOS
+      # deployment target past our Podfile's and broke `pod install`
+      # mid-release with zero repo changes. Bump deliberately, with the
+      # Podfile and local SDK, not by surprise.
+      flutter: 3.41.1
       xcode: latest
       cocoapods: default
       java: 17
@@ -121,7 +126,12 @@ workflows:
     integrations:
       app_store_connect: admin
     environment:
-      flutter: stable
+      # Pinned to the version the app is developed/tested against.
+      # `stable` floats: the 2026-08 stable bumped Flutter's minimum iOS
+      # deployment target past our Podfile's and broke `pod install`
+      # mid-release with zero repo changes. Bump deliberately, with the
+      # Podfile and local SDK, not by surprise.
+      flutter: 3.41.1
       xcode: latest
       cocoapods: default
       groups:
@@ -188,7 +198,12 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m2
     environment:
-      flutter: stable
+      # Pinned to the version the app is developed/tested against.
+      # `stable` floats: the 2026-08 stable bumped Flutter's minimum iOS
+      # deployment target past our Podfile's and broke `pod install`
+      # mid-release with zero repo changes. Bump deliberately, with the
+      # Podfile and local SDK, not by surprise.
+      flutter: 3.41.1
       java: 17
       groups:
         - google_play
