@@ -92,109 +92,112 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         ],
       ),
       body: SafeArea(
-        child: SizedBox(
-          width: responsiveViewportWidth(context),
-          child: SingleChildScrollView(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: responsiveMaxContentWidth(context),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(context.s(20)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _hero(context),
-                      SizedBox(height: context.s(14)),
-                      _perks(context),
-                      SizedBox(height: context.s(14)),
-                      _ValueNudge(context),
-                      SizedBox(height: context.s(22)),
-                      if (productsAsync == null)
-                        _tiers(context, _screenshotProducts)
-                      else
-                        productsAsync.when(
-                          // Never invent prices: a tier list built from
-                          // hardcoded USD fallbacks shows the wrong amount
-                          // on every non-US storefront and contradicts the
-                          // store's own payment sheet. If the store gave us
-                          // nothing, say so and offer a retry.
-                          data: (products) => products.isEmpty
-                              ? _storeUnavailable(context)
-                              : _tiers(context, products),
-                          error: (_, _) => _storeUnavailable(context),
-                          loading: () => Padding(
-                            padding: EdgeInsets.all(context.s(24)),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                        ),
-                      SizedBox(height: context.s(18)),
-                      SizedBox(
-                        width: double.infinity,
-                        height: context.s(56),
-                        child: FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.violet,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                context.s(18),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: responsiveViewportWidth(context),
+            child: SingleChildScrollView(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: responsiveMaxContentWidth(context),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(context.s(20)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _hero(context),
+                        SizedBox(height: context.s(14)),
+                        _perks(context),
+                        SizedBox(height: context.s(14)),
+                        _ValueNudge(context),
+                        SizedBox(height: context.s(22)),
+                        if (productsAsync == null)
+                          _tiers(context, _screenshotProducts)
+                        else
+                          productsAsync.when(
+                            // Never invent prices: a tier list built from
+                            // hardcoded USD fallbacks shows the wrong amount
+                            // on every non-US storefront and contradicts the
+                            // store's own payment sheet. If the store gave us
+                            // nothing, say so and offer a retry.
+                            data: (products) => products.isEmpty
+                                ? _storeUnavailable(context)
+                                : _tiers(context, products),
+                            error: (_, _) => _storeUnavailable(context),
+                            loading: () => Padding(
+                              padding: EdgeInsets.all(context.s(24)),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
                               ),
                             ),
                           ),
-                          // No live products = nothing trustworthy to sell;
-                          // a dead CTA beats charging against a price the
-                          // user never saw.
-                          onPressed: hasProducts ? _buy : null,
-                          child: Text(
-                            _selected == IapProductIds.premiumLifetime
-                                ? 'Pay Once & Unlock'
-                                : 'Start Premium',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
+                        SizedBox(height: context.s(18)),
+                        SizedBox(
+                          width: double.infinity,
+                          height: context.s(56),
+                          child: FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppTheme.violet,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  context.s(18),
+                                ),
+                              ),
+                            ),
+                            // No live products = nothing trustworthy to sell;
+                            // a dead CTA beats charging against a price the
+                            // user never saw.
+                            onPressed: hasProducts ? _buy : null,
+                            child: Text(
+                              _selected == IapProductIds.premiumLifetime
+                                  ? 'Pay Once & Unlock'
+                                  : 'Start Premium',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: context.s(8)),
-                      _SubscriptionDisclosure(
-                        selectedProductId: _selected,
-                        products: productsAsync == null
-                            ? _screenshotProducts
-                            : productsAsync.maybeWhen(
-                                data: (products) => products,
-                                orElse: () => const <IapProduct>[],
-                              ),
-                      ),
-                      SizedBox(height: context.s(8)),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 4,
-                        runSpacing: 0,
-                        children: [
-                          TextButton(
-                            onPressed: () => _openUrl(LegalUrls.privacy),
-                            child: const Text('Privacy Policy'),
-                          ),
-                          TextButton(
-                            onPressed: () => _openUrl(LegalUrls.terms),
-                            child: const Text('Terms of Use (EULA)'),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        'Manage or cancel subscriptions in your App Store account settings.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppTheme.mute,
-                          fontSize: context.s(10).clamp(10, 12),
+                        SizedBox(height: context.s(8)),
+                        _SubscriptionDisclosure(
+                          selectedProductId: _selected,
+                          products: productsAsync == null
+                              ? _screenshotProducts
+                              : productsAsync.maybeWhen(
+                                  data: (products) => products,
+                                  orElse: () => const <IapProduct>[],
+                                ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: context.s(8)),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 4,
+                          runSpacing: 0,
+                          children: [
+                            TextButton(
+                              onPressed: () => _openUrl(LegalUrls.privacy),
+                              child: const Text('Privacy Policy'),
+                            ),
+                            TextButton(
+                              onPressed: () => _openUrl(LegalUrls.terms),
+                              child: const Text('Terms of Use (EULA)'),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'Manage or cancel subscriptions in your App Store account settings.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppTheme.mute,
+                            fontSize: context.s(10).clamp(10, 12),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -264,7 +267,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
     return Column(
       children: [
-        row(Icons.all_inclusive_rounded, 'Unlimited themed word packs — no daily cap'),
+        row(
+          Icons.all_inclusive_rounded,
+          'Unlimited themed word packs — no daily cap',
+        ),
         row(Icons.calculate_rounded, 'Unlimited Math Bee rounds in Number Bee'),
         row(Icons.list_alt_rounded, 'Unlimited parent-made word lists'),
         row(Icons.record_voice_over_rounded, 'Studio voice pronunciation'),
@@ -472,7 +478,6 @@ class _SubscriptionDisclosure extends StatelessWidget {
       style: const TextStyle(color: AppTheme.mute, fontSize: 11, height: 1.35),
     );
   }
-
 }
 
 class _ValueNudge extends StatelessWidget {

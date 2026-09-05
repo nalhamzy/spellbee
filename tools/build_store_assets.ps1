@@ -235,8 +235,8 @@ function Validate-Assets($Root) {
     foreach ($entry in $expected.GetEnumerator()) {
         $dir = Join-Path $Root $entry.Key
         $files = @(Get-ChildItem -LiteralPath $dir -Filter '*.png' | Sort-Object Name)
-        if ($files.Count -ne 5) {
-            throw "$($entry.Key) expected 5 screenshots, found $($files.Count)."
+        if ($files.Count -ne 8) {
+            throw "$($entry.Key) expected 8 screenshots, found $($files.Count)."
         }
         foreach ($file in $files) {
             $size = Get-ImageSize $file.FullName
@@ -266,8 +266,8 @@ function Validate-Assets($Root) {
 
     $expectedRelativePngs = @()
     foreach ($entry in $expected.GetEnumerator()) {
-        for ($i = 1; $i -le 5; $i++) {
-            $names = @('home', 'practice', 'test', 'lists', 'paywall')
+        for ($i = 1; $i -le 8; $i++) {
+            $names = @('home', 'games', 'numbers', 'tiles', 'aloud', 'math', 'results', 'paywall')
             $expectedRelativePngs += "$($entry.Key)\$('{0:D2}' -f $i)_$($names[$i - 1]).png"
         }
     }
@@ -288,8 +288,8 @@ function Validate-Assets($Root) {
 function New-FeatureGraphic($SourceDir, $DestinationDir) {
     New-Item -ItemType Directory -Force -Path $DestinationDir | Out-Null
     $homeShot = Join-Path $SourceDir '01_home.png'
-    $practice = Join-Path $SourceDir '02_practice.png'
-    $paywall = Join-Path $SourceDir '05_paywall.png'
+    $practice = Join-Path $SourceDir '03_numbers.png'
+    $paywall = Join-Path $SourceDir '07_results.png'
     $dest = Join-Path $DestinationDir 'feature_graphic_1024x500.png'
 
     $tmpHome = Join-Path $env:TEMP ("spellbee_home_" + [guid]::NewGuid() + '.png')
@@ -352,24 +352,36 @@ try {
         $outRoot = Join-Path $ProjectRoot 'store_assets\upload_ready'
         New-CleanDirectory $outRoot
 
+        # Chrome on Windows refuses windows narrower than ~500 px: a 480-wide
+        # request rendered at 500 and cropped, clipping the app bar's right
+        # icon. Phone captures are therefore 500 wide with the height set to
+        # keep each store's exact aspect ratio; the app still lays out at
+        # LayoutWidth via ?vw=, centered.
         $sets = @(
-        @{ Name = 'ios_67'; Width = 1290; Height = 2796; CaptureWidth = 480; CaptureHeight = 1040; LayoutWidth = 430; Scale = 1 },
-        @{ Name = 'ios_65'; Width = 1284; Height = 2778; CaptureWidth = 480; CaptureHeight = 1038; LayoutWidth = 428; Scale = 1 },
-        @{ Name = 'ipad_129'; Width = 2048; Height = 2732; CaptureWidth = 1100; CaptureHeight = 1468; LayoutWidth = 1024; Scale = 1 },
-        @{ Name = 'android_phone'; Width = 1080; Height = 1920; CaptureWidth = 500; CaptureHeight = 889; LayoutWidth = 428; Scale = 1 },
-        @{ Name = 'android_tablet'; Width = 1600; Height = 2560; CaptureWidth = 860; CaptureHeight = 1376; LayoutWidth = 800; Scale = 1 }
+        @{ Name = 'ios_67'; Width = 1290; Height = 2796; CaptureWidth = 500; CaptureHeight = 1084; LayoutWidth = 430; Scale = 1; GamesScroll = 900 },
+        @{ Name = 'ios_65'; Width = 1284; Height = 2778; CaptureWidth = 500; CaptureHeight = 1082; LayoutWidth = 428; Scale = 1; GamesScroll = 900 },
+        @{ Name = 'ipad_129'; Width = 2048; Height = 2732; CaptureWidth = 1100; CaptureHeight = 1468; LayoutWidth = 1024; Scale = 1; GamesScroll = 1150 },
+        @{ Name = 'android_phone'; Width = 1080; Height = 1920; CaptureWidth = 500; CaptureHeight = 889; LayoutWidth = 428; Scale = 1; GamesScroll = 960 },
+        @{ Name = 'android_tablet'; Width = 1600; Height = 2560; CaptureWidth = 860; CaptureHeight = 1376; LayoutWidth = 800; Scale = 1; GamesScroll = 1050 }
         )
-        $shots = @(
+        # Scene order = store order. The first three carry the v1.1.0
+        # story (quests + honey, the game grid, Number Bee); the rest show
+        # the mechanics a parent is buying. GamesScroll is per layout width.
+        $shotList = { param($set) @(
             @{ Name = '01_home'; Shot = 'home' },
-            @{ Name = '02_practice'; Shot = 'practice' },
-            @{ Name = '03_test'; Shot = 'test' },
-            @{ Name = '04_lists'; Shot = 'lists' },
-            @{ Name = '05_paywall'; Shot = 'paywall' }
-        )
+            @{ Name = '02_games'; Shot = ('home&scroll=' + $set.GamesScroll) },
+            @{ Name = '03_numbers'; Shot = 'numbers' },
+            @{ Name = '04_tiles'; Shot = 'tiles&fill=4' },
+            @{ Name = '05_aloud'; Shot = 'test&mode=mic' },
+            @{ Name = '06_math'; Shot = 'math' },
+            @{ Name = '07_results'; Shot = 'results' },
+            @{ Name = '08_paywall'; Shot = 'paywall' }
+        ) }
 
         foreach ($set in $sets) {
             $dir = Join-Path $outRoot $set.Name
             New-Item -ItemType Directory -Force -Path $dir | Out-Null
+            $shots = & $shotList $set
             foreach ($shot in $shots) {
                 $url = "$baseUrl/?screenshot=1&shot=$($shot.Shot)&vw=$($set.LayoutWidth)"
                 $dest = Join-Path $dir ($shot.Name + '.png')

@@ -10,10 +10,15 @@ import 'package:spellbee/core/utils/responsive.dart';
 class ConfettiBurst extends StatefulWidget {
   final Duration duration;
   final int count;
+
+  /// Hold the animation at this progress (0..1) instead of playing it —
+  /// store screenshots need the paper mid-air, not the empty end state.
+  final double? freezeAt;
   const ConfettiBurst({
     super.key,
     this.duration = const Duration(milliseconds: 2600),
     this.count = 70,
+    this.freezeAt,
   });
 
   @override
@@ -49,8 +54,13 @@ class _ConfettiBurstState extends State<ConfettiBurst>
         round: rng.nextBool(),
       );
     });
-    _ctrl = AnimationController(vsync: this, duration: widget.duration)
-      ..forward();
+    _ctrl = AnimationController(vsync: this, duration: widget.duration);
+    final freeze = widget.freezeAt;
+    if (freeze != null) {
+      _ctrl.value = freeze.clamp(0.0, 1.0);
+    } else {
+      _ctrl.forward();
+    }
   }
 
   @override

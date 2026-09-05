@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math' as math;
+
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
+import 'package:spellbee/core/models/progression.dart';
+import 'package:spellbee/core/models/test_result.dart';
+import 'package:spellbee/core/models/word.dart';
+import 'package:spellbee/core/utils/number_words.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/custom_lists_screen.dart';
 import 'package:spellbee/screens/dashboard_screen.dart';
+import 'package:spellbee/screens/number_bee_screen.dart';
 import 'package:spellbee/screens/practice_screen.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
+import 'package:spellbee/screens/results_screen.dart';
 import 'package:spellbee/screens/settings_screen.dart';
 import 'package:spellbee/screens/stats_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
@@ -91,6 +99,79 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp>
           words: (kWordsCatalog[3] ?? const []).take(5).toList(),
           title: 'Level 3 trial',
           savesStats: false,
+          level: 3,
+          initialMode: Uri.base.queryParameters['mode'] == 'mic'
+              ? InputMode.mic
+              : InputMode.keyboard,
+        );
+      case 'tiles':
+        return const TestScreen(
+          words: [
+            Word(
+              'rainbow',
+              'An arc of colors in the sky after rain.',
+              'A rainbow appeared after the storm.',
+            ),
+            Word(
+              'castle',
+              'A large fortified building.',
+              'The castle had tall towers.',
+            ),
+            Word(
+              'bridge',
+              'A structure that crosses water.',
+              'We crossed the bridge slowly.',
+            ),
+          ],
+          title: 'Tile builder',
+          savesStats: false,
+          initialMode: InputMode.tiles,
+        );
+      case 'numbers':
+        return const NumberBeeScreen();
+      case 'math':
+        return TestScreen(
+          words: [
+            const Word(
+              'twelve',
+              'Add the two numbers, then spell the answer as a word.',
+              'Count it out on your fingers if you like, then spell what you get.',
+              prompt: 'What is 7 plus 5? Spell the answer.',
+              display: '7 + 5 = ?',
+            ),
+            ...NumberBee.mathRound(NumberRange.little, random: math.Random(3)),
+          ],
+          title: 'Math Bee',
+          savesStats: false,
+          kind: RoundKind.math,
+        );
+      case 'results':
+        return ResultsScreen(
+          title: 'Level 3 trial',
+          result: TestResult(
+            items: const [
+              AskedItem(target: 'rainbow', submitted: 'rainbow', isCorrect: true),
+              AskedItem(target: 'castle', submitted: 'castle', isCorrect: true),
+              AskedItem(target: 'bridge', submitted: 'bridge', isCorrect: true),
+              AskedItem(target: 'thunder', submitted: 'thunder', isCorrect: true),
+              AskedItem(target: 'giraffe', submitted: 'giraffe', isCorrect: true),
+              AskedItem(target: 'library', submitted: 'library', isCorrect: true),
+              AskedItem(target: 'penguin', submitted: 'penguin', isCorrect: true),
+              AskedItem(target: 'volcano', submitted: 'volcano', isCorrect: true),
+            ],
+            elapsed: const Duration(seconds: 74),
+            endedAt: DateTime.now(),
+            longestStreak: 8,
+            tilesCorrect: 3,
+          ),
+          outcome: ProgressionOutcome(
+            honeyEarned: 46,
+            questsCompleted: [kQuestPool[0]],
+            newBadges: [badgeById('perfect_test')!],
+            rankBefore: BeeRank.all[1],
+            rankAfter: BeeRank.all[2],
+            bonusCredits: 1,
+          ),
         );
       case 'paywall':
         return const PaywallScreen(screenshotMode: true);

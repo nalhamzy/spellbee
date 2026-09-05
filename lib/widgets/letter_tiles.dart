@@ -82,8 +82,6 @@ class LetterTilesInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final long = board.answerLength > 9;
-    final slotSize = context.s(long ? 34 : 44);
     final tileSize = context.s(46);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -95,27 +93,39 @@ class LetterTilesInput extends StatelessWidget {
             radius: context.s(18),
             shadow: false,
           ),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: context.s(6),
-            runSpacing: context.s(6),
-            children: [
-              for (var slot = 0; slot < board.answerLength; slot++)
-                _Slot(
-                  size: slotSize,
-                  letter: slot < board.placed.length
-                      ? board.tray[board.placed[slot]]
-                      : null,
-                  correct: correct,
-                  onTap: enabled && slot < board.placed.length
-                      ? () {
-                          HapticFeedback.selectionClick();
-                          board.removeSlot(slot);
-                          onChanged();
-                        }
-                      : null,
-                ),
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Shrink the slots so a whole word sits on one row; only
+              // championship-length words (11+ letters) wrap.
+              final n = board.answerLength;
+              final gap = context.s(6);
+              final fit = (constraints.maxWidth - gap * (n - 1)) / n;
+              final slotSize = math
+                  .min(context.s(44), fit)
+                  .clamp(context.s(26), context.s(44));
+              return Wrap(
+                alignment: WrapAlignment.center,
+                spacing: gap,
+                runSpacing: gap,
+                children: [
+                  for (var slot = 0; slot < n; slot++)
+                    _Slot(
+                      size: slotSize,
+                      letter: slot < board.placed.length
+                          ? board.tray[board.placed[slot]]
+                          : null,
+                      correct: correct,
+                      onTap: enabled && slot < board.placed.length
+                          ? () {
+                              HapticFeedback.selectionClick();
+                              board.removeSlot(slot);
+                              onChanged();
+                            }
+                          : null,
+                    ),
+                ],
+              );
+            },
           ),
         ),
         SizedBox(height: context.s(12)),

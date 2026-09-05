@@ -8,6 +8,7 @@ import 'package:spellbee/app.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
+import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
@@ -107,8 +108,37 @@ Future<void> _seedScreenshotDataIfNeeded(StorageService storage) async {
         ),
       },
       lastPlayedEpochMs: DateTime.now().millisecondsSinceEpoch,
+      // Yesterday, so the store shot shows the "Spell it now" call to action
+      // instead of a finished card.
       lastDailyEpochDay:
+          DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay -
+          1,
+    ),
+  );
+  await storage.saveProgression(
+    Progression(
+      honey: 215,
+      badges: const {
+        'first_test': 1,
+        'perfect_test': 2,
+        'mic_first': 3,
+        'tiles_first': 4,
+        'daily_3': 5,
+      },
+      questDay:
           DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay,
+      questProgress: const {
+        'correctWords': 14,
+        'finishTests': 1,
+        'streakInTest': 5,
+        'useMic': 3,
+        'useTiles': 2,
+        'readFacts': 1,
+      },
+      questsRewarded: const {'streak5'},
+      totalMicWords: 9,
+      totalTilesWords: 6,
+      factsRead: 4,
     ),
   );
 

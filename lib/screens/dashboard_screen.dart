@@ -25,11 +25,21 @@ class DashboardScreen extends ConsumerWidget {
     final quests = ref.watch(dailyQuestsProvider);
     final fact = ref.watch(dailyFactProvider);
 
+    // Store screenshots only: `?screenshot=1&scroll=<px>` opens the page
+    // scrolled so the Play grid can be captured as its own scene. Never
+    // created in normal use, so the missing dispose is moot.
+    final screenshotScroll = Uri.base.queryParameters['screenshot'] == '1'
+        ? double.tryParse(Uri.base.queryParameters['scroll'] ?? '')
+        : null;
+
     return SafeArea(
       child: ResponsiveContentBox(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: context.s(20)),
           child: ListView(
+            controller: screenshotScroll == null
+                ? null
+                : ScrollController(initialScrollOffset: screenshotScroll),
             padding: EdgeInsets.fromLTRB(0, context.s(16), 0, context.s(120)),
             children: [
               _Header(streak: stats.dailyStreak),

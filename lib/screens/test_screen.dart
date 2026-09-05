@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -309,9 +310,29 @@ class _TestScreenState extends ConsumerState<TestScreen>
     setState(() => _s.typed = v);
   }
 
-  TileBoard _tilesFor(_ItemState s, Word w) => s.tiles ??= TileBoard.forWord(
-    w.letters,
-  );
+  TileBoard _tilesFor(_ItemState s, Word w) {
+    final existing = s.tiles;
+    if (existing != null) return existing;
+    final board = TileBoard.forWord(w.letters);
+    // Store screenshots only (`?screenshot=1&fill=N`): show a half-built
+    // word so the tile mechanic reads at a glance.
+    final fill = kIsWeb && Uri.base.queryParameters['screenshot'] == '1'
+        ? int.tryParse(Uri.base.queryParameters['fill'] ?? '')
+        : null;
+    if (fill != null) {
+      final prefix = w.letters.substring(0, fill.clamp(0, w.letters.length));
+      for (final c in prefix.split('')) {
+        for (var i = 0; i < board.tray.length; i++) {
+          if (board.tray[i] == c && !board.isPlaced(i)) {
+            board.place(i);
+            break;
+          }
+        }
+      }
+      s.typed = board.built;
+    }
+    return s.tiles = board;
+  }
 
   void _setMode(InputMode m) {
     if (_mode == m) return;

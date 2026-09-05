@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
@@ -200,7 +201,15 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
               ),
             ),
           ),
-          if (_celebrate) const Positioned.fill(child: ConfettiBurst()),
+          if (_celebrate)
+            Positioned.fill(
+              child: ConfettiBurst(
+                freezeAt:
+                    kIsWeb && Uri.base.queryParameters['screenshot'] == '1'
+                    ? 0.42
+                    : null,
+              ),
+            ),
         ],
       ),
     );
