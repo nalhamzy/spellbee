@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
+import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/tts_service.dart';
 
@@ -49,6 +50,23 @@ class StorageService {
   Future<void> saveStats(PlayerStats s) =>
       _prefs.setString(_kStats, s.encode());
 
+  // ── Progression (honey, rank, quests, badges) ──────────────────────
+
+  static const _kProgression = 'sb.progress.v1';
+
+  Progression loadProgression() {
+    final raw = _prefs.getString(_kProgression);
+    if (raw == null) return const Progression();
+    try {
+      return Progression.decode(raw);
+    } catch (_) {
+      return const Progression();
+    }
+  }
+
+  Future<void> saveProgression(Progression p) =>
+      _prefs.setString(_kProgression, p.encode());
+
   // ── Premium ─────────────────────────────────────────────────────────
 
   static const _kPremium = 'sb.premium.v1';
@@ -73,6 +91,7 @@ class StorageService {
   static const _kVoiceSpeed = 'sb.settings.voiceSpeed';
   static const _kVoiceQuality = 'sb.settings.voiceQuality';
   static const _kOpenAiVoice = 'sb.settings.openAiVoice';
+  static const _kAutoListen = 'sb.settings.autoListen';
 
   int getSelectedLevel() => _prefs.getInt(_kSelectedLevel) ?? 3;
   Future<void> setSelectedLevel(int v) => _prefs.setInt(_kSelectedLevel, v);
@@ -89,6 +108,11 @@ class StorageService {
       _prefs.getString(_kOpenAiVoice) ?? kOpenAiStudioVoices.first.id;
   Future<void> setOpenAiVoice(String voice) =>
       _prefs.setString(_kOpenAiVoice, voice);
+
+  /// Hands-free spell-aloud: the mic opens by itself after the pronouncer
+  /// finishes the word. On by default — the mode is opt-in already.
+  bool getAutoListen() => _prefs.getBool(_kAutoListen) ?? true;
+  Future<void> setAutoListen(bool v) => _prefs.setBool(_kAutoListen, v);
 
   String? getParentPin() => _prefs.getString(_kParentPin);
   Future<void> setParentPin(String? pin) async {
@@ -111,6 +135,15 @@ class StorageService {
   Future<void> setAiCredits(int v) =>
       _prefs.setInt('$_kAiCreditsPrefix${_todayKey()}', v);
 
+  // ── Generic per-day counters (free-tier caps on mini-games) ───────
+
+  static const _kDailyPrefix = 'sb.daily.';
+
+  int getDailyCount(String name) =>
+      _prefs.getInt('$_kDailyPrefix$name.${_todayKey()}') ?? 0;
+  Future<void> setDailyCount(String name, int v) =>
+      _prefs.setInt('$_kDailyPrefix$name.${_todayKey()}', v);
+
   // ── Utility ─────────────────────────────────────────────────────────
 
   /// Only used by tests / debug.
@@ -118,5 +151,6 @@ class StorageService {
     'lists': _prefs.getStringList(_kLists),
     'stats': _prefs.getString(_kStats),
     'premium': _prefs.getString(_kPremium),
+    'progress': _prefs.getString(_kProgression),
   });
 }

@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:spellbee/core/services/bundled_tts_service.dart'
+    show waitForPlaybackEnd;
 
 /// Premium voice through the SpellBee Firebase TTS gateway.
 ///
@@ -106,6 +108,9 @@ class OpenAiTtsService {
       }
       await _player.stop();
       await _player.play(DeviceFileSource(file.path));
+      // Sentences (definitions, math questions) run longer than single
+      // words; the timeout only matters if the player never reports an end.
+      await waitForPlaybackEnd(_player, const Duration(seconds: 20));
       return true;
     } catch (_) {
       return false;

@@ -2,26 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/voice_phrase_bank.dart';
+import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/test_screen.dart';
+import 'package:spellbee/widgets/celebration.dart';
 
 class ResultsScreen extends ConsumerStatefulWidget {
   final TestResult result;
   final String title;
-  const ResultsScreen({super.key, required this.result, required this.title});
+  final ProgressionOutcome? outcome;
+  const ResultsScreen({
+    super.key,
+    required this.result,
+    required this.title,
+    this.outcome,
+  });
 
   @override
   ConsumerState<ResultsScreen> createState() => _ResultsScreenState();
 }
 
 class _ResultsScreenState extends ConsumerState<ResultsScreen> {
+  bool get _celebrate {
+    final o = widget.outcome;
+    return widget.result.isPerfect ||
+        (o != null && (o.rankedUp || o.newBadges.isNotEmpty));
+  }
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final tts = ref.read(ttsServiceProvider);
       final premium = ref.read(isPremiumProvider);
       final stub = VoicePhraseBank.pick(
@@ -29,7 +43,16 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
             ? VoicePhraseBank.perfectFinish
             : VoicePhraseBank.finish,
       );
-      tts.playPhrase(stub, premium: premium);
+      await tts.playPhrase(stub, premium: premium);
+      final o = widget.outcome;
+      if (!mounted || o == null || !o.rankedUp) return;
+      // The pronouncer announces the rank — the moment kids remember.
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+      if (!mounted) return;
+      await tts.speakText(
+        'Rank up! You are now a ${o.rankAfter.title}.',
+        premium: premium,
+      );
     });
   }
 
@@ -39,6 +62,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
     final title = widget.title;
     final pct = (result.accuracy * 100).round();
     final missedWords = _missedWords(result);
+    final outcome = widget.outcome;
     String blurb;
     if (pct == 100) {
       blurb = 'Perfect! Every word nailed. Ready for the next level?';
@@ -56,110 +80,128 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
         foregroundColor: AppTheme.ink,
         title: Text(title),
       ),
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.pageGradient),
-        child: SafeArea(
-          child: ResponsiveContentBox(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: context.s(20)),
-              child: ListView(
-                padding: EdgeInsets.symmetric(vertical: context.s(20)),
-                children: [
-                  _score(context, pct),
-                  SizedBox(height: context.s(16)),
-                  Container(
-                    padding: EdgeInsets.all(context.s(16)),
-                    decoration: AppTheme.card(
-                      gradient: AppTheme.surfaceLiftGradient,
-                      radius: context.s(16),
-                    ),
-                    child: Text(
-                      blurb,
-                      style: TextStyle(
-                        color: AppTheme.ink,
-                        fontSize: context.s(15),
-                        height: 1.45,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: context.s(18)),
-                  Text(
-                    'Review',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  SizedBox(height: context.s(8)),
-                  for (final item in result.items) _row(context, item),
-                  SizedBox(height: context.s(24)),
-                  if (missedWords.isNotEmpty) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      height: context.s(54),
-                      child: FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppTheme.ink,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(context.s(16)),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(gradient: AppTheme.pageGradient),
+            child: SafeArea(
+              child: ResponsiveContentBox(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: context.s(20)),
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(vertical: context.s(20)),
+                    children: [
+                      _score(context, pct),
+                      SizedBox(height: context.s(16)),
+                      if (outcome != null && !outcome.isEmpty) ...[
+                        RewardsCard(outcome: outcome),
+                        SizedBox(height: context.s(16)),
+                      ],
+                      Container(
+                        padding: EdgeInsets.all(context.s(16)),
+                        decoration: AppTheme.card(
+                          gradient: AppTheme.surfaceLiftGradient,
+                          radius: context.s(16),
+                        ),
+                        child: Text(
+                          blurb,
+                          style: TextStyle(
+                            color: AppTheme.ink,
+                            fontSize: context.s(15),
+                            height: 1.45,
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => TestScreen(
-                                words: missedWords,
-                                title: 'Retry missed words',
+                      ),
+                      SizedBox(height: context.s(18)),
+                      Text(
+                        'Review',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      SizedBox(height: context.s(8)),
+                      for (final item in result.items) _row(context, item),
+                      SizedBox(height: context.s(24)),
+                      if (missedWords.isNotEmpty) ...[
+                        SizedBox(
+                          width: double.infinity,
+                          height: context.s(54),
+                          child: FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppTheme.ink,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  context.s(16),
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        icon: const Icon(Icons.replay_rounded),
-                        label: const Text(
-                          'Practice missed words',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: context.s(10)),
-                  ],
-                  SizedBox(
-                    width: double.infinity,
-                    height: context.s(54),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(context.s(16)),
-                        onTap: () {
-                          Navigator.of(context).popUntil((r) => r.isFirst);
-                          ref.read(tabProvider.notifier).go(AppTab.home);
-                        },
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            gradient: AppTheme.ctaGradient,
-                            borderRadius: BorderRadius.circular(context.s(16)),
-                            boxShadow: AppTheme.softShadow,
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'Back to home',
+                            onPressed: () {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (_) => TestScreen(
+                                    words: missedWords,
+                                    title: 'Retry missed words',
+                                    kind: result.kind == RoundKind.math
+                                        ? RoundKind.math
+                                        : result.kind == RoundKind.numbers
+                                        ? RoundKind.numbers
+                                        : RoundKind.focus,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.replay_rounded),
+                            label: const Text(
+                              'Practice missed words',
                               style: TextStyle(
-                                color: AppTheme.ink,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 16,
                               ),
                             ),
                           ),
                         ),
+                        SizedBox(height: context.s(10)),
+                      ],
+                      SizedBox(
+                        width: double.infinity,
+                        height: context.s(54),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(context.s(16)),
+                            onTap: () {
+                              Navigator.of(context).popUntil((r) => r.isFirst);
+                              ref.read(tabProvider.notifier).go(AppTab.home);
+                            },
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                gradient: AppTheme.ctaGradient,
+                                borderRadius: BorderRadius.circular(
+                                  context.s(16),
+                                ),
+                                boxShadow: AppTheme.softShadow,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Back to home',
+                                  style: TextStyle(
+                                    color: AppTheme.ink,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          if (_celebrate) const Positioned.fill(child: ConfettiBurst()),
+        ],
       ),
     );
   }
@@ -176,6 +218,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   }
 
   Widget _score(BuildContext context, int pct) {
+    final perfect = pct == 100;
     return Container(
       padding: EdgeInsets.all(context.s(20)),
       decoration: BoxDecoration(
@@ -209,9 +252,49 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                 ),
                 SizedBox(height: context.s(4)),
                 Text(
-                  '${widget.result.elapsed.inSeconds}s total',
+                  '${widget.result.elapsed.inSeconds}s total'
+                  '${widget.result.longestStreak >= 3 ? ' · best run ${widget.result.longestStreak}' : ''}',
                   style: const TextStyle(color: AppTheme.ink),
                 ),
+                if (perfect) ...[
+                  SizedBox(height: context.s(8)),
+                  // The column beside a 56 px "100%" is ~130 px on a
+                  // 360-wide phone; scale the pill down rather than clip it.
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.stars_rounded,
+                            size: 16,
+                            color: AppTheme.honeyDark,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'PERFECT ROUND',
+                            style: TextStyle(
+                              color: AppTheme.honeyDark,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

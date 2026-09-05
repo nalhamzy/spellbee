@@ -71,6 +71,7 @@ class BundledTtsService {
           ? assetPath.substring('assets/'.length)
           : assetPath;
       await _player.play(AssetSource(rel));
+      await waitForPlaybackEnd(_player, const Duration(seconds: 6));
       return true;
     } catch (_) {
       return false;
@@ -85,5 +86,22 @@ class BundledTtsService {
 
   void dispose() {
     _player.dispose();
+  }
+}
+
+/// `play()` returns as soon as playback STARTS. Speech callers need the end
+/// — the hands-free mic must not open while the pronouncer is still saying
+/// the word (the recognizer would hear "cat" and grade it correct). Resolves
+/// on completed OR stopped (a stop() mid-clip must not hang the caller), with
+/// a timeout as the safety net for players that never report either.
+Future<void> waitForPlaybackEnd(AudioPlayer player, Duration timeout) async {
+  try {
+    await player.onPlayerStateChanged
+        .firstWhere(
+          (s) => s == PlayerState.completed || s == PlayerState.stopped,
+        )
+        .timeout(timeout);
+  } catch (_) {
+    // Timeout or a disposed player: the caller proceeds either way.
   }
 }

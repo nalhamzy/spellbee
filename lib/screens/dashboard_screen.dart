@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
+import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/number_bee_screen.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
+import 'package:spellbee/widgets/progress_cards.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -18,6 +21,9 @@ class DashboardScreen extends ConsumerWidget {
     final accPct = (stats.accuracy * 100).round();
     final dailyWord = ref.watch(dailyWordProvider);
     final dailyDone = ref.watch(dailyWordDoneProvider);
+    final progression = ref.watch(progressionProvider);
+    final quests = ref.watch(dailyQuestsProvider);
+    final fact = ref.watch(dailyFactProvider);
 
     return SafeArea(
       child: ResponsiveContentBox(
@@ -27,7 +33,9 @@ class DashboardScreen extends ConsumerWidget {
             padding: EdgeInsets.fromLTRB(0, context.s(16), 0, context.s(120)),
             children: [
               _Header(streak: stats.dailyStreak),
-              SizedBox(height: context.s(16)),
+              SizedBox(height: context.s(14)),
+              RankCard(progression: progression, compact: true),
+              SizedBox(height: context.s(14)),
               _StartTrialButton(
                 level: level,
                 onPressed: () => _start(context, level),
@@ -44,6 +52,7 @@ class DashboardScreen extends ConsumerWidget {
                             builder: (_) => TestScreen(
                               words: [dailyWord],
                               title: 'Daily word',
+                              kind: RoundKind.daily,
                               onComplete: () => ref
                                   .read(playerStatsProvider.notifier)
                                   .recordDailyWordComplete(),
@@ -52,6 +61,8 @@ class DashboardScreen extends ConsumerWidget {
                         );
                       },
               ),
+              SizedBox(height: context.s(14)),
+              QuestsCard(quests: quests, progression: progression),
               SizedBox(height: context.s(22)),
               _SectionTitle(
                 title: 'Practice level',
@@ -59,8 +70,37 @@ class DashboardScreen extends ConsumerWidget {
               ),
               SizedBox(height: context.s(10)),
               _levelPicker(context, ref, level),
-              SizedBox(height: context.s(18)),
-              _SimpleChoices(ref: ref),
+              SizedBox(height: context.s(22)),
+              const _SectionTitle(title: 'Play', subtitle: 'Pick a game'),
+              SizedBox(height: context.s(10)),
+              _ActivityGrid(
+                onWordPacks: () =>
+                    ref.read(tabProvider.notifier).go(AppTab.practice),
+                onLists: () => ref.read(tabProvider.notifier).go(AppTab.lists),
+                onNumberBee: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const NumberBeeScreen()),
+                ),
+                onTiles: () => _start(
+                  context,
+                  level,
+                  mode: InputMode.tiles,
+                  title: 'Tile builder',
+                  count: 8,
+                ),
+              ),
+              SizedBox(height: context.s(14)),
+              _FactCard(
+                fact: fact,
+                onHear: () async {
+                  final tts = ref.read(ttsServiceProvider);
+                  await tts.stop();
+                  await tts.speakText(
+                    fact,
+                    premium: ref.read(isPremiumProvider),
+                  );
+                  await ref.read(progressionProvider.notifier).recordFactRead();
+                },
+              ),
               if (!ref.watch(isPremiumProvider)) ...[
                 SizedBox(height: context.s(22)),
                 _PremiumBanner(
@@ -70,7 +110,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ],
               SizedBox(height: context.s(22)),
-              _SectionTitle(title: 'Parent view', subtitle: 'Progress'),
+              const _SectionTitle(title: 'Parent view', subtitle: 'Progress'),
               SizedBox(height: context.s(10)),
               _StatsRail(
                 tests: stats.totalTests,
@@ -84,15 +124,23 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  static void _start(BuildContext context, int level) {
+  static void _start(
+    BuildContext context,
+    int level, {
+    InputMode mode = InputMode.keyboard,
+    String? title,
+    int count = 10,
+  }) {
     final pool = kWordsCatalog[level] ?? [];
     if (pool.isEmpty) return;
     final sampled = [...pool]..shuffle();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TestScreen(
-          words: sampled.take(10).toList(),
-          title: 'Level $level trial',
+          words: sampled.take(count).toList(),
+          title: title ?? 'Level $level trial',
+          level: level,
+          initialMode: mode,
         ),
       ),
     );
@@ -274,7 +322,7 @@ class _HeroPanel extends StatelessWidget {
                         done ? Icons.done_rounded : Icons.play_arrow_rounded,
                       ),
                       label: Text(
-                        done ? 'Come back later' : 'Spell it now',
+                        done ? 'Come back tomorrow' : 'Spell it now',
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
@@ -503,12 +551,16 @@ class _StartTrialButton extends StatelessWidget {
                   color: AppTheme.ink,
                 ),
                 SizedBox(width: context.s(6)),
-                Text(
-                  'Start level $level trial',
-                  style: const TextStyle(
-                    color: AppTheme.ink,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
+                Flexible(
+                  child: Text(
+                    'Start level $level trial',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
               ],
@@ -520,51 +572,107 @@ class _StartTrialButton extends StatelessWidget {
   }
 }
 
-class _SimpleChoices extends StatelessWidget {
-  final WidgetRef ref;
-  const _SimpleChoices({required this.ref});
+/// The 2×2 game grid from the design references: one tile per activity,
+/// each in its own pastel so a pre-reader can find it by colour.
+class _ActivityGrid extends StatelessWidget {
+  final VoidCallback onWordPacks;
+  final VoidCallback onLists;
+  final VoidCallback onNumberBee;
+  final VoidCallback onTiles;
+
+  const _ActivityGrid({
+    required this.onWordPacks,
+    required this.onLists,
+    required this.onNumberBee,
+    required this.onTiles,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final gap = context.s(10);
     return Column(
       children: [
-        _WideActionCard(
-          icon: Icons.auto_awesome_rounded,
-          color: AppTheme.violet,
-          background: AppTheme.lilac,
-          title: 'Make a word pack',
-          subtitle: 'Pick a theme and practice a fresh set.',
-          onTap: () => ref.read(tabProvider.notifier).go(AppTab.practice),
+        Row(
+          children: [
+            Expanded(
+              child: _ActivityTile(
+                icon: Icons.pin_rounded,
+                color: AppTheme.sage,
+                background: AppTheme.mint,
+                gradient: AppTheme.successGradient,
+                title: 'Number Bee',
+                subtitle: 'Spell numbers & sums',
+                badge: 'NEW',
+                onTap: onNumberBee,
+              ),
+            ),
+            SizedBox(width: gap),
+            Expanded(
+              child: _ActivityTile(
+                icon: Icons.grid_view_rounded,
+                color: AppTheme.coral,
+                background: AppTheme.rose,
+                gradient: AppTheme.errorGradient,
+                title: 'Tile builder',
+                subtitle: 'Tap letters into words',
+                badge: 'NEW',
+                onTap: onTiles,
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: context.s(10)),
-        _WideActionCard(
-          icon: Icons.library_books_rounded,
-          color: AppTheme.sky,
-          background: AppTheme.aqua,
-          title: 'Practice my list',
-          subtitle: 'Use spelling words from school or home.',
-          onTap: () => ref.read(tabProvider.notifier).go(AppTab.lists),
+        SizedBox(height: gap),
+        Row(
+          children: [
+            Expanded(
+              child: _ActivityTile(
+                icon: Icons.auto_awesome_rounded,
+                color: AppTheme.violet,
+                background: AppTheme.lilac,
+                gradient: AppTheme.premiumGradient,
+                title: 'Word packs',
+                subtitle: 'Pick a theme, get 10',
+                onTap: onWordPacks,
+              ),
+            ),
+            SizedBox(width: gap),
+            Expanded(
+              child: _ActivityTile(
+                icon: Icons.library_books_rounded,
+                color: AppTheme.sky,
+                background: AppTheme.aqua,
+                gradient: AppTheme.voiceGradient,
+                title: 'My lists',
+                subtitle: 'Words from school',
+                onTap: onLists,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class _WideActionCard extends StatelessWidget {
+class _ActivityTile extends StatelessWidget {
   final IconData icon;
   final Color color;
   final Color background;
+  final Gradient gradient;
   final String title;
   final String subtitle;
+  final String? badge;
   final VoidCallback onTap;
 
-  const _WideActionCard({
+  const _ActivityTile({
     required this.icon,
     required this.color,
     required this.background,
+    required this.gradient,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.badge,
   });
 
   @override
@@ -573,45 +681,153 @@ class _WideActionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.s(22)),
       child: Container(
+        padding: EdgeInsets.all(context.s(14)),
+        decoration: AppTheme.card(
+          color: background,
+          gradient: gradient,
+          radius: context.s(22),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: context.s(46),
+                  height: context.s(46),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(context.s(15)),
+                  ),
+                  child: Icon(icon, color: color, size: context.s(26)),
+                ),
+                const Spacer(),
+                if (badge != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            SizedBox(height: context.s(12)),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.ink,
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            SizedBox(height: context.s(2)),
+            Text(
+              subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: AppTheme.mute, fontSize: 11.5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Bee fact of the day" — the pronouncer reads it out on tap.
+class _FactCard extends StatelessWidget {
+  final String fact;
+  final VoidCallback onHear;
+  const _FactCard({required this.fact, required this.onHear});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onHear,
+      borderRadius: BorderRadius.circular(context.s(22)),
+      child: Container(
         padding: EdgeInsets.all(context.s(15)),
-        decoration: AppTheme.card(color: background, radius: context.s(22)),
+        decoration: AppTheme.card(
+          color: AppTheme.peach,
+          gradient: AppTheme.ctaGradient,
+          border: AppTheme.honeyDark.withValues(alpha: 0.3),
+          radius: context.s(22),
+        ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: context.s(48),
-              height: context.s(48),
+              width: context.s(44),
+              height: context.s(44),
               decoration: BoxDecoration(
-                color: AppTheme.surface.withValues(alpha: 0.82),
-                borderRadius: BorderRadius.circular(context.s(16)),
+                color: AppTheme.surface.withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(context.s(14)),
               ),
-              child: Icon(icon, color: color, size: context.s(26)),
+              child: const Icon(
+                Icons.lightbulb_rounded,
+                color: AppTheme.honeyDark,
+              ),
             ),
             SizedBox(width: context.s(12)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Bee fact of the day',
+                          style: TextStyle(
+                            color: AppTheme.ink,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.volume_up_rounded,
+                        color: AppTheme.honeyDark,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
                   Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    fact,
                     style: const TextStyle(
                       color: AppTheme.ink,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
+                      height: 1.35,
                     ),
                   ),
-                  SizedBox(height: context.s(2)),
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Tap to hear it',
+                    style: TextStyle(
+                      color: AppTheme.mute,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: color),
           ],
         ),
       ),
@@ -655,7 +871,7 @@ class _PremiumBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Unlock the studio voice',
+                    'Go Premium',
                     style: TextStyle(
                       color: AppTheme.ink,
                       fontSize: 16,
@@ -664,7 +880,7 @@ class _PremiumBanner extends StatelessWidget {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Unlimited word packs, studio voice, parent-managed Premium.',
+                    'Unlimited word packs, Math Bee rounds, lists and the studio voice.',
                     style: TextStyle(color: AppTheme.mute, fontSize: 12),
                   ),
                 ],

@@ -53,6 +53,27 @@ class SettingsScreen extends ConsumerWidget {
                       hasRemoteStudioVoice: hasRemoteStudioVoice,
                     ),
                   ],
+                  const Divider(height: 0),
+                  SwitchListTile(
+                    value: ref.watch(autoListenProvider),
+                    onChanged: (v) =>
+                        ref.read(autoListenProvider.notifier).set(v),
+                    activeThumbColor: AppTheme.ink,
+                    activeTrackColor: AppTheme.honey,
+                    secondary: const Icon(
+                      Icons.hearing_rounded,
+                      color: AppTheme.coral,
+                    ),
+                    title: const Text(
+                      'Hands-free spell aloud',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    subtitle: const Text(
+                      'In "Aloud" mode the mic opens by itself after each '
+                      'word and checks the spelling when your child stops '
+                      'talking. Say "repeat" to hear a word again.',
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: context.s(16)),
@@ -68,8 +89,8 @@ class SettingsScreen extends ConsumerWidget {
                     title: Text(isPremium ? 'Premium active' : 'Go Premium'),
                     subtitle: Text(
                       isPremium
-                          ? 'Studio voice and unlimited word packs.'
-                          : 'Unlock studio voice and unlimited packs.',
+                          ? 'Studio voice, unlimited packs and Math Bee.'
+                          : 'Unlock studio voice, unlimited packs and Math Bee.',
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(context).push(

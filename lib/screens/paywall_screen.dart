@@ -10,7 +10,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PaywallScreen extends ConsumerStatefulWidget {
   final bool screenshotMode;
-  const PaywallScreen({super.key, this.screenshotMode = false});
+
+  /// Contextual line under the title — "Unlimited Math Bee rounds" when the
+  /// kid hit that cap, the generic promise otherwise. Parents convert on
+  /// the thing they were just stopped from doing, not on a feature list.
+  final String? headline;
+  const PaywallScreen({super.key, this.screenshotMode = false, this.headline});
 
   @override
   ConsumerState<PaywallScreen> createState() => _PaywallScreenState();
@@ -228,9 +233,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'A calmer, richer spelling room for daily practice.',
-                  style: TextStyle(color: AppTheme.mute, fontSize: 13),
+                Text(
+                  widget.headline ??
+                      'A calmer, richer spelling room for daily practice.',
+                  style: const TextStyle(color: AppTheme.mute, fontSize: 13),
                 ),
               ],
             ),
@@ -259,6 +265,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     return Column(
       children: [
         row(Icons.all_inclusive_rounded, 'Unlimited themed word packs — no daily cap'),
+        row(Icons.calculate_rounded, 'Unlimited Math Bee rounds in Number Bee'),
         row(Icons.list_alt_rounded, 'Unlimited parent-made word lists'),
         row(Icons.record_voice_over_rounded, 'Studio voice pronunciation'),
       ],

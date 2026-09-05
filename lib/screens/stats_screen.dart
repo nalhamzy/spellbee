@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
+import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/test_screen.dart';
+import 'package:spellbee/widgets/progress_cards.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -16,6 +18,7 @@ class StatsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(playerStatsProvider);
     final lists = ref.watch(wordListsProvider);
+    final progression = ref.watch(progressionProvider);
     final accPct = (s.accuracy * 100).round();
     final focusWords = _focusWords(s.missedWordCounts).take(8).toList();
     final listProgress = _listProgress(s.listScores, lists).take(3).toList();
@@ -42,6 +45,10 @@ class StatsScreen extends ConsumerWidget {
                 totalTests: s.totalTests,
                 dailyStreak: s.dailyStreak,
               ),
+              SizedBox(height: context.s(16)),
+              RankCard(progression: progression),
+              SizedBox(height: context.s(16)),
+              BadgesGrid(progression: progression),
               SizedBox(height: context.s(16)),
               _FocusPanel(words: focusWords),
               SizedBox(height: context.s(16)),
@@ -73,6 +80,21 @@ class StatsScreen extends ConsumerWidget {
                     title: 'Perfect streak',
                     value: '${s.currentStreak}',
                     color: AppTheme.violet,
+                  ),
+                  _MetricChip(
+                    title: 'Spoken aloud',
+                    value: '${progression.totalMicWords}',
+                    color: AppTheme.honeyDark,
+                  ),
+                  _MetricChip(
+                    title: 'Built with tiles',
+                    value: '${progression.totalTilesWords}',
+                    color: AppTheme.coral,
+                  ),
+                  _MetricChip(
+                    title: 'Facts heard',
+                    value: '${progression.factsRead}',
+                    color: AppTheme.sage,
                   ),
                 ],
               ),
@@ -354,8 +376,11 @@ class _FocusPanel extends StatelessWidget {
               ),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) =>
-                      TestScreen(words: words, title: 'Coach focus round'),
+                  builder: (_) => TestScreen(
+                    words: words,
+                    title: 'Coach focus round',
+                    kind: RoundKind.focus,
+                  ),
                 ),
               ),
               icon: const Icon(Icons.play_arrow_rounded),

@@ -450,6 +450,11 @@ class TtsService {
     await _sayWithFallback(prompt, premium: premium);
   }
 
+  /// Say an arbitrary sentence — Number Bee questions, facts, rank-up
+  /// lines. Same studio→device routing as every other utterance.
+  Future<void> speakText(String text, {bool premium = false}) =>
+      _sayWithFallback(text.trim(), premium: premium);
+
   Future<void> speakDefinition(
     String word,
     String definition, {

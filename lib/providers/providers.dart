@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spellbee/core/data/word_facts.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
+import 'package:spellbee/core/models/progression.dart';
+import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/ai_word_generator.dart';
@@ -169,6 +172,253 @@ final dailyWordDoneProvider = Provider<bool>((ref) {
   final stats = ref.watch(playerStatsProvider);
   return stats.lastDailyEpochDay == ref.watch(dayTickProvider);
 });
+
+/// Today's "did you know?" line for the dashboard — same on every device.
+final dailyFactProvider = Provider<String>(
+  (ref) => dailyBeeFact(ref.watch(dayTickProvider)),
+);
+
+// ─── Progression: honey, ranks, quests, badges ──────────────────────────
+
+final progressionProvider =
+    NotifierProvider<ProgressionNotifier, Progression>(
+      ProgressionNotifier.new,
+    );
+
+/// The three quests for today, with their live progress.
+final dailyQuestsProvider = Provider<List<QuestDef>>(
+  (ref) => dailyQuestsFor(ref.watch(dayTickProvider)),
+);
+
+class ProgressionNotifier extends Notifier<Progression> {
+  @override
+  Progression build() {
+    final today = ref.watch(dayTickProvider);
+    return _rolled(ref.read(storageServiceProvider).loadProgression(), today);
+  }
+
+  /// Quest counters belong to one calendar day; anything older is wiped the
+  /// first time the day is observed so a kid never wakes up to yesterday's
+  /// half-done quests.
+  static Progression _rolled(Progression p, int today) {
+    if (p.questDay == today) return p;
+    return p.copyWith(
+      questDay: today,
+      questProgress: const {},
+      questsRewarded: const {},
+    );
+  }
+
+  static const _honeyPerCorrect = 2;
+  static const _honeyPerfectBonus = 5;
+  static const _honeyDailyWord = 3;
+
+  /// Apply a finished round. Must run AFTER playerStats and the daily-word
+  /// callback so badge checks see the updated lifetime numbers.
+  Future<ProgressionOutcome> recordRound(TestResult result) async {
+    final stats = ref.read(playerStatsProvider);
+    final before = state.rank;
+    var p = _rolled(state, ref.read(dayTickProvider));
+
+    var honey = result.correct * _honeyPerCorrect;
+    if (result.isPerfect) honey += _honeyPerfectBonus;
+    if (result.kind == RoundKind.daily && result.isPerfect) {
+      honey += _honeyDailyWord;
+    }
+
+    final progress = Map<String, int>.from(p.questProgress);
+    void bump(QuestType t, int by) {
+      if (by <= 0) return;
+      progress[t.name] = (progress[t.name] ?? 0) + by;
+    }
+
+    void high(QuestType t, int value) {
+      if (value > (progress[t.name] ?? 0)) progress[t.name] = value;
+    }
+
+    bump(QuestType.correctWords, result.correct);
+    bump(QuestType.finishTests, 1);
+    if (result.isPerfect) bump(QuestType.perfectTest, 1);
+    high(QuestType.streakInTest, result.longestStreak);
+    bump(QuestType.useMic, result.micCorrect);
+    bump(QuestType.useTiles, result.tilesCorrect);
+    if (result.kind == RoundKind.daily && result.isPerfect) {
+      bump(QuestType.dailyWord, 1);
+    }
+
+    p = p.copyWith(
+      questProgress: progress,
+      totalMicWords: p.totalMicWords + result.micCorrect,
+      totalTilesWords: p.totalTilesWords + result.tilesCorrect,
+    );
+
+    // Quest rewards.
+    final rewarded = Set<String>.from(p.questsRewarded);
+    final completed = <QuestDef>[];
+    var bonusCredits = 0;
+    for (final q in ref.read(dailyQuestsProvider)) {
+      if (rewarded.contains(q.id) || !p.isComplete(q)) continue;
+      rewarded.add(q.id);
+      completed.add(q);
+      honey += q.rewardHoney;
+      if (q.bonusCredit) bonusCredits++;
+    }
+    var masterDays = p.questMasterDays;
+    if (completed.isNotEmpty &&
+        ref.read(dailyQuestsProvider).every((q) => rewarded.contains(q.id))) {
+      masterDays++;
+    }
+    p = p.copyWith(
+      honey: p.honey + honey,
+      questsRewarded: rewarded,
+      questMasterDays: masterDays,
+    );
+
+    // Badges.
+    final newBadges = <BadgeDef>[];
+    final badges = Map<String, int>.from(p.badges);
+    void award(String id, bool condition) {
+      if (!condition || badges.containsKey(id)) return;
+      final def = badgeById(id);
+      if (def == null) return;
+      badges[id] = DateTime.now().millisecondsSinceEpoch;
+      newBadges.add(def);
+    }
+
+    award('first_test', stats.totalTests >= 1);
+    award('perfect_test', result.isPerfect && result.total >= 3);
+    award('streak_10', result.longestStreak >= 10 || stats.bestStreak >= 10);
+    award('daily_3', stats.dailyStreak >= 3);
+    award('daily_7', stats.dailyStreak >= 7);
+    award('daily_30', stats.dailyStreak >= 30);
+    award('words_100', stats.totalWordsCorrect >= 100);
+    award('words_500', stats.totalWordsCorrect >= 500);
+    award('words_1000', stats.totalWordsCorrect >= 1000);
+    award('mic_first', p.totalMicWords >= 1);
+    award('tiles_first', p.totalTilesWords >= 1);
+    award('quests_day', masterDays >= 1);
+    award('rank_worker', p.rank.index >= 2);
+    award('rank_queen', p.rank.index >= 7);
+    award(
+      'champion_perfect',
+      result.isPerfect && result.level == 8 && result.total >= 5,
+    );
+    p = p.copyWith(badges: badges);
+
+    state = p;
+    await ref.read(storageServiceProvider).saveProgression(p);
+    if (bonusCredits > 0) {
+      await ref.read(aiCreditsProvider.notifier).grant(bonusCredits);
+    }
+    return ProgressionOutcome(
+      honeyEarned: honey,
+      newBadges: newBadges,
+      questsCompleted: completed,
+      rankBefore: before,
+      rankAfter: p.rank,
+      bonusCredits: bonusCredits,
+    );
+  }
+
+  /// A fact was opened (reveal card or dashboard). Small honey, counts
+  /// toward the facts quest and the Curious Bee badge.
+  Future<ProgressionOutcome> recordFactRead() async {
+    final before = state.rank;
+    var p = _rolled(state, ref.read(dayTickProvider));
+    final progress = Map<String, int>.from(p.questProgress);
+    progress[QuestType.readFacts.name] =
+        (progress[QuestType.readFacts.name] ?? 0) + 1;
+    var honey = 1;
+    p = p.copyWith(questProgress: progress, factsRead: p.factsRead + 1);
+
+    final rewarded = Set<String>.from(p.questsRewarded);
+    final completed = <QuestDef>[];
+    var bonusCredits = 0;
+    for (final q in ref.read(dailyQuestsProvider)) {
+      if (rewarded.contains(q.id) || !p.isComplete(q)) continue;
+      rewarded.add(q.id);
+      completed.add(q);
+      honey += q.rewardHoney;
+      if (q.bonusCredit) bonusCredits++;
+    }
+    var masterDays = p.questMasterDays;
+    if (completed.isNotEmpty &&
+        ref.read(dailyQuestsProvider).every((q) => rewarded.contains(q.id))) {
+      masterDays++;
+    }
+    final badges = Map<String, int>.from(p.badges);
+    final newBadges = <BadgeDef>[];
+    if (p.factsRead >= 10 && !badges.containsKey('facts_10')) {
+      badges['facts_10'] = DateTime.now().millisecondsSinceEpoch;
+      newBadges.add(badgeById('facts_10')!);
+    }
+    if (masterDays >= 1 && !badges.containsKey('quests_day')) {
+      badges['quests_day'] = DateTime.now().millisecondsSinceEpoch;
+      newBadges.add(badgeById('quests_day')!);
+    }
+    p = p.copyWith(
+      honey: p.honey + honey,
+      questsRewarded: rewarded,
+      questMasterDays: masterDays,
+      badges: badges,
+    );
+    state = p;
+    await ref.read(storageServiceProvider).saveProgression(p);
+    if (bonusCredits > 0) {
+      await ref.read(aiCreditsProvider.notifier).grant(bonusCredits);
+    }
+    return ProgressionOutcome(
+      honeyEarned: honey,
+      newBadges: newBadges,
+      questsCompleted: completed,
+      rankBefore: before,
+      rankAfter: p.rank,
+      bonusCredits: bonusCredits,
+    );
+  }
+}
+
+// ─── Number Bee free-tier cap ───────────────────────────────────────────
+
+/// Math Bee rounds played today. Free tier gets [kFreeMathRoundsPerDay];
+/// "Say the number" is never capped — counting is core learning.
+const kFreeMathRoundsPerDay = 1;
+
+final mathRoundsTodayProvider =
+    NotifierProvider<MathRoundsTodayNotifier, int>(
+      MathRoundsTodayNotifier.new,
+    );
+
+class MathRoundsTodayNotifier extends Notifier<int> {
+  static const _name = 'mathbee';
+
+  @override
+  int build() {
+    ref.watch(dayTickProvider);
+    return ref.read(storageServiceProvider).getDailyCount(_name);
+  }
+
+  Future<void> increment() async {
+    state = state + 1;
+    await ref.read(storageServiceProvider).setDailyCount(_name, state);
+  }
+}
+
+// ─── Hands-free spell-aloud ─────────────────────────────────────────────
+
+final autoListenProvider = NotifierProvider<AutoListenNotifier, bool>(
+  AutoListenNotifier.new,
+);
+
+class AutoListenNotifier extends Notifier<bool> {
+  @override
+  bool build() => ref.read(storageServiceProvider).getAutoListen();
+
+  Future<void> set(bool v) async {
+    state = v;
+    await ref.read(storageServiceProvider).setAutoListen(v);
+  }
+}
 
 // ─── Player stats ───────────────────────────────────────────────────────
 
