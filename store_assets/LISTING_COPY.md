@@ -38,10 +38,20 @@ SpellBee is the fastest way to get spelling-bee ready. Pick a grade level, hit s
 
 Built by a spelling-bee parent who was tired of drill apps that feel like worksheets.
 
-TWO WAYS TO PRACTICE
+THREE WAYS TO PRACTICE
 
 • TYPE — See the prompt, type the word, check instantly. Misses trigger a clear spell-out so you hear every letter.
-• SPELL ALOUD — Tap the mic and say each letter. SpellBee understands letter names ("see a tee" → CAT) and whole words, so there's no typing between attempts.
+• LETTER TILES — Tap letters into place. Early readers build words without a keyboard.
+• SPELL ALOUD — Say each letter, hands-free. SpellBee understands letter names ("see a tee" → CAT) and whole words, opens the mic by itself after each word, and checks when your child stops talking. Say "repeat" to hear a word again.
+
+QUESTS, HONEY AND BADGES
+Three daily quests, honey for every correct word, Bee ranks from Egg to Queen Bee, and badges for milestones. Perfect rounds get confetti.
+
+NUMBER BEE
+Spell numbers as words ("38" → thirty-eight) or play Math Bee: hear a sum, work it out, spell the answer. Three sizes from 0–20 up to 0–999.
+
+DID YOU KNOW?
+Over 100 words come with a fun fact the pronouncer reads aloud — the reward for getting a word right.
 
 EIGHT DIFFICULTY LEVELS
 From K-1 starter words to championship-tier stumpers like "pneumonoultramicroscopicsilicovolcanoconiosis". Every word ships with a definition and an example sentence so the context lands.
@@ -68,6 +78,7 @@ All lists, stats, and purchases live on your device. No account. No cloud sync. 
 PREMIUM
 Unlock everything for less than one coffee a month:
 • Unlimited themed word packs — no daily cap
+• Unlimited Math Bee rounds (free tier: 1 a day)
 • Unlimited parent-made word lists (free tier: 3)
 • Enhanced voice pronunciation
 
@@ -79,7 +90,21 @@ Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
 Free to start. Premium when your practice routine is ready.
 ```
 
-### What's New in This Version (v1.0.14)
+### What's New in This Version (v1.1.0)
+```
+SpellBee just levelled up — quests, honey, and two new ways to play:
+
+• Daily quests: three fresh challenges every day, with honey rewards and badges
+• Bee ranks: earn honey for every correct word and climb from Egg to Queen Bee
+• Number Bee: spell numbers as words, plus Math Bee — hear a sum, spell the answer
+• Letter tiles: tap letters into words, a friendlier way to spell for early readers
+• Hands-free spell aloud: the mic opens by itself and checks when your child stops talking; say "repeat" to hear a word again
+• Did you know? Fun facts on over 100 words, read aloud by the pronouncer
+• Confetti and rewards on perfect rounds and rank-ups
+• Fixes: the microphone and voice now always stop when a round is quit
+```
+
+### What's New archive (v1.0.14)
 ```
 A smoother, more reliable SpellBee for every speller:
 
