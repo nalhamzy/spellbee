@@ -817,6 +817,7 @@ class _TestScreenState extends ConsumerState<TestScreen>
                           _HearCard(
                             display: _w.display,
                             isMath: widget.kind == RoundKind.math,
+                            byMic: _mode == InputMode.mic,
                             onHearWord: _speak,
                             onHearDefinition: _speakDefinition,
                             onHearExample: _speakExample,
@@ -1366,6 +1367,10 @@ class _FactChip extends StatelessWidget {
 class _HearCard extends StatelessWidget {
   final String? display;
   final bool isMath;
+
+  /// Spell-aloud is live: the instruction has to ask for letters, not for
+  /// "the word", or a child reasonably answers by saying it.
+  final bool byMic;
   final VoidCallback onHearWord;
   final VoidCallback onHearDefinition;
   final VoidCallback onHearExample;
@@ -1373,6 +1378,7 @@ class _HearCard extends StatelessWidget {
   const _HearCard({
     required this.display,
     required this.isMath,
+    required this.byMic,
     required this.onHearWord,
     required this.onHearDefinition,
     required this.onHearExample,
@@ -1442,7 +1448,13 @@ class _HearCard extends StatelessWidget {
           SizedBox(height: context.s(12)),
           Center(
             child: Text(
-              isMath
+              // "Spell it as a word" reads as "say the word" when the answer
+              // is spoken, so the mic asks for letters in so many words.
+              byMic
+                  ? (isMath
+                        ? 'Work it out, then say the letters one by one.'
+                        : 'Listen, then say the letters one by one.')
+                  : isMath
                   ? 'Work it out, then spell the answer.'
                   : shown != null
                   ? 'Listen, then spell the number as a word.'
