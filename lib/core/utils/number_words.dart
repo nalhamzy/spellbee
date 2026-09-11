@@ -149,8 +149,9 @@ class NumberBee {
     return words;
   }
 
-  /// Best-effort digits → words for spoken answers ("38" → "thirty-eight"),
-  /// so a child who SAYS the number in mic mode is understood.
+  /// Best-effort digits → words ("38" → "thirty-eight"). Used to RECOGNISE
+  /// that a child read the number aloud — never to award them the point for
+  /// it, since reading a number is not spelling it.
   static String? digitsToWords(String transcript) {
     final m = RegExp(r'^\s*(\d{1,3})\s*$').firstMatch(transcript);
     if (m == null) return null;

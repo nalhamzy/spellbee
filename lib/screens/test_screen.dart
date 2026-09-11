@@ -36,6 +36,11 @@ class _ItemState {
 
   /// Which input answered this word correctly (mode quests + badges).
   InputMode? answeredWith;
+
+  /// How often the child said the word instead of spelling it. The first
+  /// nudge is spoken; later ones only appear on screen, so a child who keeps
+  /// saying the word is not lectured by the pronouncer every time.
+  int spellItNudges = 0;
   bool factOpened = false;
   TileBoard? tiles;
   Timer? autoAdvance;
@@ -167,6 +172,15 @@ class _TestScreenState extends ConsumerState<TestScreen>
 
   // ── TTS ────────────────────────────────────────────────────────────
 
+  /// flutter_tts only completes a `speak` when the engine reports back. An
+  /// engine that never does (no voice data, a killed service) would strand
+  /// hands-free mode waiting forever, so every await that gates the mic is
+  /// capped. Speech itself is unaffected — only our waiting for it.
+  Future<void> _awaitSpeech(Future<void> speaking) => speaking.timeout(
+    const Duration(seconds: 12),
+    onTimeout: () {},
+  );
+
   /// Say the current item, then (hands-free mode) open the mic once the
   /// pronouncer is done so the child never has to reach for the button.
   Future<void> _speak() async {
@@ -174,9 +188,9 @@ class _TestScreenState extends ConsumerState<TestScreen>
     final tts = _tts;
     final prompt = _w.prompt;
     if (prompt != null) {
-      await tts.speakText(prompt, premium: _premium);
+      await _awaitSpeech(tts.speakText(prompt, premium: _premium));
     } else {
-      await tts.speakWord(_w.text, premium: _premium);
+      await _awaitSpeech(tts.speakWord(_w.text, premium: _premium));
     }
     if (!mounted || epoch != _speakEpoch) return;
     if (_mode == InputMode.mic &&
@@ -342,55 +356,138 @@ class _TestScreenState extends ConsumerState<TestScreen>
     if (m == InputMode.keyboard && !_s.revealed) _focus.requestFocus();
   }
 
-  String _currentAnswer() {
-    switch (_mode) {
-      case InputMode.keyboard:
-        return _normalizeTyped(_ctrl.text);
-      case InputMode.tiles:
-        return _tilesFor(_s, _w).built;
-      case InputMode.mic:
-        final raw = _s.sttTranscript;
-        if (_isNumberRound) {
-          // "38" said aloud in a number round is the right answer to
-          // "thirty-eight"; the recognizer likes returning digits.
-          final asWords = NumberBee.digitsToWords(raw);
-          if (asWords != null) return _normalizeTyped(asWords);
-        }
-        return _normalizeTyped(
-          SttService.normalize(raw, target: _w.text),
-        );
-    }
-  }
+  SpokenAnswer get _spoken => SttService.classify(
+    _s.sttTranscript,
+    target: _w.letters,
+    spokenNumber: _isNumberRound ? _numberLetters : null,
+  );
+
+  /// "38" -> "thirtyeight", so a child reading the digits aloud is told to
+  /// spell instead of being marked right (or wrong) for saying them.
+  static String? _numberLetters(String digits) => NumberBee.digitsToWords(
+    digits,
+  )?.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
 
   void _submit() {
     if (_s.revealed) return;
-    final typed = _currentAnswer();
+
+    // Spell-aloud is graded from LETTERS only. Saying the word — or reading
+    // the number — is not a spelling, so it is nudged rather than scored.
+    if (_mode == InputMode.mic) {
+      final spoken = _spoken;
+      switch (spoken.kind) {
+        case SpokenAnswerKind.empty:
+          _nudgeEmpty();
+          return;
+        case SpokenAnswerKind.wholeWord:
+        case SpokenAnswerKind.unclear:
+          _nudgeSpellItOut(spoken);
+          return;
+        case SpokenAnswerKind.letters:
+          _grade(spoken.letters);
+          return;
+      }
+    }
+
+    final typed = _mode == InputMode.tiles
+        ? _tilesFor(_s, _w).built
+        : _normalizeTyped(_ctrl.text);
 
     if (typed.isEmpty) {
-      // An empty submit must not read as "the app is broken" to a child:
-      // nudge with words, not silence.
-      HapticFeedback.mediumImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(switch (_mode) {
-            InputMode.keyboard => 'Type the word first, then check it!',
-            InputMode.mic => 'Tap the mic and spell the word out loud first!',
-            InputMode.tiles => 'Tap the letter tiles to build the word first!',
-          }),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-      if (_mode == InputMode.keyboard) _focus.requestFocus();
+      // A number round invites typing digits; say what is actually wanted
+      // instead of the generic "type the word first".
+      if (_mode == InputMode.keyboard &&
+          _isNumberRound &&
+          RegExp(r'\d').hasMatch(_ctrl.text)) {
+        _nudgeSpellItOut(
+          SpokenAnswer(SpokenAnswerKind.wholeWord, heard: _ctrl.text.trim()),
+        );
+        return;
+      }
+      _nudgeEmpty();
       return;
     }
 
+    _grade(typed);
+  }
+
+  void _nudgeEmpty() {
+    // An empty submit must not read as "the app is broken" to a child:
+    // nudge with words, not silence.
+    HapticFeedback.mediumImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(switch (_mode) {
+          InputMode.keyboard => 'Type the word first, then check it!',
+          InputMode.mic => 'Tap the mic and spell the word out loud first!',
+          InputMode.tiles => 'Tap the letter tiles to build the word first!',
+        }),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    if (_mode == InputMode.keyboard) _focus.requestFocus();
+  }
+
+  /// The child said the answer instead of spelling it. Not a miss: nothing
+  /// is revealed, no streak breaks, the word stays open — we just ask for
+  /// the letters and point at the tiles, so mic mode is never a dead end.
+  Future<void> _nudgeSpellItOut(SpokenAnswer spoken) async {
+    final first = _s.spellItNudges == 0;
+    _s.spellItNudges++;
+    HapticFeedback.mediumImpact();
+    _speakEpoch++;
+    await _stt.stop();
+    if (!mounted) return;
+    setState(() => _s.sttTranscript = '');
+
+    final saidIt = spoken.kind == SpokenAnswerKind.wholeWord;
+    final thing = _isNumberRound ? 'number' : 'word';
+    final byMic = _mode == InputMode.mic;
+    final how = byMic ? 'out loud, letter by letter' : 'as a word';
+    final message = saidIt
+        ? "That's the $thing! Now spell it $how."
+        : 'I heard "${spoken.heard}". Say the letters one at a time.';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'Use tiles',
+          onPressed: () {
+            if (mounted) _setMode(InputMode.tiles);
+          },
+        ),
+      ),
+    );
+
+    final epoch = _speakEpoch;
+    // Only the mic asks for speech back, so only the mic answers in speech.
+    if (first && byMic) {
+      await _awaitSpeech(
+        _tts.speakText(
+          saidIt
+              ? 'That is the $thing. Now spell it, letter by letter.'
+              : 'Say the letters one at a time.',
+          premium: _premium,
+        ),
+      );
+    }
+    if (!mounted || epoch != _speakEpoch || _s.revealed) return;
+    if (_mode == InputMode.mic && ref.read(autoListenProvider)) {
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      if (!mounted || epoch != _speakEpoch || _s.revealed) return;
+      await _toggleMic();
+    }
+  }
+
+  void _grade(String typed) {
     final correct = typed == _w.letters;
     setState(() {
       _s.revealed = true;
       _s.correct = correct;
       _s.submitted = true;
       _s.attempted = true;
-      if (_mode == InputMode.tiles) _s.typed = typed;
+      if (_mode != InputMode.keyboard) _s.typed = typed;
       if (!correct) _s.missedOnce = true;
       _s.answeredWith = correct ? _mode : null;
     });
@@ -530,11 +627,9 @@ class _TestScreenState extends ConsumerState<TestScreen>
     for (var i = 0; i < widget.words.length; i++) {
       final it = _items[i];
       final target = widget.words[i].text;
-      final submitted = it.typed.isNotEmpty
-          ? _normalizeTyped(it.typed)
-          : _normalizeTyped(
-              SttService.normalize(it.sttTranscript, target: target),
-            );
+      // it.typed holds the graded answer for every mode (set in _grade),
+      // so an ungraded transcript is never rewritten into one here.
+      final submitted = _normalizeTyped(it.typed);
       items.add(
         AskedItem(
           target: target,
@@ -909,10 +1004,19 @@ class _TestScreenState extends ConsumerState<TestScreen>
   Widget _micInput() {
     final stt = ref.watch(sttServiceProvider);
     final autoListen = ref.watch(autoListenProvider);
-    final normalized = SttService.normalize(_s.sttTranscript, target: _w.text);
-    final shown = _isNumberRound
-        ? (NumberBee.digitsToWords(_s.sttTranscript) ?? normalized)
-        : normalized;
+    // Echo the LETTERS heard so far. When a child says the word instead of
+    // spelling it, showing "THIRTYEIGHT" would imply it had been accepted,
+    // so the raw speech is quoted underneath instead.
+    final spoken = _spoken;
+    // Show letters only while they read as a spelling. "sea" assembles to
+    // "c", so echoing letters for a spoken word would imply the app took it.
+    final shown =
+        spoken.kind == SpokenAnswerKind.letters ||
+            (spoken.isSpellingShape && spoken.kind == SpokenAnswerKind.unclear)
+        ? spoken.letters
+        : '';
+    final saidWordAloud =
+        shown.isEmpty && spoken.kind != SpokenAnswerKind.empty;
     return Column(
       children: [
         GestureDetector(
@@ -946,7 +1050,9 @@ class _TestScreenState extends ConsumerState<TestScreen>
         SizedBox(height: context.s(12)),
         Text(
           shown.isEmpty
-              ? (stt.listening
+              ? (saidWordAloud
+                    ? '"${spoken.heard}"'
+                    : stt.listening
                     ? 'Listening… say each letter'
                     : autoListen
                     ? 'Say each letter slowly'
@@ -963,7 +1069,9 @@ class _TestScreenState extends ConsumerState<TestScreen>
         if (shown.isEmpty) ...[
           SizedBox(height: context.s(6)),
           Text(
-            autoListen
+            saidWordAloud
+                ? 'That is the ${_isNumberRound ? 'number' : 'word'} — now say the letters, one at a time.'
+                : autoListen
                 ? 'Hands-free: the mic opens after each word and checks when you stop. Say "repeat" to hear it again.'
                 : 'Say "repeat" to hear the word again.',
             textAlign: TextAlign.center,

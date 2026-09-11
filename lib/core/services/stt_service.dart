@@ -105,75 +105,174 @@ class SttService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Convert an STT transcript like "C A T" or "see a tee" into a best-guess
-  /// spelled word. Accepts space-separated letters, phonetic letter names,
-  /// and direct spellings.
-  ///
-  /// [target] guards against homophone traps: when the word being tested IS
-  /// a letter name ("sea", "bee", "tea", "you"...), a correct transcript
-  /// must not be collapsed into its letter — spelling S-E-A in an app that
-  /// hears "sea" and grades "c" would be unwinnable.
-  static String normalize(String transcript, {String? target}) {
-    var lower = transcript.trim().toLowerCase();
-    if (lower.isEmpty) return '';
+  /// Letter names the recognizer returns instead of bare letters. Many are
+  /// also ordinary words ("sea", "you", "why"), which is exactly why a
+  /// transcript has to be classified rather than blindly rewritten.
+  static const _letterNames = {
+    'ay': 'a',
+    'bee': 'b',
+    'see': 'c',
+    'dee': 'd',
+    'ee': 'e',
+    'ef': 'f',
+    'gee': 'g',
+    'aitch': 'h',
+    'eye': 'i',
+    'jay': 'j',
+    'kay': 'k',
+    'el': 'l',
+    'em': 'm',
+    'en': 'n',
+    'oh': 'o',
+    'pee': 'p',
+    'cue': 'q',
+    'ar': 'r',
+    'es': 's',
+    'tee': 't',
+    'you': 'u',
+    'vee': 'v',
+    'be': 'b',
+    'sea': 'c',
+    'tea': 't',
+    'queue': 'q',
+    'ex': 'x',
+    'why': 'y',
+    'zee': 'z',
+    'zed': 'z',
+  };
 
-    lower = lower
+  static List<String> _tokenize(String transcript) {
+    final lower = transcript
+        .trim()
+        .toLowerCase()
         .replaceAll(RegExp(r'\bdouble\s+you\b'), 'w')
         .replaceAll(RegExp(r'\bdub(?:le)?\s+you\b'), 'w');
+    if (lower.isEmpty) return const [];
+    return lower
+        .split(RegExp(r'[^a-z0-9]+'))
+        .where((t) => t.isNotEmpty)
+        .toList();
+  }
 
-    // Letter-name fallbacks (covers "ay bee see" etc.)
-    const names = {
-      'ay': 'a',
-      'bee': 'b',
-      'see': 'c',
-      'dee': 'd',
-      'ee': 'e',
-      'ef': 'f',
-      'gee': 'g',
-      'aitch': 'h',
-      'eye': 'i',
-      'jay': 'j',
-      'kay': 'k',
-      'el': 'l',
-      'em': 'm',
-      'en': 'n',
-      'oh': 'o',
-      'pee': 'p',
-      'cue': 'q',
-      'ar': 'r',
-      'es': 's',
-      'tee': 't',
-      'you': 'u',
-      'vee': 'v',
-      'be': 'b',
-      'sea': 'c',
-      'tea': 't',
-      'queue': 'q',
-      'ex': 'x',
-      'why': 'y',
-      'zee': 'z',
-      'zed': 'z',
-    };
+  static bool _isLetterToken(String t) =>
+      (t.length == 1 && RegExp(r'[a-z]').hasMatch(t)) ||
+      _letterNames.containsKey(t);
 
-    final cleanTarget = (target ?? '').trim().toLowerCase();
-    final tokens = lower.split(RegExp(r'\s+'));
+  static String _asLetter(String t) =>
+      t.length == 1 ? t : (_letterNames[t] ?? '');
+
+  /// Best-effort letters for DISPLAY only — what to echo back under the mic
+  /// while a child is still speaking. Never grade with this: it cannot tell
+  /// "C-A-T" from "cat". Use [classify] to score an answer.
+  static String normalize(String transcript, {String? target}) {
+    final tokens = _tokenize(transcript);
     final buf = StringBuffer();
-    for (var t in tokens) {
-      t = t.replaceAll(RegExp(r'[^a-z]'), '');
-      if (t == cleanTarget && cleanTarget.length > 1) {
-        // The recognizer heard the tested word itself — keep it whole even
-        // if it doubles as a letter name.
-        buf.write(t);
-      } else if (t.length == 1) {
-        buf.write(t);
-      } else if (names.containsKey(t)) {
-        buf.write(names[t]);
+    for (final t in tokens) {
+      if (_isLetterToken(t)) {
+        buf.write(_asLetter(t));
       } else {
-        // If a whole word comes through, assume the student said the word
-        // itself — just append.
-        buf.write(t);
+        buf.write(t.replaceAll(RegExp(r'[^a-z]'), ''));
       }
     }
     return buf.toString();
   }
+
+  /// Read a transcript as a spelling attempt.
+  ///
+  /// [target] is the plain-letters answer ("thirtyeight", "cat"). The whole
+  /// point of the app is that a child SPELLS: saying "cat" for *cat*, or
+  /// "thirty-eight" / "38" for *thirty-eight*, is not an answer and must
+  /// never be scored as one — it comes back as [SpokenAnswerKind.wholeWord]
+  /// so the caller can ask for the letters instead of awarding the point.
+  /// [spokenNumber] turns a digit string into the letters of its number
+  /// word ("38" -> "thirtyeight"), so reading a number aloud is recognised
+  /// as saying it. Passed in by the Number Bee; omit it elsewhere.
+  static SpokenAnswer classify(
+    String transcript, {
+    required String target,
+    String? Function(String digits)? spokenNumber,
+  }) {
+    final tokens = _tokenize(transcript);
+    if (tokens.isEmpty) return const SpokenAnswer(SpokenAnswerKind.empty);
+
+    final goal = target.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
+    final heard = tokens.join(' ');
+
+    // A genuine spelling: every token is a letter or a letter name. Checked
+    // first so "s e a" reads as S-E-A even though it also spells the target.
+    final letterTokens = tokens.where(_isLetterToken).toList();
+    final spelled = letterTokens.map(_asLetter).join();
+    final spellingShape = letterTokens.length == tokens.length;
+    if (spellingShape && (tokens.length >= 2 || goal.length <= 1)) {
+      return SpokenAnswer(
+        SpokenAnswerKind.letters,
+        letters: spelled,
+        heard: heard,
+        isSpellingShape: true,
+      );
+    }
+
+    // The word itself, spoken rather than spelled — including digits, since
+    // the recognizer returns "38" when a child reads a number aloud.
+    final saidWord = tokens.map((t) => t.replaceAll(RegExp(r'[^a-z]'), '')).join();
+    final digits = tokens.join();
+    final asNumber = RegExp(r'^\d{1,3}$').hasMatch(digits)
+        ? spokenNumber?.call(digits)
+        : null;
+    if (saidWord == goal || (asNumber != null && asNumber == goal)) {
+      return SpokenAnswer(
+        SpokenAnswerKind.wholeWord,
+        letters: spelled,
+        heard: heard,
+        isSpellingShape: spellingShape,
+      );
+    }
+
+    return SpokenAnswer(
+      SpokenAnswerKind.unclear,
+      letters: spelled,
+      heard: heard,
+      isSpellingShape: spellingShape,
+    );
+  }
+
+}
+
+/// How a transcript reads once classified.
+enum SpokenAnswerKind {
+  /// Nothing usable was heard.
+  empty,
+
+  /// A real letter-by-letter attempt. [SpokenAnswer.letters] is the guess.
+  letters,
+
+  /// The child said the whole word (or read the number) instead of spelling
+  /// it. Not a wrong answer — not an answer at all.
+  wholeWord,
+
+  /// Speech that is neither letters nor the target word.
+  unclear,
+}
+
+class SpokenAnswer {
+  final SpokenAnswerKind kind;
+
+  /// Letters assembled from whatever letter tokens were heard. Safe to show
+  /// while listening; only graded when [kind] is [SpokenAnswerKind.letters].
+  final String letters;
+
+  /// A readable echo of what the recognizer returned, for the nudge copy.
+  final String heard;
+
+  /// Every token read as a letter or a letter name — the child was spelling,
+  /// even if only one letter has arrived so far. Lets the mic echo a
+  /// half-finished spelling without implying it has been accepted.
+  final bool isSpellingShape;
+
+  const SpokenAnswer(
+    this.kind, {
+    this.letters = '',
+    this.heard = '',
+    this.isSpellingShape = false,
+  });
 }

@@ -104,6 +104,14 @@ void main() {
     ),
   );
 
+  /// TestScreen caps its wait on the TTS engine with a timer; a mocked
+  /// engine never completes, so tests that mount it must let the cap expire.
+  Future<void> drainSpeechWaits(WidgetTester tester) async {
+    for (var i = 0; i < 3; i++) {
+      await tester.pump(const Duration(seconds: 13));
+    }
+  }
+
   Future<void> pumpAt(
     WidgetTester tester,
     Widget w, {
@@ -210,6 +218,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expectNoException(tester);
     expect(find.textContaining('Hands-free'), findsOneWidget);
+    await drainSpeechWaits(tester);
   });
 
   testWidgets('tiles mode builds a word and grades it', (tester) async {
@@ -251,6 +260,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expectNoException(tester);
     expect(find.text('Correct!'), findsOneWidget);
+    await drainSpeechWaits(tester);
   });
 
   testWidgets('math round shows the equation and hides the answer', (
@@ -273,6 +283,7 @@ void main() {
     expect(find.text(words.first.display!), findsOneWidget);
     expect(find.text('Check my answer'), findsOneWidget);
     expect(find.text('How to'), findsOneWidget);
+    await drainSpeechWaits(tester);
   });
 
   testWidgets('results screen renders rewards and confetti on a perfect round', (

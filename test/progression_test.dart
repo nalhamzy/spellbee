@@ -258,9 +258,12 @@ void main() {
           .read(progressionProvider.notifier)
           .recordRound(_round(correct: core.target, total: core.target));
       expect(first.questsCompleted.map((q) => q.id), contains(core.id));
-      if (core.bonusCredit) {
-        expect(c.read(aiCreditsProvider), creditsBefore + 1);
-      }
+      // One credit per completed bonus quest. Some days pair two of them
+      // (a 20-word round is also a perfect round), so count rather than
+      // assume one — this assertion used to fail roughly one day in 14.
+      final bonusQuests =
+          first.questsCompleted.where((q) => q.bonusCredit).length;
+      expect(c.read(aiCreditsProvider), creditsBefore + bonusQuests);
 
       final second = await c
           .read(progressionProvider.notifier)
