@@ -8,11 +8,29 @@ import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/services/storage_service.dart';
+import 'package:spellbee/core/services/tts_service.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/results_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
 
 const custom = Word('colour', 'Our spelling of color.', 'The colour is blue.');
+
+/// Daily grading does not depend on the native audio engine's callbacks.
+class _SilentTts extends TtsService {
+  @override
+  Future<void> speakWord(
+    String word, {
+    bool premium = false,
+    bool skipBundled = false,
+  }) async {}
+  @override
+  Future<void> speakText(String text, {bool premium = false}) async {}
+  @override
+  Future<void> playPhrase(String stub, {bool premium = false}) async {}
+  @override
+  Future<void> stop() async {}
+}
+
 AskedItem answer({
   bool first = true,
   bool correct = true,
@@ -127,6 +145,75 @@ void main() {
       expect(result.isPerfect, isFalse);
     },
   );
+
+  testWidgets('daily word preserves completion but cannot establish recall', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(500, 1100);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({});
+    final storage = StorageService(await SharedPreferences.getInstance());
+    final speech = _SilentTts();
+    addTearDown(speech.dispose);
+    final container = ProviderContainer(
+      overrides: [
+        storageServiceProvider.overrideWithValue(storage),
+        ttsServiceProvider.overrideWithValue(speech),
+      ],
+    );
+    addTearDown(container.dispose);
+    var completed = false;
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          home: TestScreen(
+            words: const [custom],
+            title: 'Daily word',
+            kind: RoundKind.daily,
+            // Deliberately omit immediateReview: protection belongs to the round.
+            onComplete: () {
+              completed = true;
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.enterText(find.byType(TextField), 'colour');
+    await tester.ensureVisible(find.text('Check my spelling'));
+    await tester.tap(find.text('Check my spelling'));
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    final result = tester
+        .widget<ResultsScreen>(find.byType(ResultsScreen))
+        .result;
+    expect(completed, isTrue);
+    expect(result.correct, 1);
+    expect(result.firstAttemptCorrect, 1);
+    expect(result.items.single.immediateReview, isTrue);
+    expect(result.independentCorrect, 0);
+    expect(result.isPerfect, isFalse);
+    expect(find.textContaining('1 of 1 on first try'), findsOneWidget);
+    expect(find.text('PERFECT ROUND'), findsNothing);
+    final review = storage.loadLearning().values.single;
+    expect(review.independentDays, 0);
+    expect(review.lastIndependentDay, isNull);
+    expect(review.dueDay, learningDay(DateTime.now()) + 1);
+    expect(
+      container.read(progressionProvider).honey,
+      greaterThanOrEqualTo(5),
+      reason: 'Correct daily practice keeps completion and daily-word honey.',
+    );
+    await tester.pumpWidget(const SizedBox());
+    for (var i = 0; i < 3; i++) {
+      await tester.pump(const Duration(seconds: 13));
+    }
+    expect(tester.takeException(), isNull);
+  });
 
   test('hints, tiles and same-day practice are distinguished from recall', () {
     for (final item in [

@@ -209,9 +209,13 @@ class AppTheme {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
     ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(foregroundColor: ink),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: surface,
+      floatingLabelStyle: const TextStyle(color: ink),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
         borderSide: const BorderSide(color: outline),

@@ -20,9 +20,9 @@ SpellBee: Spelling Bee Tutor
 
 ### Subtitle (30 char)
 ```
-Practice with voice & word packs
+School lists. Daily practice.
 ```
-**30 chars exactly.** Hits "practice", "voice", "AI".
+**29 chars.** Leads with school-list relevance and a daily practice habit.
 
 ### Keywords (100 char — comma-separated, no spaces, singular)
 ```
@@ -223,7 +223,7 @@ SpellBee: Spelling Bee for Kids
 
 ### Short Description (80 char)
 ```
-Spelling bee practice with voice, themed word packs, and parent-made lists.
+Paste school words, practice daily and build spelling confidence. Ad-free.
 ```
 **72 chars.**
 
@@ -258,8 +258,8 @@ https://nalhamzy.github.io/spellbee/privacy.html
 
 ### Target Audience
 **Ages 6–12 AND 13+** (primary kid-age range + parent decision-makers).
-Do NOT mark "Designed for Families" unless you want the contextual-ads
-treatment; leaving it off gives you full ad inventory.
+The app targets children and must follow the Play Families policy. The live declaration
+records this commitment. SpellBee has no ads; do not add ad-inventory guidance.
 
 ---
 

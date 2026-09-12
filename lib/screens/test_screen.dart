@@ -149,6 +149,8 @@ class _TestScreenState extends ConsumerState<TestScreen>
       final word = widget.words[i];
       _items[i].immediateReview =
           widget.immediateReview ||
+          // The daily-word card shows the answer before practice starts.
+          widget.kind == RoundKind.daily ||
           history.values.any(
             (r) =>
                 r.word.text.toLowerCase() == word.text.toLowerCase() &&
