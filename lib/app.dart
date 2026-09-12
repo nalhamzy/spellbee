@@ -35,7 +35,8 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(iapServiceProvider).onPurchaseSuccess = (productId) {
-        ref.read(premiumProvider.notifier).activate(productId);
+        // main() has already saved access and invalidated premiumProvider.
+        // Success UI must not issue a second, unawaited entitlement write.
         final ctx = _scaffoldMessenger.currentContext;
         if (ctx != null) {
           ScaffoldMessenger.of(ctx).showSnackBar(

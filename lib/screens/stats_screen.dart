@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
+import 'package:spellbee/core/models/learning_history.dart';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
@@ -20,7 +21,22 @@ class StatsScreen extends ConsumerWidget {
     final lists = ref.watch(wordListsProvider);
     final progression = ref.watch(progressionProvider);
     final accPct = (s.accuracy * 100).round();
-    final focusWords = _focusWords(s.missedWordCounts).take(8).toList();
+    final learning = ref.watch(learningHistoryProvider);
+    final day = ref.watch(learningDayProvider);
+    final due = learning.values.where((r) => r.dueDay <= day).length;
+    final recalled = learning.values
+        .where((r) => r.independentDays >= 2)
+        .length;
+    final firstCorrect = learning.values.fold<int>(
+      0,
+      (n, r) => n + r.firstAttemptCorrect,
+    );
+    final practiced = learning.values.fold<int>(0, (n, r) => n + r.practiced);
+    final focusWords = _focusWords(
+      s.missedWordCounts,
+      learning,
+      lists,
+    ).take(8).toList();
     final listProgress = _listProgress(s.listScores, lists).take(3).toList();
 
     return SafeArea(
@@ -31,15 +47,40 @@ class StatsScreen extends ConsumerWidget {
             padding: EdgeInsets.fromLTRB(0, context.s(16), 0, context.s(120)),
             children: [
               Text(
-                'Your stats',
+                'Learning progress',
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               SizedBox(height: context.s(6)),
               const Text(
-                'All stored on your device. Nothing sent to any server.',
+                'Learning progress is stored on this device.',
                 style: TextStyle(color: AppTheme.mute, fontSize: 12),
               ),
               SizedBox(height: context.s(20)),
+              Container(
+                padding: EdgeInsets.all(context.s(18)),
+                decoration: AppTheme.card(gradient: AppTheme.successGradient),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${learning.length} words practiced',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text('$due ready for review today'),
+                    Text('$recalled recalled without help on separate days'),
+                    const SizedBox(height: 8),
+                    Text('$firstCorrect/$practiced correct on the first try'),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Recall excludes letter hints, tiles and same-day repeats. '
+                      'This record starts with the daily practice update; earlier scores are kept below.',
+                      style: TextStyle(color: AppTheme.mute, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: context.s(16)),
               _SummaryPanel(
                 accuracy: accPct,
                 totalTests: s.totalTests,
@@ -50,7 +91,15 @@ class StatsScreen extends ConsumerWidget {
               SizedBox(height: context.s(16)),
               BadgesGrid(progression: progression),
               SizedBox(height: context.s(16)),
-              _FocusPanel(words: focusWords),
+              _FocusPanel(
+                words: focusWords,
+                sourceIds: {
+                  for (final list in lists)
+                    for (final word in list.words) word.text: list.id,
+                  for (final record in learning.values)
+                    record.word.text: record.sourceListId,
+                },
+              ),
               SizedBox(height: context.s(16)),
               _ListProgressPanel(entries: listProgress),
               SizedBox(height: context.s(16)),
@@ -131,7 +180,11 @@ class StatsScreen extends ConsumerWidget {
     return entries;
   }
 
-  List<Word> _focusWords(Map<String, int> counts) {
+  List<Word> _focusWords(
+    Map<String, int> counts,
+    Map<String, WordReview> history,
+    List<WordList> lists,
+  ) {
     final entries = counts.entries.toList()
       ..sort((a, b) {
         final byCount = b.value.compareTo(a.value);
@@ -139,13 +192,32 @@ class StatsScreen extends ConsumerWidget {
       });
     return [
       for (final entry in entries)
-        _catalogWord(entry.key) ??
+        _originalWord(entry.key, history, lists) ??
+            _catalogWord(entry.key) ??
             Word(
               entry.key,
               'A word to practice again.',
               'Spell ${entry.key} one more time.',
             ),
     ];
+  }
+
+  Word? _originalWord(
+    String text,
+    Map<String, WordReview> history,
+    List<WordList> lists,
+  ) {
+    for (final record in history.values.toList().reversed) {
+      if (record.word.text.toLowerCase() == text.toLowerCase()) {
+        return record.word;
+      }
+    }
+    for (final list in lists.reversed) {
+      for (final word in list.words.reversed) {
+        if (word.text.toLowerCase() == text.toLowerCase()) return word;
+      }
+    }
+    return null;
   }
 
   Word? _catalogWord(String text) {
@@ -203,7 +275,7 @@ class _SummaryPanel extends StatelessWidget {
               SizedBox(
                 width: tileWidth,
                 child: _BigNumber(
-                  label: 'Accuracy',
+                  label: 'Practice completion',
                   value: '$accuracy%',
                   color: AppTheme.sage,
                 ),
@@ -280,8 +352,9 @@ class _BigNumber extends StatelessWidget {
 
 class _FocusPanel extends StatelessWidget {
   final List<Word> words;
+  final Map<String, String?> sourceIds;
 
-  const _FocusPanel({required this.words});
+  const _FocusPanel({required this.words, required this.sourceIds});
 
   @override
   Widget build(BuildContext context) {
@@ -355,7 +428,7 @@ class _FocusPanel extends StatelessWidget {
                 shadow: false,
               ),
               child: const Text(
-                'No focus words yet. Take a trial and missed words will appear here for quick review.',
+                'No focus words yet. Start practice and words needing another review will appear here.',
                 style: TextStyle(
                   color: AppTheme.ink,
                   fontSize: 12,
@@ -378,8 +451,10 @@ class _FocusPanel extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => TestScreen(
                     words: words,
+                    wordSourceListIds: sourceIds,
                     title: 'Coach focus round',
                     kind: RoundKind.focus,
+                    immediateReview: true,
                   ),
                 ),
               ),
@@ -441,7 +516,7 @@ class _ListProgressPanel extends StatelessWidget {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      'Last score and best score for saved lists.',
+                      'Last and best completion scores, including retries.',
                       style: TextStyle(color: AppTheme.mute, fontSize: 12),
                     ),
                   ],

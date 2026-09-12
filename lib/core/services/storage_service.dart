@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spellbee/core/models/learning_history.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
 import 'package:spellbee/core/models/progression.dart';
@@ -31,6 +32,39 @@ class StorageService {
 
   Future<void> saveLists(List<WordList> lists) async {
     await _prefs.setStringList(_kLists, lists.map((l) => l.encode()).toList());
+  }
+
+  // Independent recall starts with this release, without backfilling old scores.
+  static const _kLearning = 'sb.learning.v1';
+
+  Map<String, WordReview> loadLearning() {
+    final raw = _prefs.getString(_kLearning);
+    if (raw == null) return {};
+    try {
+      final entries = jsonDecode(raw) as Map<String, dynamic>;
+      final result = <String, WordReview>{};
+      for (final entry in entries.entries) {
+        try {
+          result[entry.key] = WordReview.fromJson(
+            entry.value as Map<String, dynamic>,
+          );
+        } catch (_) {
+          /* Preserve other readable records. */
+        }
+      }
+      return result;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> saveLearning(Map<String, WordReview> history) async {
+    if (!await _prefs.setString(
+      _kLearning,
+      jsonEncode(history.map((key, value) => MapEntry(key, value.toJson()))),
+    )) {
+      throw StateError('Could not save learning progress');
+    }
   }
 
   // ── Player stats ───────────────────────────────────────────────────
@@ -81,8 +115,11 @@ class StorageService {
     }
   }
 
-  Future<void> savePremium(PremiumState s) =>
-      _prefs.setString(_kPremium, s.encode());
+  Future<void> savePremium(PremiumState s) async {
+    if (!await _prefs.setString(_kPremium, s.encode())) {
+      throw StateError('Could not save premium access');
+    }
+  }
 
   // ── Settings ────────────────────────────────────────────────────────
 
@@ -93,7 +130,8 @@ class StorageService {
   static const _kOpenAiVoice = 'sb.settings.openAiVoice';
   static const _kAutoListen = 'sb.settings.autoListen';
 
-  int getSelectedLevel() => _prefs.getInt(_kSelectedLevel) ?? 3;
+  int getSelectedLevel() =>
+      _prefs.getInt(_kSelectedLevel) ?? (loadStats().totalTests > 0 ? 3 : 1);
   Future<void> setSelectedLevel(int v) => _prefs.setInt(_kSelectedLevel, v);
 
   /// Returns 0 (calm), 1 (normal) or 2 (fast). Defaults to calm for early
@@ -150,7 +188,7 @@ class StorageService {
   String exportAll() => jsonEncode({
     'lists': _prefs.getStringList(_kLists),
     'stats': _prefs.getString(_kStats),
-    'premium': _prefs.getString(_kPremium),
+    'premium': jsonEncode(loadPremium().toJson(includeCredential: false)),
     'progress': _prefs.getString(_kProgression),
   });
 }

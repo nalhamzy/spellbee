@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/data/word_facts.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
+import 'package:spellbee/core/models/learning_history.dart';
 import 'package:spellbee/core/models/premium_state.dart';
 import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/test_result.dart';
@@ -140,6 +142,7 @@ class DayTickNotifier extends Notifier<int> {
   /// Re-reads the clock; only changes state (and thus dependents) when the
   /// date actually rolled over.
   void refresh() {
+    ref.invalidate(learningDayProvider);
     final today = _todayEpochDay();
     if (today != state) state = today;
   }
@@ -180,10 +183,9 @@ final dailyFactProvider = Provider<String>(
 
 // ─── Progression: honey, ranks, quests, badges ──────────────────────────
 
-final progressionProvider =
-    NotifierProvider<ProgressionNotifier, Progression>(
-      ProgressionNotifier.new,
-    );
+final progressionProvider = NotifierProvider<ProgressionNotifier, Progression>(
+  ProgressionNotifier.new,
+);
 
 /// The three quests for today, with their live progress.
 final dailyQuestsProvider = Provider<List<QuestDef>>(
@@ -222,7 +224,7 @@ class ProgressionNotifier extends Notifier<Progression> {
 
     var honey = result.correct * _honeyPerCorrect;
     if (result.isPerfect) honey += _honeyPerfectBonus;
-    if (result.kind == RoundKind.daily && result.isPerfect) {
+    if (result.kind == RoundKind.daily && result.correct == result.total) {
       honey += _honeyDailyWord;
     }
 
@@ -242,7 +244,7 @@ class ProgressionNotifier extends Notifier<Progression> {
     high(QuestType.streakInTest, result.longestStreak);
     bump(QuestType.useMic, result.micCorrect);
     bump(QuestType.useTiles, result.tilesCorrect);
-    if (result.kind == RoundKind.daily && result.isPerfect) {
+    if (result.kind == RoundKind.daily && result.correct == result.total) {
       bump(QuestType.dailyWord, 1);
     }
 
@@ -384,10 +386,9 @@ class ProgressionNotifier extends Notifier<Progression> {
 /// "Say the number" is never capped — counting is core learning.
 const kFreeMathRoundsPerDay = 1;
 
-final mathRoundsTodayProvider =
-    NotifierProvider<MathRoundsTodayNotifier, int>(
-      MathRoundsTodayNotifier.new,
-    );
+final mathRoundsTodayProvider = NotifierProvider<MathRoundsTodayNotifier, int>(
+  MathRoundsTodayNotifier.new,
+);
 
 class MathRoundsTodayNotifier extends Notifier<int> {
   static const _name = 'mathbee';
@@ -419,6 +420,53 @@ class AutoListenNotifier extends Notifier<bool> {
     await ref.read(storageServiceProvider).setAutoListen(v);
   }
 }
+
+/// Review dates follow the learner's calendar and refresh on app resume.
+final learningDayProvider = Provider<int>((ref) {
+  return learningDay(DateTime.now());
+});
+
+final learningHistoryProvider =
+    NotifierProvider<LearningHistoryNotifier, Map<String, WordReview>>(
+      LearningHistoryNotifier.new,
+    );
+
+class LearningHistoryNotifier extends Notifier<Map<String, WordReview>> {
+  @override
+  Map<String, WordReview> build() =>
+      ref.read(storageServiceProvider).loadLearning();
+
+  Future<void> record(TestResult result) async {
+    if (result.kind == RoundKind.numbers || result.kind == RoundKind.math) {
+      return;
+    }
+    final next = Map<String, WordReview>.from(state);
+    final day = learningDay(result.endedAt);
+    for (final item in result.items) {
+      final key = reviewKey(item.target, item.sourceListId);
+      final previous =
+          next[key] ??
+          WordReview(
+            word: Word(item.target, item.definition, item.example),
+            sourceListId: item.sourceListId,
+            lastDay: day,
+            dueDay: day,
+          );
+      next[key] = previous.record(item, day);
+    }
+    await ref.read(storageServiceProvider).saveLearning(next);
+    state = next;
+  }
+}
+
+final todaysPracticeProvider = Provider<List<WordReview>>((ref) {
+  return buildDailyPractice(
+    history: ref.watch(learningHistoryProvider).values,
+    levelWords: kWordsCatalog[ref.watch(selectedLevelProvider)] ?? [],
+    day: ref.watch(learningDayProvider),
+    limit: ref.watch(playerStatsProvider).totalTests == 0 ? 5 : 8,
+  );
+});
 
 // ─── Player stats ───────────────────────────────────────────────────────
 
@@ -506,14 +554,17 @@ final premiumProvider = NotifierProvider<PremiumNotifier, PremiumState>(
 
 class PremiumNotifier extends Notifier<PremiumState> {
   @override
-  PremiumState build() => ref.read(storageServiceProvider).loadPremium();
-
-  Future<void> activate(String productId) async {
-    state = state.copyWith(
-      activeProductId: productId,
-      activatedAt: DateTime.now(),
-    );
-    await ref.read(storageServiceProvider).savePremium(state);
+  PremiumState build() {
+    final premium = ref.read(storageServiceProvider).loadPremium();
+    final expiry = premium.expiresAt;
+    if (expiry != null && premium.isPremium) {
+      final timer = Timer(
+        expiry.difference(DateTime.now()),
+        ref.invalidateSelf,
+      );
+      ref.onDispose(timer.cancel);
+    }
+    return premium;
   }
 
   Future<void> clear() async {
@@ -572,7 +623,13 @@ final selectedLevelProvider = NotifierProvider<SelectedLevelNotifier, int>(
 
 class SelectedLevelNotifier extends Notifier<int> {
   @override
-  int build() => ref.read(storageServiceProvider).getSelectedLevel();
+  int build() {
+    final storage = ref.read(storageServiceProvider);
+    final level = storage.getSelectedLevel().clamp(1, 8);
+    // Persist the initial choice before the first round changes totalTests.
+    storage.setSelectedLevel(level).ignore();
+    return level;
+  }
 
   Future<void> set(int v) async {
     state = v.clamp(1, 8);

@@ -23,16 +23,42 @@ class PaywallScreen extends ConsumerStatefulWidget {
 
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   String _selected = IapProductIds.premiumYearly;
+  bool _startingPurchase = false;
+  bool _restoring = false;
 
-  Future<void> _buy() async {
+  Future<void> _buy(String productId) async {
+    if (_startingPurchase || widget.screenshotMode) return;
+    setState(() => _startingPurchase = true);
     try {
-      await ref.read(iapServiceProvider).buy(_selected);
-    } catch (e) {
+      await ref.read(iapServiceProvider).buy(productId);
+    } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Could not start purchase: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not start the purchase. Please try again.'),
+          ),
+        );
       }
+    } finally {
+      if (mounted) setState(() => _startingPurchase = false);
+    }
+  }
+
+  Future<void> _restore() async {
+    if (_restoring || widget.screenshotMode) return;
+    setState(() => _restoring = true);
+    try {
+      await ref.read(iapServiceProvider).restore();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not restore purchases. Please try again.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _restoring = false);
     }
   }
 
@@ -75,19 +101,31 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     final productsAsync = widget.screenshotMode
         ? null
         : ref.watch(iapProductsProvider);
-    final hasProducts =
-        productsAsync == null ||
-        productsAsync.maybeWhen(
-          data: (products) => products.isNotEmpty,
-          orElse: () => false,
-        );
+    final products =
+        (productsAsync == null
+                ? _screenshotProducts
+                : productsAsync.maybeWhen(
+                    data: (products) => products,
+                    orElse: () => const <IapProduct>[],
+                  ))
+            .where((p) => IapProductIds.all.contains(p.id))
+            .toList();
+    final availableIds = products.map((p) => p.id).toSet();
+    final selected = availableIds.contains(_selected)
+        ? _selected
+        : [
+            IapProductIds.premiumYearly,
+            IapProductIds.premiumLifetime,
+            IapProductIds.premiumMonthly,
+          ].where(availableIds.contains).firstOrNull;
+    final busy = _startingPurchase || _restoring;
 
     return Scaffold(
       appBar: AppBar(
         actions: [
           TextButton(
-            onPressed: () => ref.read(iapServiceProvider).restore(),
-            child: const Text('Restore'),
+            onPressed: busy || widget.screenshotMode ? null : _restore,
+            child: Text(_restoring ? 'Restoring…' : 'Restore'),
           ),
         ],
       ),
@@ -114,7 +152,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         _ValueNudge(context),
                         SizedBox(height: context.s(22)),
                         if (productsAsync == null)
-                          _tiers(context, _screenshotProducts)
+                          _tiers(context, products, selected)
                         else
                           productsAsync.when(
                             // Never invent prices: a tier list built from
@@ -122,9 +160,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             // on every non-US storefront and contradicts the
                             // store's own payment sheet. If the store gave us
                             // nothing, say so and offer a retry.
-                            data: (products) => products.isEmpty
+                            data: (_) => products.isEmpty
                                 ? _storeUnavailable(context)
-                                : _tiers(context, products),
+                                : _tiers(context, products, selected),
                             error: (_, _) => _storeUnavailable(context),
                             loading: () => Padding(
                               padding: EdgeInsets.all(context.s(24)),
@@ -147,12 +185,16 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                                 ),
                               ),
                             ),
-                            // No live products = nothing trustworthy to sell;
-                            // a dead CTA beats charging against a price the
-                            // user never saw.
-                            onPressed: hasProducts ? _buy : null,
+                            onPressed:
+                                selected == null ||
+                                    busy ||
+                                    widget.screenshotMode
+                                ? null
+                                : () => _buy(selected),
                             child: Text(
-                              _selected == IapProductIds.premiumLifetime
+                              _startingPurchase
+                                  ? 'Opening store…'
+                                  : selected == IapProductIds.premiumLifetime
                                   ? 'Pay Once & Unlock'
                                   : 'Start Premium',
                               style: TextStyle(
@@ -163,15 +205,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           ),
                         ),
                         SizedBox(height: context.s(8)),
-                        _SubscriptionDisclosure(
-                          selectedProductId: _selected,
-                          products: productsAsync == null
-                              ? _screenshotProducts
-                              : productsAsync.maybeWhen(
-                                  data: (products) => products,
-                                  orElse: () => const <IapProduct>[],
-                                ),
-                        ),
+                        if (selected != null)
+                          _SubscriptionDisclosure(
+                            selectedProductId: selected,
+                            products: products,
+                          ),
                         SizedBox(height: context.s(8)),
                         Wrap(
                           alignment: WrapAlignment.center,
@@ -189,7 +227,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           ],
                         ),
                         Text(
-                          'Manage or cancel subscriptions in your App Store account settings.',
+                          Theme.of(context).platform == TargetPlatform.android
+                              ? 'Manage or cancel subscriptions in Google Play.'
+                              : 'Manage or cancel subscriptions in your App Store account settings.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppTheme.mute,
@@ -278,7 +318,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
   }
 
-  Widget _tiers(BuildContext c, List<IapProduct> products) {
+  Widget _tiers(BuildContext c, List<IapProduct> products, String? selected) {
     IapProduct? find(String id) =>
         products.where((p) => p.id == id).cast<IapProduct?>().firstOrNull;
 
@@ -288,30 +328,36 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
     return Column(
       children: [
-        _tile(
-          id: IapProductIds.premiumYearly,
-          title: 'Premium Yearly',
-          subtitle: 'Best value for steady school practice',
-          price: yearly?.price ?? '—',
-          period: '/year',
-          highlight: true,
-        ),
+        if (yearly != null)
+          _tile(
+            id: IapProductIds.premiumYearly,
+            selected: selected == IapProductIds.premiumYearly,
+            title: 'Premium Yearly',
+            subtitle: 'Best value for steady school practice',
+            price: yearly.price,
+            period: '/year',
+            highlight: true,
+          ),
         SizedBox(height: c.s(8)),
-        _tile(
-          id: IapProductIds.premiumLifetime,
-          title: 'Premium Lifetime',
-          subtitle: 'Pay once for this family',
-          price: lifetime?.price ?? '—',
-          period: 'one-time',
-        ),
+        if (lifetime != null)
+          _tile(
+            id: IapProductIds.premiumLifetime,
+            selected: selected == IapProductIds.premiumLifetime,
+            title: 'Premium Lifetime',
+            subtitle: 'Pay once for this family',
+            price: lifetime.price,
+            period: 'one-time',
+          ),
         SizedBox(height: c.s(8)),
-        _tile(
-          id: IapProductIds.premiumMonthly,
-          title: 'Premium Monthly',
-          subtitle: 'Try premium month-to-month',
-          price: monthly?.price ?? '—',
-          period: '/month',
-        ),
+        if (monthly != null)
+          _tile(
+            id: IapProductIds.premiumMonthly,
+            selected: selected == IapProductIds.premiumMonthly,
+            title: 'Premium Monthly',
+            subtitle: 'Try premium month-to-month',
+            price: monthly.price,
+            period: '/month',
+          ),
       ],
     );
   }
@@ -322,12 +368,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     required String subtitle,
     required String price,
     required String period,
+    required bool selected,
     bool highlight = false,
   }) {
-    final selected = _selected == id;
     return InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap: () => setState(() => _selected = id),
+      onTap: _startingPurchase || _restoring
+          ? null
+          : () => setState(() => _selected = id),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -352,7 +400,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
                     children: [
                       Text(
                         title,
@@ -363,7 +413,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         ),
                       ),
                       if (highlight) ...[
-                        const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -392,22 +441,26 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  price,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16,
-                    color: AppTheme.ink,
+            const SizedBox(width: 10),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    price,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      color: AppTheme.ink,
+                    ),
                   ),
-                ),
-                Text(
-                  period,
-                  style: const TextStyle(color: AppTheme.mute, fontSize: 11),
-                ),
-              ],
+                  Text(
+                    period,
+                    style: const TextStyle(color: AppTheme.mute, fontSize: 11),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -24,6 +24,7 @@ class DashboardScreen extends ConsumerWidget {
     final progression = ref.watch(progressionProvider);
     final quests = ref.watch(dailyQuestsProvider);
     final fact = ref.watch(dailyFactProvider);
+    final today = ref.watch(todaysPracticeProvider);
 
     // Store screenshots only: `?screenshot=1&scroll=<px>` opens the page
     // scrolled so the Play grid can be captured as its own scene. Never
@@ -44,12 +45,47 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               _Header(streak: stats.dailyStreak),
               SizedBox(height: context.s(14)),
-              RankCard(progression: progression, compact: true),
+              _SectionTitle(
+                title: stats.totalTests == 0
+                    ? 'Choose a comfortable level'
+                    : 'Practice level',
+                subtitle: kLevelLabels[level] ?? 'Level $level',
+              ),
+              SizedBox(height: context.s(10)),
+              _levelPicker(context, ref, level),
               SizedBox(height: context.s(14)),
               _StartTrialButton(
                 level: level,
-                onPressed: () => _start(context, level),
+                onPressed: () {
+                  ref.invalidate(learningDayProvider);
+                  final fresh = ref.read(todaysPracticeProvider);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => TestScreen(
+                        words: fresh.map((r) => r.word).toList(),
+                        wordSourceListIds: {
+                          for (final r in fresh) r.word.text: r.sourceListId,
+                        },
+                        title: "Today's practice",
+                        level: level,
+                      ),
+                    ),
+                  );
+                },
               ),
+              SizedBox(height: context.s(8)),
+              Text(
+                '${today.length} words · due reviews, then level $level practice',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+              ),
+              TextButton.icon(
+                onPressed: () =>
+                    ref.read(tabProvider.notifier).go(AppTab.lists),
+                icon: const Icon(Icons.playlist_add_rounded),
+                label: const Text('Practice a school list'),
+              ),
+              RankCard(progression: progression, compact: true),
               SizedBox(height: context.s(14)),
               _HeroPanel(
                 word: dailyWord,
@@ -63,6 +99,7 @@ class DashboardScreen extends ConsumerWidget {
                               words: [dailyWord],
                               title: 'Daily word',
                               kind: RoundKind.daily,
+                              immediateReview: true,
                               onComplete: () => ref
                                   .read(playerStatsProvider.notifier)
                                   .recordDailyWordComplete(),
@@ -73,13 +110,6 @@ class DashboardScreen extends ConsumerWidget {
               ),
               SizedBox(height: context.s(14)),
               QuestsCard(quests: quests, progression: progression),
-              SizedBox(height: context.s(22)),
-              _SectionTitle(
-                title: 'Practice level',
-                subtitle: kLevelLabels[level] ?? 'Level $level',
-              ),
-              SizedBox(height: context.s(10)),
-              _levelPicker(context, ref, level),
               SizedBox(height: context.s(22)),
               const _SectionTitle(title: 'Play', subtitle: 'Pick a game'),
               SizedBox(height: context.s(10)),
@@ -148,7 +178,7 @@ class DashboardScreen extends ConsumerWidget {
       MaterialPageRoute(
         builder: (_) => TestScreen(
           words: sampled.take(count).toList(),
-          title: title ?? 'Level $level trial',
+          title: title ?? 'Level $level practice',
           level: level,
           initialMode: mode,
         ),
@@ -442,7 +472,11 @@ class _StatsRail extends StatelessWidget {
       children: [
         _MiniStat(label: 'Tests', value: '$tests', color: AppTheme.sky),
         SizedBox(width: context.s(9)),
-        _MiniStat(label: 'Accuracy', value: '$accuracy%', color: AppTheme.sage),
+        _MiniStat(
+          label: 'Completion',
+          value: '$accuracy%',
+          color: AppTheme.sage,
+        ),
         SizedBox(width: context.s(9)),
         _MiniStat(
           label: 'Best run',
@@ -563,7 +597,7 @@ class _StartTrialButton extends StatelessWidget {
                 SizedBox(width: context.s(6)),
                 Flexible(
                   child: Text(
-                    'Start level $level trial',
+                    "Start today's practice",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

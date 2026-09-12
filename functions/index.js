@@ -8,6 +8,8 @@ const {onRequest} = require("firebase-functions/v2/https");
 
 initializeApp();
 
+exports.spellbeeVerifyPurchase = require("./verify-purchase").spellbeeVerifyPurchase;
+
 const openAiApiKey = defineSecret("OPENAI_API_KEY");
 const pollyAccessKeyId = defineSecret("POLLY_AWS_ACCESS_KEY_ID");
 const pollySecretAccessKey = defineSecret("POLLY_AWS_SECRET_ACCESS_KEY");

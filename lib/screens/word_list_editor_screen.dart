@@ -5,6 +5,7 @@ import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/school_word_import_dialog.dart';
 
 class WordListEditorScreen extends ConsumerStatefulWidget {
   final WordList? existing;
@@ -15,8 +16,7 @@ class WordListEditorScreen extends ConsumerStatefulWidget {
       _WordListEditorScreenState();
 }
 
-class _WordListEditorScreenState
-    extends ConsumerState<WordListEditorScreen> {
+class _WordListEditorScreenState extends ConsumerState<WordListEditorScreen> {
   late final TextEditingController _nameCtrl;
   late final List<Word> _words;
 
@@ -29,7 +29,12 @@ class _WordListEditorScreenState
     super.initState();
     _nameCtrl = TextEditingController(text: widget.existing?.name ?? '');
     _words = [...?widget.existing?.words];
+    for (final controller in [_nameCtrl, _wordCtrl, _defCtrl, _exCtrl]) {
+      controller.addListener(_draftChanged);
+    }
   }
+
+  void _draftChanged() => setState(() {});
 
   @override
   void dispose() {
@@ -41,14 +46,44 @@ class _WordListEditorScreenState
   }
 
   bool _dirty = false;
+  bool _allowPop = false;
+  bool _saving = false;
+
+  Future<void> _pasteWords() async {
+    final words = await showDialog<List<String>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => SchoolWordImportDialog(
+        existingWords: _words.map((word) => word.text),
+      ),
+    );
+    if (!mounted || words == null || words.isEmpty) return;
+    setState(() {
+      _dirty = true;
+      _words.addAll(words.map((word) => Word(word, '', '')));
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${words.length} words added. Save your list when ready.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _leaveEditor() async {
+    setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) Navigator.pop(context);
+  }
 
   void _addWord() {
     final w = _wordCtrl.text.trim().toLowerCase();
     if (w.isEmpty) return;
     if (_words.any((x) => x.text.toLowerCase() == w)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('"$w" is already in this list.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('"$w" is already in this list.')));
       return;
     }
     setState(() {
@@ -63,7 +98,9 @@ class _WordListEditorScreenState
   bool get _hasUnsavedWork =>
       _dirty ||
       _nameCtrl.text.trim() != (widget.existing?.name ?? '') ||
-      _wordCtrl.text.trim().isNotEmpty;
+      _wordCtrl.text.trim().isNotEmpty ||
+      _defCtrl.text.trim().isNotEmpty ||
+      _exCtrl.text.trim().isNotEmpty;
 
   Future<bool> _confirmDiscard() async {
     if (!_hasUnsavedWork) return true;
@@ -91,28 +128,41 @@ class _WordListEditorScreenState
   }
 
   Future<void> _save() async {
+    if (_saving) return;
     if (_nameCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please name the list.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please name the list.')));
       return;
     }
     if (_words.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add at least one word.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Add at least one word.')));
       return;
     }
     final list = WordList(
-      id: widget.existing?.id ??
-          'wl_${DateTime.now().microsecondsSinceEpoch}',
+      id: widget.existing?.id ?? 'wl_${DateTime.now().microsecondsSinceEpoch}',
       name: _nameCtrl.text.trim(),
-      words: _words,
+      level: widget.existing?.level,
+      words: List.of(_words),
       createdAt: widget.existing?.createdAt ?? DateTime.now(),
     );
-    await ref.read(wordListsProvider.notifier).upsert(list);
-    if (!mounted) return;
-    Navigator.pop(context);
+    setState(() => _saving = true);
+    try {
+      await ref.read(wordListsProvider.notifier).upsert(list);
+      if (mounted) await _leaveEditor();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not save the list. Please try again.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   Future<void> _delete() async {
@@ -123,7 +173,8 @@ class _WordListEditorScreenState
       builder: (ctx) => AlertDialog(
         title: const Text('Delete list?'),
         content: Text(
-            'Permanently delete "${widget.existing!.name}"? This cannot be undone.'),
+          'Permanently delete "${widget.existing!.name}"? This cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -140,7 +191,7 @@ class _WordListEditorScreenState
     if (ok != true) return;
     await ref.read(wordListsProvider.notifier).delete(id);
     if (!mounted) return;
-    Navigator.pop(context);
+    await _leaveEditor();
   }
 
   @override
@@ -148,12 +199,11 @@ class _WordListEditorScreenState
     // A parent typing 15 words must never lose them to a stray back
     // gesture; guard every pop with a discard confirmation.
     return PopScope(
-      canPop: !_hasUnsavedWork,
+      canPop: _allowPop || !_hasUnsavedWork,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
-        final navigator = Navigator.of(context);
         final leave = await _confirmDiscard();
-        if (leave && mounted) navigator.pop();
+        if (leave && mounted) await _leaveEditor();
       },
       child: _buildScaffold(context),
     );
@@ -173,10 +223,14 @@ class _WordListEditorScreenState
               icon: const Icon(Icons.delete_outline_rounded),
             ),
           TextButton(
-            onPressed: _save,
-            child: const Text('Save',
-                style: TextStyle(
-                    fontWeight: FontWeight.w800, color: AppTheme.honeyDark)),
+            onPressed: _saving ? null : _save,
+            child: const Text(
+              'Save',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: AppTheme.honeyDark,
+              ),
+            ),
           ),
         ],
       ),
@@ -199,8 +253,16 @@ class _WordListEditorScreenState
                 ),
               ),
               SizedBox(height: context.s(18)),
-              Text('Add a word',
-                  style: Theme.of(context).textTheme.headlineSmall),
+              OutlinedButton.icon(
+                onPressed: _pasteWords,
+                icon: const Icon(Icons.content_paste_rounded),
+                label: const Text('Paste school words'),
+              ),
+              SizedBox(height: context.s(18)),
+              Text(
+                'Add a word',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               SizedBox(height: context.s(8)),
               Container(
                 padding: EdgeInsets.all(context.s(12)),
@@ -214,20 +276,23 @@ class _WordListEditorScreenState
                     TextField(
                       controller: _wordCtrl,
                       textInputAction: TextInputAction.next,
-                      decoration:
-                          const InputDecoration(labelText: 'Word (required)'),
+                      decoration: const InputDecoration(
+                        labelText: 'Word (required)',
+                      ),
                     ),
                     SizedBox(height: context.s(8)),
                     TextField(
                       controller: _defCtrl,
                       decoration: const InputDecoration(
-                          labelText: 'Definition (optional)'),
+                        labelText: 'Definition (optional)',
+                      ),
                     ),
                     SizedBox(height: context.s(8)),
                     TextField(
                       controller: _exCtrl,
                       decoration: const InputDecoration(
-                          labelText: 'Used in a sentence (optional)'),
+                        labelText: 'Used in a sentence (optional)',
+                      ),
                     ),
                     SizedBox(height: context.s(12)),
                     SizedBox(
@@ -246,11 +311,12 @@ class _WordListEditorScreenState
                 ),
               ),
               SizedBox(height: context.s(20)),
-              Text('Words (${_words.length})',
-                  style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                'Words (${_words.length})',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               SizedBox(height: context.s(8)),
-              for (int i = 0; i < _words.length; i++)
-                _wordRow(context, i),
+              for (int i = 0; i < _words.length; i++) _wordRow(context, i),
             ],
           ),
         ),
@@ -274,13 +340,18 @@ class _WordListEditorScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(w.text,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w800, color: AppTheme.ink)),
+                Text(
+                  w.text,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.ink,
+                  ),
+                ),
                 if (w.definition.isNotEmpty)
-                  Text(w.definition,
-                      style:
-                          const TextStyle(color: AppTheme.mute, fontSize: 12)),
+                  Text(
+                    w.definition,
+                    style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                  ),
               ],
             ),
           ),

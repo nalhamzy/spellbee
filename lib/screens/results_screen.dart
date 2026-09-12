@@ -40,7 +40,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
       final tts = ref.read(ttsServiceProvider);
       final premium = ref.read(isPremiumProvider);
       final stub = VoicePhraseBank.pick(
-        widget.result.accuracy >= 1.0
+        widget.result.isPerfect
             ? VoicePhraseBank.perfectFinish
             : VoicePhraseBank.finish,
       );
@@ -65,8 +65,12 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
     final missedWords = _missedWords(result);
     final outcome = widget.outcome;
     String blurb;
-    if (pct == 100) {
-      blurb = 'Perfect! Every word nailed. Ready for the next level?';
+    if (result.isPerfect) {
+      blurb =
+          'Every word on the first try! Come back another day to see what you remember.';
+    } else if (result.correct == result.total) {
+      blurb =
+          'You finished every word! Hints, tiles and retries help you learn. Another day brings a fresh chance to remember.';
     } else if (pct >= 80) {
       blurb = 'Great work. A few to polish — check the list below.';
     } else if (pct >= 50) {
@@ -93,6 +97,16 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                     padding: EdgeInsets.symmetric(vertical: context.s(20)),
                     children: [
                       _score(context, pct),
+                      SizedBox(height: context.s(10)),
+                      Text(
+                        '${result.correct}/${result.total} correct after practice · '
+                        '${result.independentCorrect}/${result.total} recalled without help',
+                        style: const TextStyle(color: AppTheme.ink),
+                      ),
+                      const Text(
+                        'Recall excludes letter hints, tiles and same-day repeats.',
+                        style: TextStyle(color: AppTheme.mute, fontSize: 12),
+                      ),
                       SizedBox(height: context.s(16)),
                       if (outcome != null && !outcome.isEmpty) ...[
                         RewardsCard(outcome: outcome),
@@ -140,6 +154,11 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                                 MaterialPageRoute(
                                   builder: (_) => TestScreen(
                                     words: missedWords,
+                                    immediateReview: true,
+                                    wordSourceListIds: {
+                                      for (final item in result.items)
+                                        item.target: item.sourceListId,
+                                    },
                                     title: 'Retry missed words',
                                     kind: result.kind == RoundKind.math
                                         ? RoundKind.math
@@ -218,7 +237,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   List<Word> _missedWords(TestResult result) {
     final seen = <String>{};
     final words = <Word>[];
-    for (final item in result.items.where((item) => !item.isCorrect)) {
+    for (final item in result.items.where((item) => !item.independentRecall)) {
       final key = item.target.toLowerCase();
       if (!seen.add(key)) continue;
       words.add(Word(item.target, item.definition, item.example));
@@ -227,7 +246,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   }
 
   Widget _score(BuildContext context, int pct) {
-    final perfect = pct == 100;
+    final perfect = widget.result.isPerfect;
     return Container(
       padding: EdgeInsets.all(context.s(20)),
       decoration: BoxDecoration(
@@ -252,7 +271,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${widget.result.correct} of ${widget.result.total} correct',
+                  '${widget.result.firstAttemptCorrect} of ${widget.result.total} on first try',
                   style: TextStyle(
                     fontSize: context.s(16),
                     fontWeight: FontWeight.w800,
@@ -349,6 +368,16 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                     'You said: ${item.submitted}',
                     style: const TextStyle(color: AppTheme.mute, fontSize: 12),
                   ),
+                Text(
+                  item.independentRecall
+                      ? 'First try, without help'
+                      : !item.correctOnFirstAttempt && item.isCorrect
+                      ? 'Correct after retry'
+                      : item.isCorrect
+                      ? 'Correct with practice support'
+                      : 'Keep practicing',
+                  style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                ),
               ],
             ),
           ),

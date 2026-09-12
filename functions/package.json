@@ -7,7 +7,8 @@
     "node": "20"
   },
   "scripts": {
-    "lint": "node --check index.js"
+    "lint": "node --check index.js && node --check purchases.js && node --check verify-purchase.js",
+    "test": "node --test purchases.test.js"
   },
   "dependencies": {
     "@aws-sdk/client-polly": "^3.1084.0",

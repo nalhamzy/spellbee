@@ -33,9 +33,12 @@ class TestResult extends Equatable {
   });
 
   int get correct => items.where((i) => i.isCorrect).length;
+  int get firstAttemptCorrect =>
+      items.where((i) => i.correctOnFirstAttempt).length;
+  int get independentCorrect => items.where((i) => i.independentRecall).length;
   int get total => items.length;
-  double get accuracy => total == 0 ? 0 : correct / total;
-  bool get isPerfect => total > 0 && correct == total;
+  double get accuracy => total == 0 ? 0 : firstAttemptCorrect / total;
+  bool get isPerfect => total > 0 && independentCorrect == total;
 
   @override
   List<Object?> get props => [
@@ -56,6 +59,19 @@ class AskedItem extends Equatable {
   final String example;
   final String submitted;
   final bool isCorrect;
+  final bool? firstAttemptCorrect;
+  final int attempts;
+  final bool usedHint;
+  final String inputMode;
+  final bool immediateReview;
+  final String? sourceListId;
+
+  bool get correctOnFirstAttempt => firstAttemptCorrect ?? isCorrect;
+  bool get independentRecall =>
+      correctOnFirstAttempt &&
+      !usedHint &&
+      inputMode != 'tiles' &&
+      !immediateReview;
 
   const AskedItem({
     required this.target,
@@ -63,6 +79,12 @@ class AskedItem extends Equatable {
     this.example = '',
     required this.submitted,
     required this.isCorrect,
+    this.firstAttemptCorrect,
+    this.attempts = 1,
+    this.usedHint = false,
+    this.inputMode = 'keyboard',
+    this.immediateReview = false,
+    this.sourceListId,
   });
 
   @override
@@ -72,5 +94,11 @@ class AskedItem extends Equatable {
     example,
     submitted,
     isCorrect,
+    firstAttemptCorrect,
+    attempts,
+    usedHint,
+    inputMode,
+    immediateReview,
+    sourceListId,
   ];
 }

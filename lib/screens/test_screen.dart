@@ -7,6 +7,7 @@ import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/voice_phrase_bank.dart';
 import 'package:spellbee/core/data/word_facts.dart';
 import 'package:spellbee/core/models/progression.dart';
+import 'package:spellbee/core/models/learning_history.dart';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/services/stt_service.dart';
@@ -33,6 +34,11 @@ class _ItemState {
   /// so the coach's missed-word counts see the words a kid struggled with
   /// even when they eventually got them right.
   bool missedOnce = false;
+  bool? firstAttemptCorrect;
+  InputMode? firstInputMode;
+  int attempts = 0;
+  bool usedHint = false;
+  bool immediateReview = false;
 
   /// Which input answered this word correctly (mode quests + badges).
   InputMode? answeredWith;
@@ -51,6 +57,8 @@ class TestScreen extends ConsumerStatefulWidget {
   final String title;
   final bool savesStats;
   final String? sourceListId;
+  final Map<String, String?> wordSourceListIds;
+  final bool immediateReview;
   final RoundKind kind;
   final int? level;
   final InputMode initialMode;
@@ -66,6 +74,8 @@ class TestScreen extends ConsumerStatefulWidget {
     required this.title,
     this.savesStats = true,
     this.sourceListId,
+    this.wordSourceListIds = const {},
+    this.immediateReview = false,
     this.onComplete,
     this.kind = RoundKind.practice,
     this.level,
@@ -116,7 +126,11 @@ class _TestScreenState extends ConsumerState<TestScreen>
   int get _runStreak {
     var s = 0;
     for (final it in _items.take(_idx + 1)) {
-      if (it.revealed && (it.correct ?? false)) {
+      if (it.revealed &&
+          it.firstAttemptCorrect == true &&
+          !it.usedHint &&
+          !it.immediateReview &&
+          it.firstInputMode != InputMode.tiles) {
         s++;
       } else if (it.revealed) {
         s = 0;
@@ -129,6 +143,18 @@ class _TestScreenState extends ConsumerState<TestScreen>
   void initState() {
     super.initState();
     _items = List.generate(widget.words.length, (_) => _ItemState());
+    final history = ref.read(learningHistoryProvider);
+    final today = learningDay(DateTime.now());
+    for (var i = 0; i < widget.words.length; i++) {
+      final word = widget.words[i];
+      _items[i].immediateReview =
+          widget.immediateReview ||
+          history.values.any(
+            (r) =>
+                r.word.text.toLowerCase() == word.text.toLowerCase() &&
+                r.lastDay == today,
+          );
+    }
     _startedAt = DateTime.now();
     _tts = ref.read(ttsServiceProvider);
     _stt = ref.read(sttServiceProvider);
@@ -176,10 +202,8 @@ class _TestScreenState extends ConsumerState<TestScreen>
   /// engine that never does (no voice data, a killed service) would strand
   /// hands-free mode waiting forever, so every await that gates the mic is
   /// capped. Speech itself is unaffected — only our waiting for it.
-  Future<void> _awaitSpeech(Future<void> speaking) => speaking.timeout(
-    const Duration(seconds: 12),
-    onTimeout: () {},
-  );
+  Future<void> _awaitSpeech(Future<void> speaking) =>
+      speaking.timeout(const Duration(seconds: 12), onTimeout: () {});
 
   /// Say the current item, then (hands-free mode) open the mic once the
   /// pronouncer is done so the child never has to reach for the button.
@@ -225,6 +249,7 @@ class _TestScreenState extends ConsumerState<TestScreen>
   }
 
   Future<void> _speakSpellOut() async {
+    _s.usedHint = true;
     await _tts.spellOut(_w.text, premium: _premium);
   }
 
@@ -325,6 +350,7 @@ class _TestScreenState extends ConsumerState<TestScreen>
   }
 
   TileBoard _tilesFor(_ItemState s, Word w) {
+    s.usedHint = true;
     final existing = s.tiles;
     if (existing != null) return existing;
     final board = TileBoard.forWord(w.letters);
@@ -483,6 +509,9 @@ class _TestScreenState extends ConsumerState<TestScreen>
   void _grade(String typed) {
     final correct = typed == _w.letters;
     setState(() {
+      _s.firstAttemptCorrect ??= correct;
+      _s.firstInputMode ??= _mode;
+      _s.attempts++;
       _s.revealed = true;
       _s.correct = correct;
       _s.submitted = true;
@@ -512,12 +541,9 @@ class _TestScreenState extends ConsumerState<TestScreen>
       );
       // Words with a fact get a longer pause — the card is worth reading.
       final hasFact = factFor(_w.text) != null;
-      _s.autoAdvance = Timer(
-        Duration(milliseconds: hasFact ? 3200 : 1800),
-        () {
-          if (mounted && _s.revealed && !_s.factOpened) _next();
-        },
-      );
+      _s.autoAdvance = Timer(Duration(milliseconds: hasFact ? 3200 : 1800), () {
+        if (mounted && _s.revealed && !_s.factOpened) _next();
+      });
     } else {
       _playFeedback(VoicePhraseBank.miss);
       // Spell it out 0.9s in.
@@ -608,6 +634,8 @@ class _TestScreenState extends ConsumerState<TestScreen>
       return;
     }
     setState(() {
+      _s.firstAttemptCorrect ??= false;
+      _s.firstInputMode ??= _mode;
       _s.revealed = true;
       _s.correct = false;
       _s.submitted = true;
@@ -637,6 +665,12 @@ class _TestScreenState extends ConsumerState<TestScreen>
           example: widget.words[i].example,
           submitted: submitted,
           isCorrect: it.correct ?? false,
+          firstAttemptCorrect: it.firstAttemptCorrect ?? false,
+          attempts: it.attempts,
+          usedHint: it.usedHint,
+          inputMode: (it.firstInputMode ?? _mode).name,
+          immediateReview: it.immediateReview,
+          sourceListId: widget.wordSourceListIds[target] ?? widget.sourceListId,
         ),
       );
       if (it.answeredWith == InputMode.mic) micCorrect++;
@@ -654,6 +688,7 @@ class _TestScreenState extends ConsumerState<TestScreen>
     );
     ProgressionOutcome? outcome;
     if (widget.savesStats) {
+      await ref.read(learningHistoryProvider.notifier).record(result);
       // A word counts as missed if ANY attempt on it was wrong, even when
       // "Try again" ended in success — those are exactly the words the
       // coach's focus round exists for. Mastery only decrements the counter
@@ -661,9 +696,8 @@ class _TestScreenState extends ConsumerState<TestScreen>
       final struggled = <String>[];
       final clean = <String>[];
       for (var i = 0; i < widget.words.length; i++) {
-        final it = _items[i];
         final target = widget.words[i].text;
-        if (it.missedOnce || !(it.correct ?? false)) {
+        if (!items[i].independentRecall) {
           struggled.add(target);
         } else {
           clean.add(target);
@@ -749,6 +783,7 @@ class _TestScreenState extends ConsumerState<TestScreen>
   }
 
   void _revealFirstLetter() {
+    _s.usedHint = true;
     final first = _w.letters.substring(0, 1);
     if (_mode == InputMode.keyboard) {
       if (!_s.typed.toLowerCase().startsWith(first)) {
@@ -1409,7 +1444,9 @@ class _HearCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(context.s(18)),
-                  border: Border.all(color: AppTheme.sky.withValues(alpha: 0.4)),
+                  border: Border.all(
+                    color: AppTheme.sky.withValues(alpha: 0.4),
+                  ),
                   boxShadow: AppTheme.tintedShadow(AppTheme.sky),
                 ),
                 child: Text(
@@ -1472,7 +1509,9 @@ class _HearCard extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onHearDefinition,
                   icon: Icon(
-                    isMath ? Icons.tips_and_updates_rounded : Icons.menu_book_rounded,
+                    isMath
+                        ? Icons.tips_and_updates_rounded
+                        : Icons.menu_book_rounded,
                     size: 18,
                   ),
                   label: Text(isMath ? 'How to' : 'Definition'),

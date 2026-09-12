@@ -1,5 +1,10 @@
 # SpellBee — Store listing copy
 
+## Release 1.2.0
+
+School-list paste, today's practice, first-attempt reporting, and store-verified Premium.
+Prices and product IDs are unchanged. See `docs/purchase-release-checklist.md` for validation.
+
 SEO-tuned for the spelling-bee / student-education niche. Every field under its
 platform limit.
 
@@ -42,7 +47,7 @@ THREE WAYS TO PRACTICE
 
 • TYPE — See the prompt, type the word, check instantly. Misses trigger a clear spell-out so you hear every letter.
 • LETTER TILES — Tap letters into place. Early readers build words without a keyboard.
-• SPELL ALOUD — Say each letter, hands-free. SpellBee understands letter names ("see a tee" → CAT) and whole words, opens the mic by itself after each word, and checks when your child stops talking. Say "repeat" to hear a word again.
+• SPELL ALOUD — Say each letter, hands-free. SpellBee understands letter names ("see a tee" → CAT), opens the mic by itself after each word, and checks when your child stops talking. Say "repeat" to hear a word again.
 
 QUESTS, HONEY AND BADGES
 Three daily quests, honey for every correct word, Bee ranks from Egg to Queen Bee, and badges for milestones. Perfect rounds get confetti.
@@ -57,13 +62,13 @@ EIGHT DIFFICULTY LEVELS
 From K-1 starter words to championship-tier stumpers like "pneumonoultramicroscopicsilicovolcanoconiosis". Every word ships with a definition and an example sentence so the context lands.
 
 THEMED WORD PACKS
-Give SpellBee a theme — dinosaurs, space, baking, cooking, mythology — and it builds a fresh 10-word pack at your level. Built-in themed packs work offline, with a studio gateway available for expanded packs when configured.
+Choose a built-in theme for a practice pack at your level. Built-in packs work offline.
 
 PARENT-MADE LISTS
-Copy this week's school words into a saved list. Tap "practice" and the same words read aloud with optional definitions you wrote yourself. Great for weekly spelling tests, pre-bee warm-ups, and ESL families who want their own word set.
+Paste this week's school words, separated by lines or commas. Review and edit the words before adding them; duplicates are removed. Tap "practice" and the same words read aloud with optional definitions you wrote yourself. Great for weekly spelling tests, pre-bee warm-ups, and ESL families who want their own word set.
 
 INSTANT FEEDBACK + STREAKS
-Every test tracks correct words, longest streak, and accuracy. Perfect tests extend your perfect-test streak.
+Today’s practice brings back words due for review and mixes in words at your chosen level. Results separate words spelled correctly on the first try from words completed after a retry. Progress shows independent recall across practice days, so parents can see what is sticking.
 
 WHO IT'S FOR
 • Elementary students prepping for weekly spelling tests
@@ -73,7 +78,7 @@ WHO IT'S FOR
 • Anyone rebuilding a reading habit
 
 PRIVACY
-All lists, stats, and purchases live on your device. No account. No cloud sync. Nothing sold. Mic audio is processed by your device's built-in speech recognizer — never uploaded.
+Lists and practice history stay on your device. No account and no ads. Optional speech recognition may use your device provider’s servers. Enhanced pronunciation sends text to our voice service. Purchases are verified securely with Apple or Google. See our privacy policy for details.
 
 PREMIUM
 Unlock everything for less than one coffee a month:
@@ -82,7 +87,7 @@ Unlock everything for less than one coffee a month:
 • Unlimited parent-made word lists (free tier: 3)
 • Enhanced voice pronunciation
 
-Monthly, yearly (save 44%), or a one-time lifetime. Cancel any time.
+Monthly or yearly subscriptions, or a one-time lifetime purchase. Manage subscription renewals in your store account.
 
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
@@ -90,18 +95,16 @@ Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
 Free to start. Premium when your practice routine is ready.
 ```
 
-### What's New in This Version (v1.1.0)
+### What's New in This Version (v1.2.0)
 ```
-SpellBee just levelled up — quests, honey, and two new ways to play:
+Build a stronger spelling habit:
 
-• Daily quests: three fresh challenges every day, with honey rewards and badges
-• Bee ranks: earn honey for every correct word and climb from Egg to Queen Bee
-• Number Bee: spell numbers as words, plus Math Bee — hear a sum, spell the answer
-• Letter tiles: tap letters into words, a friendlier way to spell for early readers
-• Hands-free spell aloud: the mic opens by itself and checks when your child stops talking; say "repeat" to hear a word again
-• Did you know? Fun facts on over 100 words, read aloud by the pronouncer
-• Confetti and rewards on perfect rounds and rank-ups
-• Fixes: the microphone and voice now always stop when a round is quit
+• Paste school words from a worksheet or message, then review and edit them together
+• Start today’s practice with a short round at your level and words due for review
+• See first-try results separately from words completed after a retry
+• Track independent recall across practice days
+• More reliable purchases and restores, with access verified by your store
+• Clearer plans, improved layouts, and updated support and privacy information
 ```
 
 ### What's New archive (v1.0.14)
@@ -139,7 +142,7 @@ Initial release.
 
 ### Support URL
 ```
-https://github.com/nalhamzy/spellbee
+https://nalhamzy.github.io/spellbee/support.html
 ```
 
 ### Privacy Policy URL
@@ -161,7 +164,7 @@ https://nalhamzy.github.io/spellbee/privacy.html
 
 ### App Review — Review Notes
 ```
-SpellBee is a local-first spelling-bee practice app for students and families. All data (custom lists, stats, premium status) is stored on-device in SharedPreferences. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). The paywall includes functional Privacy Policy and Terms of Use (EULA) links. The app contains no ads. No account, no login. Mic is used for optional speech-to-text input; audio is processed by the device and never uploaded.
+SpellBee is a local-first spelling-bee practice app for students and families. Lists and learning history are stored on-device. Purchase proofs are sent to a secure verification endpoint and checked against the Apple or Google store API before Premium is granted. IAPs: spellbee_premium_monthly, spellbee_premium_yearly (auto-renewing subscriptions in a shared group), spellbee_premium_lifetime (non-consumable). The paywall includes functional Privacy Policy and Terms of Use (EULA) links. The app contains no ads. No account, no login. Mic is used for optional speech-to-text input; the operating-system speech recognition service may process audio remotely. Enhanced pronunciation sends text to OpenAI/Amazon Polly through our service. No microphone recordings are stored by SpellBee. See the public privacy policy for operational logging details.
 ```
 
 ---
@@ -245,7 +248,7 @@ nalhamzy@gmail.com
 
 ### Website
 ```
-https://github.com/nalhamzy/spellbee
+https://nalhamzy.github.io/spellbee/support.html
 ```
 
 ### Privacy Policy

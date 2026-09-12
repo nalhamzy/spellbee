@@ -5,61 +5,81 @@ import 'package:spellbee/core/constants/iap_ids.dart';
 class PremiumState extends Equatable {
   final String? activeProductId;
   final DateTime? activatedAt;
+  final DateTime? expiresAt;
+  final DateTime? verifiedAt;
+  final bool verifiedActive;
+  final String? verificationSource;
+  final String? verificationCredential;
+  final String? verificationProductId;
 
-  const PremiumState({this.activeProductId, this.activatedAt});
+  const PremiumState({
+    this.activeProductId,
+    this.activatedAt,
+    this.expiresAt,
+    this.verifiedAt,
+    this.verifiedActive = false,
+    this.verificationSource,
+    this.verificationCredential,
+    this.verificationProductId,
+  });
 
-  /// How long a locally-stored subscription entitlement stays valid without
-  /// being refreshed by a store event (purchase/restore). The app has no
-  /// server-side receipt validation, so this window — the billing period
-  /// plus a generous offline grace — is what stops a cancelled $4.99
-  /// monthly from being premium forever. A silent restore on launch renews
-  /// [activatedAt] for anyone still subscribed.
-  static const _monthlyValidity = Duration(days: 35);
-  static const _yearlyValidity = Duration(days: 370);
-
-  bool get isPremium {
-    if (activeProductId == null) return false;
+  /// Old installs retain their ORIGINAL cached access while migrating through
+  /// restore. These dates are never reset by a purchase/restore event.
+  /// Verified subscriptions expire exactly when the store says they do.
+  bool get isPremium => isPremiumAt(DateTime.now());
+  bool isPremiumAt(DateTime now) {
+    if (!IapProductIds.all.contains(activeProductId)) return false;
+    if (verifiedAt != null) {
+      if (!verifiedActive) return false;
+      return isLifetime || (expiresAt != null && now.isBefore(expiresAt!));
+    }
     if (isLifetime) return true;
-    final at = activatedAt;
-    if (at == null) return false;
-    final validity = activeProductId == IapProductIds.premiumYearly
-        ? _yearlyValidity
-        : _monthlyValidity;
-    return DateTime.now().difference(at) <= validity;
+    if (activatedAt == null) return false;
+    final validity = Duration(
+      days: activeProductId == IapProductIds.premiumYearly ? 370 : 35,
+    );
+    return now.isBefore(activatedAt!.add(validity));
   }
 
-  /// True when a subscription entitlement exists but is past its local
-  /// validity window — the cue to attempt a silent restore.
-  bool get needsRefresh => isSubscription && !isPremium;
-
-  bool get isLifetime =>
-      activeProductId == IapProductIds.premiumLifetime;
+  bool get needsRefresh => activeProductId != null;
+  bool get isLifetime => activeProductId == IapProductIds.premiumLifetime;
   bool get isSubscription =>
-      activeProductId == IapProductIds.premiumMonthly ||
-      activeProductId == IapProductIds.premiumYearly;
+      IapProductIds.subscriptionIds.contains(activeProductId);
+  bool get canRefresh =>
+      verificationCredential != null && verificationSource != null;
 
-  PremiumState copyWith({String? activeProductId, DateTime? activatedAt}) =>
-      PremiumState(
-        activeProductId: activeProductId ?? this.activeProductId,
-        activatedAt: activatedAt ?? this.activatedAt,
-      );
-
-  Map<String, dynamic> toJson() => {
-        'activeProductId': activeProductId,
-        'activatedAt': activatedAt?.toIso8601String(),
-      };
-
+  Map<String, dynamic> toJson({bool includeCredential = true}) => {
+    'activeProductId': activeProductId,
+    'activatedAt': activatedAt?.toIso8601String(),
+    'expiresAt': expiresAt?.toIso8601String(),
+    'verifiedAt': verifiedAt?.toIso8601String(),
+    'verifiedActive': verifiedActive,
+    'verificationSource': verificationSource,
+    if (includeCredential) 'verificationCredential': verificationCredential,
+    'verificationProductId': verificationProductId,
+  };
   factory PremiumState.fromJson(Map<String, dynamic> j) => PremiumState(
-        activeProductId: j['activeProductId'] as String?,
-        activatedAt: j['activatedAt'] == null
-            ? null
-            : DateTime.tryParse(j['activatedAt'] as String),
-      );
-
+    activeProductId: j['activeProductId'] as String?,
+    activatedAt: DateTime.tryParse(j['activatedAt'] as String? ?? ''),
+    expiresAt: DateTime.tryParse(j['expiresAt'] as String? ?? ''),
+    verifiedAt: DateTime.tryParse(j['verifiedAt'] as String? ?? ''),
+    verifiedActive: j['verifiedActive'] == true,
+    verificationSource: j['verificationSource'] as String?,
+    verificationCredential: j['verificationCredential'] as String?,
+    verificationProductId: j['verificationProductId'] as String?,
+  );
   String encode() => jsonEncode(toJson());
   factory PremiumState.decode(String raw) =>
       PremiumState.fromJson(jsonDecode(raw) as Map<String, dynamic>);
-
   @override
-  List<Object?> get props => [activeProductId, activatedAt];
+  List<Object?> get props => [
+    activeProductId,
+    activatedAt,
+    expiresAt,
+    verifiedAt,
+    verifiedActive,
+    verificationSource,
+    verificationCredential,
+    verificationProductId,
+  ];
 }

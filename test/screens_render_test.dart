@@ -182,6 +182,12 @@ void main() {
   testWidgets('stats renders badges grid and mode metrics', (tester) async {
     final c = await seeded();
     await pumpAt(tester, host(c, const StatsScreen()));
+    await tester.dragUntilVisible(
+      find.text('Badges'),
+      find.byType(ListView),
+      const Offset(0, -200),
+    );
+    expectNoException(tester);
     expect(find.text('Badges'), findsOneWidget);
     expect(find.text('3 of ${kBadges.length} earned'), findsOneWidget);
   });
@@ -286,42 +292,43 @@ void main() {
     await drainSpeechWaits(tester);
   });
 
-  testWidgets('results screen renders rewards and confetti on a perfect round', (
-    tester,
-  ) async {
-    final c = await seeded();
-    final result = TestResult(
-      items: const [
-        AskedItem(target: 'cat', submitted: 'cat', isCorrect: true),
-        AskedItem(target: 'dog', submitted: 'dog', isCorrect: true),
-      ],
-      elapsed: const Duration(seconds: 12),
-      endedAt: DateTime.now(),
-      longestStreak: 2,
-    );
-    final outcome = ProgressionOutcome(
-      honeyEarned: 34,
-      newBadges: [kBadges.first],
-      questsCompleted: [kQuestPool.first],
-      rankBefore: BeeRank.all[0],
-      rankAfter: BeeRank.all[1],
-      bonusCredits: 1,
-    );
-    await pumpAt(
-      tester,
-      host(
-        c,
-        ResultsScreen(result: result, title: 'Trial', outcome: outcome),
-      ),
-    );
-    expect(find.text('+34 honey'), findsOneWidget);
-    expect(find.textContaining('Rank up!'), findsOneWidget);
-    expect(find.textContaining('Quest done'), findsOneWidget);
-    expect(find.textContaining('New badge'), findsOneWidget);
-    expect(find.text('PERFECT ROUND'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 3));
-    expectNoException(tester);
-  });
+  testWidgets(
+    'results screen renders rewards and confetti on a perfect round',
+    (tester) async {
+      final c = await seeded();
+      final result = TestResult(
+        items: const [
+          AskedItem(target: 'cat', submitted: 'cat', isCorrect: true),
+          AskedItem(target: 'dog', submitted: 'dog', isCorrect: true),
+        ],
+        elapsed: const Duration(seconds: 12),
+        endedAt: DateTime.now(),
+        longestStreak: 2,
+      );
+      final outcome = ProgressionOutcome(
+        honeyEarned: 34,
+        newBadges: [kBadges.first],
+        questsCompleted: [kQuestPool.first],
+        rankBefore: BeeRank.all[0],
+        rankAfter: BeeRank.all[1],
+        bonusCredits: 1,
+      );
+      await pumpAt(
+        tester,
+        host(
+          c,
+          ResultsScreen(result: result, title: 'Trial', outcome: outcome),
+        ),
+      );
+      expect(find.text('+34 honey'), findsOneWidget);
+      expect(find.textContaining('Rank up!'), findsOneWidget);
+      expect(find.textContaining('Quest done'), findsOneWidget);
+      expect(find.textContaining('New badge'), findsOneWidget);
+      expect(find.text('PERFECT ROUND'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+      expectNoException(tester);
+    },
+  );
 
   testWidgets('screens survive a tablet width', (tester) async {
     final c = await seeded();

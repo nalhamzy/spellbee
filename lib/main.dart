@@ -7,10 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/app.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
-import 'package:spellbee/core/models/premium_state.dart';
 import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/iap_service.dart';
+import 'package:spellbee/core/services/purchase_verification_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/providers/providers.dart';
 
@@ -51,21 +51,24 @@ Future<void> main() async {
   // The money path must exist before the purchase stream is subscribed:
   // launch-time transactions (Ask to Buy approvals, interrupted purchases,
   // restores) can arrive before any screen wires its callbacks.
-  iap.persistEntitlement = (productId) async {
-    await storage.savePremium(
-      PremiumState(activeProductId: productId, activatedAt: DateTime.now()),
-    );
-    container.invalidate(premiumProvider);
-  };
+  final verification = PurchaseVerificationService(storage)
+    ..onChanged = () => container.invalidate(premiumProvider);
+  iap.persistEntitlement = verification.verify;
+  iap.refreshEntitlement = verification.refresh;
 
   if (_isMobile) {
     await iap.initialize().catchError((_) {});
-    // Local subscription entitlements expire after their validity window;
-    // a silent restore renews anyone still subscribed (and heals lifetime
-    // buyers after reinstall) without any UI involvement.
-    if (storage.loadPremium().isSubscription) {
-      iap.restore(silent: true).catchError((_) {});
+    Future<void> refreshAccess() async {
+      container.invalidate(premiumProvider);
+      if (storage.loadPremium().activeProductId != null) {
+        await iap.restore(silent: true).catchError((_) {});
+      }
     }
+
+    refreshAccess();
+    // Lifetime refunds are checked too; legacy paid users migrate through the
+    // native store restore without losing their original cache on an outage.
+    AppLifecycleListener(onResume: refreshAccess);
   }
 
   runApp(
