@@ -1,6 +1,6 @@
 # Purchase reliability release checks
 
-Updated 13 September 2026 for 1.2.0 (19). The verification backend and public support/privacy site are deployed. No real sandbox purchase lifecycle has been exercised in this session. Store build/submission status is recorded separately in the release report.
+Updated 13 September 2026 for 1.2.0 (20). The verification backend and public support/privacy site are deployed. No real sandbox purchase lifecycle has been exercised in this session. Store build/submission status is recorded separately in the release report.
 
 ## Implemented and regression-tested
 
@@ -14,7 +14,7 @@ Updated 13 September 2026 for 1.2.0 (19). The verification backend and public su
 - [x] Displayed localized price, selected plan, disclosure and checkout agree.
 - [x] Purchase launch and restore have busy/error handling; screenshot fixtures cannot buy or restore.
 - [x] Narrow-phone layout with enlarged text and long localized prices passes widget checks.
-- [x] All 118 Flutter unit/widget tests and 10 backend provider tests pass; static analysis is clean.
+- [x] All 119 Flutter unit/widget tests and 10 backend provider tests pass; static analysis is clean.
 
 ## Before release
 

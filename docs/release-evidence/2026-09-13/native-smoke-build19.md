@@ -5,6 +5,12 @@ Tested installed SpellBee **1.2.0 (19)**, debug APK, on the dedicated
 This evidence predates the final build 20 contrast and defensive daily-round
 changes; it does not establish native verification of those later changes.
 
+Follow-up: Flutter attach and a hot restart loaded the final build 20 Dart source
+into the installed build 19 debug shell. `home-build20.png` shows the corrected
+dark-ink school-list link, visually checked on the Android emulator. This is
+native rendering evidence for the updated Home theme, **not** an installation
+or complete smoke test of the build 20 binary.
+
 ## Completed flows
 
 - Home renders the initial level choice, **Start today's practice**, five-word

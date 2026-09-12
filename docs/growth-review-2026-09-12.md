@@ -2,6 +2,8 @@
 
 Reviewed 12 September 2026. Repository: `b1cdd5e`, version `1.1.1+18`.
 
+Release follow-up, 13 September 2026: school-list paste, today's practice, per-word review scheduling, independent-recall reporting, and server-verified purchases are now implemented in 1.2.0 (20). Both signed store builds succeeded. See [the release report](release-1.2.0.md) for current store submission states, native smoke evidence, and remaining validation. The review below records the original findings and longer-term roadmap; it is not a claim that all 90-day work has shipped.
+
 ## Implementation follow-up — 12 September 2026
 
 The first purchase-reliability slice is implemented locally after this review:
