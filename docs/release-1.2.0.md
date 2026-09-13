@@ -24,16 +24,20 @@ Codemagic build 6aa5c743c12cd81c2bdf6a78 started 2026-09-12 21:42 UTC, both plat
 Firebase spellbeeVerifyPurchase deployed to project rhyme-aa29b, us-central1. Secrets remain in Firebase Secret Manager. Narrow deploy did not alter other portfolio functions.
 GitHub Pages source main/docs enabled; privacy page HTTP 200 verified.
 App Store version 8743ec5c-f77c-46b3-ba37-472c3f278b1c created with metadata and review notes; inherited phone/tablet screenshots retained.
-Apple upload 657b2d46-a520-4a9a-a645-8ecd2d73848f confirms version 1.2.0 build 20 uploaded at 2026-09-12 21:50:45 UTC. The upload API reports `PROCESSING`, no errors. Codemagic's subsequent TestFlight distribution task 6aa5c9370b9141d3ac30f2c7 remains pending processing; do not describe build 20 as TestFlight-ready until it becomes valid and distribution completes. Public version remains `PREPARE_FOR_SUBMISSION`; final build selection must follow processing. Beta review instructions have been filled, with no login required inside SpellBee.
+Apple build 657b2d46-a520-4a9a-a645-8ecd2d73848f, version 1.2.0 (20), is now `VALID`, with `usesNonExemptEncryption: false`, and is selected on the public version. Submitted for App Review at **2026-09-13 11:34:35 UTC / 15:34 Dubai**. Submission 452a9bc6-3797-407a-82bf-b14c2d019145 and version 8743ec5c-f77c-46b3-ba37-472c3f278b1c both read `WAITING_FOR_REVIEW`. The browser confirmed **1 Item Submitted**. Automatic public release after approval remains configured; existing ratings are preserved.
+
+TestFlight build 20 is `IN_BETA_TESTING` internally. Codemagic's separate external-beta task 6aa5c9370b9141d3ac30f2c7 failed with Apple 422 because build 19 is already in beta review in the same train. Build 20's external beta state is `READY_FOR_BETA_SUBMISSION`. This did not block the successful public App Review submission. Beta review instructions are filled; SpellBee requires no app login.
 Google Play English description and short description updated; Data safety answers submitted for review. No advertising/tracking; processor transfers follow the service-provider exception.
 
-Google Play accepted final build 20 on production. Edit 04038829210248633350 committed a 10% staged rollout (`inProgress`, `userFraction: 0.1`) while retaining completed build 17. Publishing overview visibly shows **Changes in review → Production → 1.2.0 (20) → Start staged rollout at 10%**, alongside listing and Data safety updates. At verification, automated quick checks were running; the release is submitted, not yet confirmed publicly available.
+Google Play accepted final build 20 on production. Edit 04038829210248633350 committed a 10% staged rollout (`inProgress`, `userFraction: 0.1`) while retaining completed build 17. Publishing overview visibly shows **Changes in review → Production → 1.2.0 (20) → Start staged rollout at 10%**, alongside listing and Data safety updates. On 13 September at 15:35 Dubai, quick checks had finished and the Console confirmed **Your changes are now in review**. The release is submitted, not yet confirmed publicly available.
 
 ## Store privacy answers
 
 Google Play: purchase history collected ephemerally for functionality/fraud prevention; optional speech audio and pronunciation text collected for functionality; operational interactions and diagnostics retained for service monitoring; hashed network identifiers retained for functionality/monitoring/abuse prevention. All optional features; no app account; encrypted transit; deletion-contact URL points to support; existing Families commitment retained. No advertising or cross-app tracking. The privacy policy explains operating-system speech processing and third-party voice services.
 
-App Store privacy nutrition label still requires a signed-in App Store Connect browser. The public API handles metadata but not that full questionnaire. A sign-in request was sent to the user while build work continued. Do not submit iOS publicly with the old “Data Not Collected” label without reviewing it against the current service behavior.
+App Store privacy label updated and published through the signed-in browser before submission. Other User Content and Other Diagnostic Data: App Functionality. Device ID and Product Interaction: Analytics and App Functionality. All four are conservatively declared linked because requests, network identifiers and service data are not guaranteed to be anonymized before collection. No tracking or advertising purpose is selected. The preview shows User Content, Identifiers, Usage Data and Diagnostics; no setup items remain.
+
+Apple and Google use different disclosure rules. Apple excludes temporary real-time verification proofs and data collected solely by Apple's own speech framework; the public privacy policy still explains both flows. The retained network hash is declared as an identifier, not location. Rationale follows [Apple's privacy disclosure guidance](https://developer.apple.com/app-store/app-privacy-details/), including its IP-address, Apple-framework and real-time-processing guidance. Local-only school lists and history are not declared as uploaded gameplay records.
 
 ## Known boundaries
 
@@ -54,8 +58,15 @@ Start Google Play at 10% after review because this release changes learning reco
 
 The staged setting follows the [Google Play track release API](https://developers.google.com/android-publisher/api-ref/rest/v3/edits.tracks): `inProgress` with `userFraction` specifies the eligible fraction. Console review status, rather than the API setting alone, determines whether the pending release has actually reached users.
 
+## Verified submission status
+
+| App | Version | Platform | Codemagic | Publishing | Store State | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| SpellBee | 1.2.0 (20) | iOS | Finished | Upload succeeded | Waiting for Review | Privacy updated; automatic release after approval; external beta review separately deferred |
+| SpellBee | 1.2.0 (20) | Android | Finished | Upload succeeded | In review | 10% staged production rollout after approval |
+
 ## Remaining release steps
 
-1. After Apple finishes processing upload 657b2d46-a520-4a9a-a645-8ecd2d73848f, verify final build 20 is `VALID`, export compliance is false, and TestFlight distribution completes. Select build 20 on App Store version 8743ec5c-f77c-46b3-ba37-472c3f278b1c.
-2. The user must sign into the retained App Store Connect Chrome page. Review and update the App Privacy nutrition label against the documented service behavior, then submit 1.2.0 for App Review. Deployment authorization is already provided; no new deployment approval is required.
-3. Check Google Play's review outcome before calling the 10% rollout live. Validate real-device purchase/restore behavior and reliability before expansion. No scheduled follow-up is installed.
+1. Await Apple and Google review outcomes before calling the new versions publicly live. No further submission or sign-in action is currently needed from the user.
+2. Validate real-device purchase/restore behavior and reliability before expanding Google Play beyond 10%. No scheduled follow-up is installed.
+3. If external TestFlight distribution of build 20 is still needed, submit its beta review after build 19's beta review finishes. Internal TestFlight and public App Review are already available/submitted respectively.
