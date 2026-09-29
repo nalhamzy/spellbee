@@ -42,9 +42,7 @@ class _NumberBeeScreenState extends ConsumerState<NumberBeeScreen> {
     if (!premium && used >= kFreeMathRoundsPerDay) {
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => const PaywallScreen(
-            headline: 'Unlimited Math Bee rounds, every day.',
-          ),
+          builder: (_) => const PaywallScreen(source: PaywallSource.mathBee),
         ),
       );
       return;
@@ -106,7 +104,10 @@ class _NumberBeeScreenState extends ConsumerState<NumberBeeScreen> {
                   ],
                 ),
                 SizedBox(height: context.s(20)),
-                Text('Pick a game', style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  'Pick a game',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 SizedBox(height: context.s(10)),
                 _GameCard(
                   icon: Icons.pin_rounded,
@@ -275,9 +276,7 @@ class _RangeChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? AppTheme.ink : AppTheme.surface,
           borderRadius: BorderRadius.circular(context.s(16)),
-          border: Border.all(
-            color: selected ? AppTheme.ink : AppTheme.outline,
-          ),
+          border: Border.all(color: selected ? AppTheme.ink : AppTheme.outline),
           boxShadow: selected ? AppTheme.softShadow : null,
         ),
         child: Column(

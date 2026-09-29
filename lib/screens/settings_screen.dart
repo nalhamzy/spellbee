@@ -43,7 +43,11 @@ class SettingsScreen extends ConsumerWidget {
                     onChanged: (value) =>
                         ref.read(voiceQualityProvider.notifier).set(value),
                     onPremiumTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const PaywallScreen(
+                          source: PaywallSource.studioVoice,
+                        ),
+                      ),
                     ),
                   ),
                   if (quality == VoiceQuality.studio) ...[
@@ -89,8 +93,8 @@ class SettingsScreen extends ConsumerWidget {
                     title: Text(isPremium ? 'Premium active' : 'Go Premium'),
                     subtitle: Text(
                       isPremium
-                          ? 'Studio voice, unlimited packs and Math Bee.'
-                          : 'Unlock studio voice, unlimited packs and Math Bee.',
+                          ? 'All adventures, unlimited lists and Math Bee.'
+                          : 'More adventures, school lists and Math Bee.',
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(context).push(
@@ -243,7 +247,7 @@ class _QualityPicker extends StatelessWidget {
         children: [
           const _TileHeader(
             icon: Icons.record_voice_over_rounded,
-            title: 'Voice quality',
+            title: 'Your practice voice',
             color: AppTheme.violet,
           ),
           SizedBox(height: context.s(12)),
@@ -255,8 +259,8 @@ class _QualityPicker extends StatelessWidget {
             segments: const [
               ButtonSegment(
                 value: VoiceQuality.device,
-                icon: Icon(Icons.phone_iphone_rounded),
-                label: Text('Device'),
+                icon: Icon(Icons.auto_awesome_rounded),
+                label: Text('Bee Buddy'),
               ),
               ButtonSegment(
                 value: VoiceQuality.studio,
@@ -272,17 +276,20 @@ class _QualityPicker extends StatelessWidget {
             quality.description,
             style: const TextStyle(color: AppTheme.mute, fontSize: 12),
           ),
-          // One notice, never two: a free user picking Studio needs the
-          // unlock path (the setting persists but playback stays on device
-          // voice until Premium); a premium user gets the ready state.
+          const SizedBox(height: 8),
+          const Text(
+            'Bee Buddy is an AI-generated voice, included for everyone. '
+            'Built-in words and clues play offline. It is not a real child’s voice.',
+            style: TextStyle(color: AppTheme.mute, fontSize: 12, height: 1.4),
+          ),
           if (quality == VoiceQuality.studio && !isPremium) ...[
             SizedBox(height: context.s(10)),
             _Notice(
               icon: Icons.lock_open_rounded,
               color: AppTheme.violet,
               text:
-                  'Studio voice is a Premium option — words keep playing '
-                  'with the device voice until you unlock it.',
+                  'Premium adds online studio voices for your own words. '
+                  'Bee Buddy stays free for built-in practice.',
               action: TextButton(
                 onPressed: onPremiumTap,
                 child: const Text('Unlock'),
@@ -294,7 +301,7 @@ class _QualityPicker extends StatelessWidget {
               icon: Icons.offline_bolt_rounded,
               color: AppTheme.sage,
               text:
-                  'Studio voice is ready. Bundled premium audio plays offline for core words and phrases.',
+                  'Bee Buddy plays built-in words offline. Online studio voices speak custom words when connected.',
             ),
           ],
         ],
@@ -331,7 +338,7 @@ class _StudioVoicePicker extends StatelessWidget {
         children: [
           const _TileHeader(
             icon: Icons.mic_rounded,
-            title: 'Studio voice',
+            title: 'Voice for custom words',
             color: AppTheme.sky,
           ),
           SizedBox(height: context.s(12)),
@@ -370,7 +377,7 @@ class _StudioVoicePicker extends StatelessWidget {
               icon: Icons.key_off_rounded,
               color: AppTheme.honeyDark,
               text:
-                  'Studio voice needs an internet connection. Bundled and device voice play offline.',
+                  'Online studio voices are unavailable in this build. Bee Buddy and device voice still play offline.',
             ),
           ],
         ],

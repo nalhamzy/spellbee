@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
+import 'package:spellbee/core/services/ai_word_generator.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
@@ -30,14 +31,17 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     if (_generating) return;
     final isPremium = ref.read(isPremiumProvider);
     final credits = ref.read(aiCreditsProvider);
-    if (!isPremium && credits <= 0) {
+    final theme = _themeCtrl.text.trim();
+    if (!isPremium &&
+        credits <= 0 &&
+        AiWordGenerator.canCallRemote &&
+        theme.isNotEmpty) {
       _offerPremiumUpgrade();
       return;
     }
 
     setState(() => _generating = true);
     final level = ref.read(selectedLevelProvider);
-    final theme = _themeCtrl.text.trim();
     try {
       final generator = ref.read(aiGeneratorProvider);
       final words = await generator.generate(
@@ -75,10 +79,10 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Out of word packs'),
+        title: const Text('More custom practice'),
         content: const Text(
-          'Free practice includes 1 custom word pack each day. Premium unlocks '
-          'unlimited themed lessons and studio voice.',
+          'Today’s free custom online pack is used. Premium adds more online '
+          'packs, all three Bee Adventures and unlimited school word lists. ',
         ),
         actions: [
           TextButton(
@@ -89,9 +93,12 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             style: FilledButton.styleFrom(backgroundColor: AppTheme.violet),
             onPressed: () async {
               Navigator.pop(ctx);
-              await Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const PaywallScreen(source: PaywallSource.wordPacks),
+                ),
+              );
             },
             child: const Text('See Premium'),
           ),
@@ -288,9 +295,12 @@ class _LabPanel extends StatelessWidget {
           if (!isPremium) ...[
             SizedBox(height: context.s(10)),
             _UpgradeReminder(
-              onTap: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const PaywallScreen())),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const PaywallScreen(source: PaywallSource.wordPacks),
+                ),
+              ),
             ),
           ],
           SizedBox(height: context.s(14)),
@@ -369,7 +379,7 @@ class _UpgradeReminder extends StatelessWidget {
             SizedBox(width: context.s(8)),
             const Expanded(
               child: Text(
-                'Premium unlocks unlimited themed lessons and the studio voice.',
+                'For parents: all three Bee Adventures, unlimited school lists and more Math Bee.',
                 style: TextStyle(
                   color: AppTheme.ink,
                   fontSize: 12,
@@ -439,9 +449,11 @@ class _CreditsCard extends StatelessWidget {
           SizedBox(width: context.s(8)),
           Expanded(
             child: Text(
-              isPremium
-                  ? 'Premium: unlimited word packs.'
-                  : 'Free tier: $credits pack(s) left today.',
+              !AiWordGenerator.canCallRemote
+                  ? 'Themed packs are free. Pick a theme and keep practising.'
+                  : isPremium
+                  ? 'Premium: unlimited custom online packs.'
+                  : '$credits custom online pack(s) left today. Built-in practice stays free.',
               style: const TextStyle(
                 color: AppTheme.ink,
                 fontWeight: FontWeight.w800,

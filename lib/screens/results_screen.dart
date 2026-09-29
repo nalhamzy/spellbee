@@ -15,11 +15,15 @@ class ResultsScreen extends ConsumerStatefulWidget {
   final TestResult result;
   final String title;
   final ProgressionOutcome? outcome;
+  final String? returnLabel;
+  final String? completionMessage;
   const ResultsScreen({
     super.key,
     required this.result,
     required this.title,
     this.outcome,
+    this.returnLabel,
+    this.completionMessage,
   });
 
   @override
@@ -44,7 +48,11 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
             ? VoicePhraseBank.perfectFinish
             : VoicePhraseBank.finish,
       );
-      await tts.playPhrase(stub, premium: premium);
+      if (widget.completionMessage case final message?) {
+        await tts.speakText(message, premium: premium);
+      } else {
+        await tts.playPhrase(stub, premium: premium);
+      }
       final o = widget.outcome;
       if (!mounted || o == null || !o.rankedUp) return;
       // The pronouncer announces the rank — the moment kids remember.
@@ -96,6 +104,33 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                   child: ListView(
                     padding: EdgeInsets.symmetric(vertical: context.s(20)),
                     children: [
+                      if (widget.returnLabel != null) ...[
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: AppTheme.card(color: AppTheme.mint),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.local_florist_rounded,
+                                color: AppTheme.sage,
+                                size: 32,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  widget.completionMessage ??
+                                      'Your adventure is waiting. Finish every word in a stop to help it shine.',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       _score(context, pct),
                       SizedBox(height: context.s(10)),
                       Text(
@@ -160,6 +195,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                                         item.target: item.sourceListId,
                                     },
                                     title: 'Retry missed words',
+                                    returnLabel: widget.returnLabel,
                                     kind: result.kind == RoundKind.math
                                         ? RoundKind.math
                                         : result.kind == RoundKind.numbers
@@ -189,6 +225,10 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(context.s(16)),
                             onTap: () {
+                              if (widget.returnLabel != null) {
+                                Navigator.of(context).pop();
+                                return;
+                              }
                               Navigator.of(context).popUntil((r) => r.isFirst);
                               ref.read(tabProvider.notifier).go(AppTab.home);
                             },
@@ -200,10 +240,10 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                                 ),
                                 boxShadow: AppTheme.softShadow,
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
-                                  'Back to home',
-                                  style: TextStyle(
+                                  widget.returnLabel ?? 'Back to home',
+                                  style: const TextStyle(
                                     color: AppTheme.ink,
                                     fontWeight: FontWeight.w900,
                                     fontSize: 16,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/core/models/learning_history.dart';
+import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
@@ -294,6 +295,30 @@ void main() {
       1,
     );
   });
+
+  test(
+    'daily word follows difficulty without granting another daily reward',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = StorageService(await SharedPreferences.getInstance());
+      final container = ProviderContainer(
+        overrides: [storageServiceProvider.overrideWithValue(storage)],
+      );
+      addTearDown(container.dispose);
+      for (final level in kWordsCatalog.keys) {
+        await container.read(selectedLevelProvider.notifier).set(level);
+        expect(
+          kWordsCatalog[level],
+          contains(container.read(dailyWordProvider)),
+        );
+      }
+      await container
+          .read(playerStatsProvider.notifier)
+          .recordDailyWordComplete();
+      await container.read(selectedLevelProvider.notifier).set(1);
+      expect(container.read(dailyWordDoneProvider), true);
+    },
+  );
 
   test(
     'migration preserves scores and saved level without fabricating recall',

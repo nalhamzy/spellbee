@@ -7,6 +7,7 @@ import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/number_bee_screen.dart';
+import 'package:spellbee/screens/adventures_screen.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
 import 'package:spellbee/widgets/progress_cards.dart';
@@ -54,6 +55,8 @@ class DashboardScreen extends ConsumerWidget {
               SizedBox(height: context.s(10)),
               _levelPicker(context, ref, level),
               SizedBox(height: context.s(14)),
+              const AdventureHomeCard(),
+              SizedBox(height: context.s(18)),
               _StartTrialButton(
                 level: level,
                 onPressed: () {
@@ -924,7 +927,7 @@ class _PremiumBanner extends StatelessWidget {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Unlimited word packs, Math Bee rounds, lists and the studio voice.',
+                    'All three adventures, unlimited school lists and Math Bee.',
                     style: TextStyle(color: AppTheme.mute, fontSize: 12),
                   ),
                 ],

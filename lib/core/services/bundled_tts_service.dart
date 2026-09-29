@@ -1,107 +1,106 @@
+import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
+import 'package:spellbee/core/services/speech_audio_player.dart';
 
-/// Plays bundled pre-generated MP3s for the premium voice. These assets were
-/// produced once by `tools/pregenerate_tts.py` and live under
-/// `assets/audio/` — a ~3 MB payload that covers the top 60 spoken items.
-///
-/// The service is silent on misses: callers check [hasWord]/[hasPhrase]
-/// before calling [playWord]/[playPhrase] and fall back to live OpenAI or
-/// device TTS otherwise.
+/// Included Bee Buddy recordings work offline for every learner.
 class BundledTtsService {
-  final _player = AudioPlayer();
-  Set<String>? _wordIndex;
-  Set<String>? _phraseIndex;
-
-  /// Lazily scan the asset manifest once. Flutter's AssetManifest.json lists
-  /// every bundled asset path, so we can answer hasWord() without a file-system
-  /// existence check (which would always crash on a readonly bundle).
-  Future<void> _ensureIndexed() async {
-    if (_wordIndex != null && _phraseIndex != null) return;
+  final SpeechAudioPlayer _player;
+  final Future<List<String>> Function() _assets;
+  final Future<String> Function() _manifest;
+  Future<void>? _indexing;
+  int _generation = 0;
+  final _words = <String, String>{};
+  final _phrases = <String, String>{};
+  final _texts = <String, String>{};
+  BundledTtsService({
+    SpeechAudioPlayer? player,
+    Future<List<String>> Function()? assetLoader,
+    Future<String> Function()? manifestLoader,
+  }) : _player = player ?? SpeechAudioPlayer(),
+       _assets =
+           assetLoader ??
+           (() async => (await AssetManifest.loadFromAssetBundle(
+             rootBundle,
+           )).listAssets()),
+       _manifest =
+           manifestLoader ??
+           (() => rootBundle.loadString(
+             'assets/audio/phrases/voice_manifest.json',
+           ));
+  Future<void> _ensureIndexed() => _indexing ??= _index();
+  Future<void> _index() async {
     try {
-      final manifest =
-          await rootBundle.loadString('AssetManifest.json');
-      _wordIndex = <String>{};
-      _phraseIndex = <String>{};
-      // Quick-and-dirty parse — we only need the keys.
-      final matches = RegExp(r'"([^"]+)"\s*:').allMatches(manifest);
-      for (final m in matches) {
-        final path = m.group(1)!;
-        if (path.startsWith('assets/audio/words/') &&
-            path.endsWith('.mp3')) {
-          _wordIndex!.add(_stubFrom(path));
-        } else if (path.startsWith('assets/audio/phrases/') &&
-            path.endsWith('.mp3')) {
-          _phraseIndex!.add(_stubFrom(path));
+      // Flutter 3.32+ no longer bundles AssetManifest.json.
+      for (final path in await _assets()) {
+        if (!path.endsWith('.mp3')) continue;
+        final stub = path.split('/').last.replaceFirst('.mp3', '');
+        if (path.startsWith('assets/audio/words/')) {
+          _words[stub] = path.substring(7);
+        }
+        if (path.startsWith('assets/audio/phrases/')) {
+          _phrases[stub] = path.substring(7);
         }
       }
+      try {
+        final manifest = jsonDecode(await _manifest()) as Map<String, dynamic>;
+        _texts.addAll((manifest['texts'] as Map).cast<String, String>());
+        _phrases.addAll((manifest['phrases'] as Map).cast<String, String>());
+      } catch (_) {
+        // Legacy recordings remain usable if a new manifest is unavailable.
+      }
     } catch (_) {
-      _wordIndex = <String>{};
-      _phraseIndex = <String>{};
+      _indexing = null;
     }
-  }
-
-  String _stubFrom(String path) {
-    final f = path.split('/').last;
-    return f.substring(0, f.length - 4); // strip .mp3
   }
 
   Future<bool> hasWord(String word) async {
     await _ensureIndexed();
-    return _wordIndex!.contains(word.toLowerCase());
+    return _texts.containsKey(word.trim().toLowerCase()) ||
+        _words.containsKey(word.trim().toLowerCase());
   }
 
   Future<bool> hasPhrase(String stub) async {
     await _ensureIndexed();
-    return _phraseIndex!.contains(stub);
+    return _phrases.containsKey(stub);
   }
 
-  Future<bool> playWord(String word) =>
-      _play('assets/audio/words/${word.toLowerCase()}.mp3');
-
-  Future<bool> playPhrase(String stub) =>
-      _play('assets/audio/phrases/$stub.mp3');
-
-  Future<bool> _play(String assetPath) async {
-    try {
-      await _player.stop();
-      // audioplayers treats AssetSource paths as relative to `assets/` so we
-      // strip that prefix before handing it over.
-      final rel = assetPath.startsWith('assets/')
-          ? assetPath.substring('assets/'.length)
-          : assetPath;
-      await _player.play(AssetSource(rel));
-      await waitForPlaybackEnd(_player, const Duration(seconds: 6));
-      return true;
-    } catch (_) {
-      return false;
-    }
+  Future<bool> hasText(String text) async {
+    await _ensureIndexed();
+    return _texts.containsKey(text.trim());
   }
 
-  Future<void> stop() async {
-    try {
-      await _player.stop();
-    } catch (_) {}
+  Future<bool> playWord(String word, {double speed = 1}) async {
+    final token = ++_generation;
+    await _ensureIndexed();
+    if (token != _generation) return true;
+    final key = word.trim().toLowerCase();
+    return _play(_texts[key] ?? _words[key], speed);
+  }
+
+  Future<bool> playPhrase(String stub, {double speed = 1}) async {
+    final token = ++_generation;
+    await _ensureIndexed();
+    if (token != _generation) return true;
+    return _play(_phrases[stub], speed);
+  }
+
+  Future<bool> playText(String text, {double speed = 1}) async {
+    final token = ++_generation;
+    await _ensureIndexed();
+    if (token != _generation) return true;
+    return _play(_texts[text.trim()], speed);
+  }
+
+  Future<bool> _play(String? path, double speed) async =>
+      path == null ? false : _player.play(AssetSource(path), speed: speed);
+  Future<void> stop() {
+    ++_generation;
+    return _player.stop();
   }
 
   void dispose() {
+    ++_generation;
     _player.dispose();
-  }
-}
-
-/// `play()` returns as soon as playback STARTS. Speech callers need the end
-/// — the hands-free mic must not open while the pronouncer is still saying
-/// the word (the recognizer would hear "cat" and grade it correct). Resolves
-/// on completed OR stopped (a stop() mid-clip must not hang the caller), with
-/// a timeout as the safety net for players that never report either.
-Future<void> waitForPlaybackEnd(AudioPlayer player, Duration timeout) async {
-  try {
-    await player.onPlayerStateChanged
-        .firstWhere(
-          (s) => s == PlayerState.completed || s == PlayerState.stopped,
-        )
-        .timeout(timeout);
-  } catch (_) {
-    // Timeout or a disposed player: the caller proceeds either way.
   }
 }

@@ -1,0 +1,7497 @@
+[
+  {
+    "kind": "word",
+    "word": "cat",
+    "text": "cat"
+  },
+  {
+    "kind": "definition",
+    "word": "cat",
+    "text": "A clue for cat: A small furry animal often kept as a pet."
+  },
+  {
+    "kind": "example",
+    "word": "cat",
+    "text": "A sentence with cat. The cat slept on the warm rug."
+  },
+  {
+    "kind": "spelling",
+    "word": "cat",
+    "text": "Listen letter by letter. cat: C, A, T."
+  },
+  {
+    "kind": "word",
+    "word": "dog",
+    "text": "dog"
+  },
+  {
+    "kind": "definition",
+    "word": "dog",
+    "text": "Think about this meaning for dog: A loyal four-legged animal that barks."
+  },
+  {
+    "kind": "example",
+    "word": "dog",
+    "text": "In context, dog sounds like this. Our dog wagged his tail at the door."
+  },
+  {
+    "kind": "spelling",
+    "word": "dog",
+    "text": "dog. Spell it with me: D, O, G."
+  },
+  {
+    "kind": "word",
+    "word": "sun",
+    "text": "sun"
+  },
+  {
+    "kind": "definition",
+    "word": "sun",
+    "text": "A clue for sun: The bright star at the center of our sky."
+  },
+  {
+    "kind": "example",
+    "word": "sun",
+    "text": "A sentence with sun. The sun rose over the quiet hill."
+  },
+  {
+    "kind": "spelling",
+    "word": "sun",
+    "text": "sun. Spell it with me: S, U, N."
+  },
+  {
+    "kind": "word",
+    "word": "moon",
+    "text": "moon"
+  },
+  {
+    "kind": "definition",
+    "word": "moon",
+    "text": "Here is what moon means: The round object that lights up the night sky."
+  },
+  {
+    "kind": "example",
+    "word": "moon",
+    "text": "Listen for moon in this sentence. A full moon hung above the trees."
+  },
+  {
+    "kind": "spelling",
+    "word": "moon",
+    "text": "Here are the letters for moon: M, O, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "tree",
+    "text": "tree"
+  },
+  {
+    "kind": "definition",
+    "word": "tree",
+    "text": "A clue for tree: A tall plant with a trunk and many leaves."
+  },
+  {
+    "kind": "example",
+    "word": "tree",
+    "text": "A sentence with tree. A tree gave us shade in the yard."
+  },
+  {
+    "kind": "spelling",
+    "word": "tree",
+    "text": "Listen letter by letter. tree: T, R, E, E."
+  },
+  {
+    "kind": "word",
+    "word": "fish",
+    "text": "fish"
+  },
+  {
+    "kind": "definition",
+    "word": "fish",
+    "text": "Here is what fish means: An animal that lives and swims in water."
+  },
+  {
+    "kind": "example",
+    "word": "fish",
+    "text": "Listen for fish in this sentence. The fish swam through the glass bowl."
+  },
+  {
+    "kind": "spelling",
+    "word": "fish",
+    "text": "fish. Spell it with me: F, I, S, H."
+  },
+  {
+    "kind": "word",
+    "word": "ball",
+    "text": "ball"
+  },
+  {
+    "kind": "definition",
+    "word": "ball",
+    "text": "Here is what ball means: A round toy that can roll or bounce."
+  },
+  {
+    "kind": "example",
+    "word": "ball",
+    "text": "Listen for ball in this sentence. She kicked the ball across the field."
+  },
+  {
+    "kind": "spelling",
+    "word": "ball",
+    "text": "ball. The letters are: B, A, L, L."
+  },
+  {
+    "kind": "word",
+    "word": "milk",
+    "text": "milk"
+  },
+  {
+    "kind": "definition",
+    "word": "milk",
+    "text": "Think about this meaning for milk: A white drink that comes from cows."
+  },
+  {
+    "kind": "example",
+    "word": "milk",
+    "text": "In context, milk sounds like this. He poured milk into his cereal bowl."
+  },
+  {
+    "kind": "spelling",
+    "word": "milk",
+    "text": "milk. The letters are: M, I, L, K."
+  },
+  {
+    "kind": "word",
+    "word": "book",
+    "text": "book"
+  },
+  {
+    "kind": "definition",
+    "word": "book",
+    "text": "A clue for book: Pages of paper bound together with a story."
+  },
+  {
+    "kind": "example",
+    "word": "book",
+    "text": "A sentence with book. She opened a book before bed."
+  },
+  {
+    "kind": "spelling",
+    "word": "book",
+    "text": "Here are the letters for book: B, O, O, K."
+  },
+  {
+    "kind": "word",
+    "word": "home",
+    "text": "home"
+  },
+  {
+    "kind": "definition",
+    "word": "home",
+    "text": "home. The meaning is: The place where someone lives."
+  },
+  {
+    "kind": "example",
+    "word": "home",
+    "text": "Here is home in a sentence. They walked home after dinner."
+  },
+  {
+    "kind": "spelling",
+    "word": "home",
+    "text": "home. The letters are: H, O, M, E."
+  },
+  {
+    "kind": "word",
+    "word": "play",
+    "text": "play"
+  },
+  {
+    "kind": "definition",
+    "word": "play",
+    "text": "Definition for play: To do something fun for enjoyment."
+  },
+  {
+    "kind": "example",
+    "word": "play",
+    "text": "Here is one example for play. The children play in the park."
+  },
+  {
+    "kind": "spelling",
+    "word": "play",
+    "text": "play. Spell it with me: P, L, A, Y."
+  },
+  {
+    "kind": "word",
+    "word": "jump",
+    "text": "jump"
+  },
+  {
+    "kind": "definition",
+    "word": "jump",
+    "text": "Think about this meaning for jump: To push off the ground into the air."
+  },
+  {
+    "kind": "example",
+    "word": "jump",
+    "text": "In context, jump sounds like this. He can jump very high."
+  },
+  {
+    "kind": "spelling",
+    "word": "jump",
+    "text": "Listen letter by letter. jump: J, U, M, P."
+  },
+  {
+    "kind": "word",
+    "word": "bird",
+    "text": "bird"
+  },
+  {
+    "kind": "definition",
+    "word": "bird",
+    "text": "A clue for bird: A small flying animal with feathers."
+  },
+  {
+    "kind": "example",
+    "word": "bird",
+    "text": "A sentence with bird. A bird sang from the highest branch."
+  },
+  {
+    "kind": "spelling",
+    "word": "bird",
+    "text": "Here are the letters for bird: B, I, R, D."
+  },
+  {
+    "kind": "word",
+    "word": "cake",
+    "text": "cake"
+  },
+  {
+    "kind": "definition",
+    "word": "cake",
+    "text": "Think about this meaning for cake: A sweet baked dessert."
+  },
+  {
+    "kind": "example",
+    "word": "cake",
+    "text": "In context, cake sounds like this. We ate cake at the birthday party."
+  },
+  {
+    "kind": "spelling",
+    "word": "cake",
+    "text": "cake. Spell it with me: C, A, K, E."
+  },
+  {
+    "kind": "word",
+    "word": "rain",
+    "text": "rain"
+  },
+  {
+    "kind": "definition",
+    "word": "rain",
+    "text": "Here is what rain means: Water drops that fall from clouds."
+  },
+  {
+    "kind": "example",
+    "word": "rain",
+    "text": "Listen for rain in this sentence. The rain tapped on the window."
+  },
+  {
+    "kind": "spelling",
+    "word": "rain",
+    "text": "rain. Spell it with me: R, A, I, N."
+  },
+  {
+    "kind": "word",
+    "word": "hat",
+    "text": "hat"
+  },
+  {
+    "kind": "definition",
+    "word": "hat",
+    "text": "A clue for hat: A covering worn on top of the head."
+  },
+  {
+    "kind": "example",
+    "word": "hat",
+    "text": "A sentence with hat. She put on her red hat before going outside."
+  },
+  {
+    "kind": "spelling",
+    "word": "hat",
+    "text": "hat. The letters are: H, A, T."
+  },
+  {
+    "kind": "word",
+    "word": "bed",
+    "text": "bed"
+  },
+  {
+    "kind": "definition",
+    "word": "bed",
+    "text": "Think about this meaning for bed: A piece of furniture for sleeping."
+  },
+  {
+    "kind": "example",
+    "word": "bed",
+    "text": "In context, bed sounds like this. He tucked his bear into bed."
+  },
+  {
+    "kind": "spelling",
+    "word": "bed",
+    "text": "Here are the letters for bed: B, E, D."
+  },
+  {
+    "kind": "word",
+    "word": "cup",
+    "text": "cup"
+  },
+  {
+    "kind": "definition",
+    "word": "cup",
+    "text": "Definition for cup: A small container for drinking."
+  },
+  {
+    "kind": "example",
+    "word": "cup",
+    "text": "Here is one example for cup. She filled her cup with juice."
+  },
+  {
+    "kind": "spelling",
+    "word": "cup",
+    "text": "Listen letter by letter. cup: C, U, P."
+  },
+  {
+    "kind": "word",
+    "word": "bug",
+    "text": "bug"
+  },
+  {
+    "kind": "definition",
+    "word": "bug",
+    "text": "Definition for bug: A small crawling or flying insect."
+  },
+  {
+    "kind": "example",
+    "word": "bug",
+    "text": "Here is one example for bug. A tiny bug landed on the leaf."
+  },
+  {
+    "kind": "spelling",
+    "word": "bug",
+    "text": "bug. Spell it with me: B, U, G."
+  },
+  {
+    "kind": "word",
+    "word": "map",
+    "text": "map"
+  },
+  {
+    "kind": "definition",
+    "word": "map",
+    "text": "Definition for map: A drawing that shows where places are."
+  },
+  {
+    "kind": "example",
+    "word": "map",
+    "text": "Here is one example for map. They used a map to find the park."
+  },
+  {
+    "kind": "spelling",
+    "word": "map",
+    "text": "map. Spell it with me: M, A, P."
+  },
+  {
+    "kind": "word",
+    "word": "bag",
+    "text": "bag"
+  },
+  {
+    "kind": "definition",
+    "word": "bag",
+    "text": "Definition for bag: A container used to carry things."
+  },
+  {
+    "kind": "example",
+    "word": "bag",
+    "text": "Here is one example for bag. She packed her bag for school."
+  },
+  {
+    "kind": "spelling",
+    "word": "bag",
+    "text": "bag. Spell it with me: B, A, G."
+  },
+  {
+    "kind": "word",
+    "word": "sit",
+    "text": "sit"
+  },
+  {
+    "kind": "definition",
+    "word": "sit",
+    "text": "Here is what sit means: To rest with your bottom on something."
+  },
+  {
+    "kind": "example",
+    "word": "sit",
+    "text": "Listen for sit in this sentence. Please sit down at your desk."
+  },
+  {
+    "kind": "spelling",
+    "word": "sit",
+    "text": "Listen letter by letter. sit: S, I, T."
+  },
+  {
+    "kind": "word",
+    "word": "hot",
+    "text": "hot"
+  },
+  {
+    "kind": "definition",
+    "word": "hot",
+    "text": "Here is what hot means: Having a very high temperature."
+  },
+  {
+    "kind": "example",
+    "word": "hot",
+    "text": "Listen for hot in this sentence. The soup was too hot to eat right away."
+  },
+  {
+    "kind": "spelling",
+    "word": "hot",
+    "text": "Here are the letters for hot: H, O, T."
+  },
+  {
+    "kind": "word",
+    "word": "red",
+    "text": "red"
+  },
+  {
+    "kind": "definition",
+    "word": "red",
+    "text": "red. The meaning is: A bright color like fire or apples."
+  },
+  {
+    "kind": "example",
+    "word": "red",
+    "text": "Here is red in a sentence. She wore a red coat to the party."
+  },
+  {
+    "kind": "spelling",
+    "word": "red",
+    "text": "Here are the letters for red: R, E, D."
+  },
+  {
+    "kind": "word",
+    "word": "big",
+    "text": "big"
+  },
+  {
+    "kind": "definition",
+    "word": "big",
+    "text": "Here is what big means: Large in size."
+  },
+  {
+    "kind": "example",
+    "word": "big",
+    "text": "Listen for big in this sentence. The big elephant drank from the river."
+  },
+  {
+    "kind": "spelling",
+    "word": "big",
+    "text": "big. Spell it with me: B, I, G."
+  },
+  {
+    "kind": "word",
+    "word": "mud",
+    "text": "mud"
+  },
+  {
+    "kind": "definition",
+    "word": "mud",
+    "text": "Here is what mud means: Wet dirt found on the ground."
+  },
+  {
+    "kind": "example",
+    "word": "mud",
+    "text": "Listen for mud in this sentence. The puppy ran through the mud."
+  },
+  {
+    "kind": "spelling",
+    "word": "mud",
+    "text": "mud. Spell it with me: M, U, D."
+  },
+  {
+    "kind": "word",
+    "word": "hop",
+    "text": "hop"
+  },
+  {
+    "kind": "definition",
+    "word": "hop",
+    "text": "A clue for hop: To jump on one foot or in small leaps."
+  },
+  {
+    "kind": "example",
+    "word": "hop",
+    "text": "A sentence with hop. The bunny began to hop across the yard."
+  },
+  {
+    "kind": "spelling",
+    "word": "hop",
+    "text": "Here are the letters for hop: H, O, P."
+  },
+  {
+    "kind": "word",
+    "word": "hen",
+    "text": "hen"
+  },
+  {
+    "kind": "definition",
+    "word": "hen",
+    "text": "hen. The meaning is: A female chicken."
+  },
+  {
+    "kind": "example",
+    "word": "hen",
+    "text": "Here is hen in a sentence. The hen laid an egg in the morning."
+  },
+  {
+    "kind": "spelling",
+    "word": "hen",
+    "text": "Here are the letters for hen: H, E, N."
+  },
+  {
+    "kind": "word",
+    "word": "nap",
+    "text": "nap"
+  },
+  {
+    "kind": "definition",
+    "word": "nap",
+    "text": "Think about this meaning for nap: A short sleep during the day."
+  },
+  {
+    "kind": "example",
+    "word": "nap",
+    "text": "In context, nap sounds like this. The baby took a nap after lunch."
+  },
+  {
+    "kind": "spelling",
+    "word": "nap",
+    "text": "Here are the letters for nap: N, A, P."
+  },
+  {
+    "kind": "word",
+    "word": "pot",
+    "text": "pot"
+  },
+  {
+    "kind": "definition",
+    "word": "pot",
+    "text": "Think about this meaning for pot: A deep round container used for cooking."
+  },
+  {
+    "kind": "example",
+    "word": "pot",
+    "text": "In context, pot sounds like this. She stirred the soup in the pot."
+  },
+  {
+    "kind": "spelling",
+    "word": "pot",
+    "text": "Here are the letters for pot: P, O, T."
+  },
+  {
+    "kind": "word",
+    "word": "pet",
+    "text": "pet"
+  },
+  {
+    "kind": "definition",
+    "word": "pet",
+    "text": "Think about this meaning for pet: An animal kept at home for company."
+  },
+  {
+    "kind": "example",
+    "word": "pet",
+    "text": "In context, pet sounds like this. His pet rabbit loved to eat carrots."
+  },
+  {
+    "kind": "spelling",
+    "word": "pet",
+    "text": "pet. The letters are: P, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "web",
+    "text": "web"
+  },
+  {
+    "kind": "definition",
+    "word": "web",
+    "text": "Definition for web: A net of fine threads made by a spider."
+  },
+  {
+    "kind": "example",
+    "word": "web",
+    "text": "Here is one example for web. A dewdrop hung on the spider web."
+  },
+  {
+    "kind": "spelling",
+    "word": "web",
+    "text": "web. Spell it with me: W, E, B."
+  },
+  {
+    "kind": "word",
+    "word": "van",
+    "text": "van"
+  },
+  {
+    "kind": "definition",
+    "word": "van",
+    "text": "van. The meaning is: A large boxy vehicle for carrying people."
+  },
+  {
+    "kind": "example",
+    "word": "van",
+    "text": "Here is van in a sentence. The family packed into the van."
+  },
+  {
+    "kind": "spelling",
+    "word": "van",
+    "text": "van. The letters are: V, A, N."
+  },
+  {
+    "kind": "word",
+    "word": "fox",
+    "text": "fox"
+  },
+  {
+    "kind": "definition",
+    "word": "fox",
+    "text": "Definition for fox: A wild animal with a bushy tail."
+  },
+  {
+    "kind": "example",
+    "word": "fox",
+    "text": "Here is one example for fox. A fox darted across the snowy field."
+  },
+  {
+    "kind": "spelling",
+    "word": "fox",
+    "text": "fox. The letters are: F, O, X."
+  },
+  {
+    "kind": "word",
+    "word": "log",
+    "text": "log"
+  },
+  {
+    "kind": "definition",
+    "word": "log",
+    "text": "A clue for log: A thick piece of wood from a tree."
+  },
+  {
+    "kind": "example",
+    "word": "log",
+    "text": "A sentence with log. He sat on a log by the campfire."
+  },
+  {
+    "kind": "spelling",
+    "word": "log",
+    "text": "log. Spell it with me: L, O, G."
+  },
+  {
+    "kind": "word",
+    "word": "pin",
+    "text": "pin"
+  },
+  {
+    "kind": "definition",
+    "word": "pin",
+    "text": "A clue for pin: A thin sharp metal stick used to hold things."
+  },
+  {
+    "kind": "example",
+    "word": "pin",
+    "text": "A sentence with pin. She used a pin to fasten the fabric."
+  },
+  {
+    "kind": "spelling",
+    "word": "pin",
+    "text": "Here are the letters for pin: P, I, N."
+  },
+  {
+    "kind": "word",
+    "word": "fin",
+    "text": "fin"
+  },
+  {
+    "kind": "definition",
+    "word": "fin",
+    "text": "A clue for fin: A flat part of a fish used for swimming."
+  },
+  {
+    "kind": "example",
+    "word": "fin",
+    "text": "A sentence with fin. The shark moved its fin through the water."
+  },
+  {
+    "kind": "spelling",
+    "word": "fin",
+    "text": "fin. The letters are: F, I, N."
+  },
+  {
+    "kind": "word",
+    "word": "jam",
+    "text": "jam"
+  },
+  {
+    "kind": "definition",
+    "word": "jam",
+    "text": "A clue for jam: A sweet fruit spread for bread."
+  },
+  {
+    "kind": "example",
+    "word": "jam",
+    "text": "A sentence with jam. He put strawberry jam on his toast."
+  },
+  {
+    "kind": "spelling",
+    "word": "jam",
+    "text": "Listen letter by letter. jam: J, A, M."
+  },
+  {
+    "kind": "word",
+    "word": "bun",
+    "text": "bun"
+  },
+  {
+    "kind": "definition",
+    "word": "bun",
+    "text": "bun. The meaning is: A small round bread roll."
+  },
+  {
+    "kind": "example",
+    "word": "bun",
+    "text": "Here is bun in a sentence. She ate a bun with her soup."
+  },
+  {
+    "kind": "spelling",
+    "word": "bun",
+    "text": "bun. The letters are: B, U, N."
+  },
+  {
+    "kind": "word",
+    "word": "wig",
+    "text": "wig"
+  },
+  {
+    "kind": "definition",
+    "word": "wig",
+    "text": "A clue for wig: A covering of hair worn on the head."
+  },
+  {
+    "kind": "example",
+    "word": "wig",
+    "text": "A sentence with wig. The actor wore a curly wig on stage."
+  },
+  {
+    "kind": "spelling",
+    "word": "wig",
+    "text": "Here are the letters for wig: W, I, G."
+  },
+  {
+    "kind": "word",
+    "word": "yam",
+    "text": "yam"
+  },
+  {
+    "kind": "definition",
+    "word": "yam",
+    "text": "A clue for yam: A starchy orange vegetable."
+  },
+  {
+    "kind": "example",
+    "word": "yam",
+    "text": "A sentence with yam. Grandma baked a sweet yam for dinner."
+  },
+  {
+    "kind": "spelling",
+    "word": "yam",
+    "text": "Here are the letters for yam: Y, A, M."
+  },
+  {
+    "kind": "word",
+    "word": "cub",
+    "text": "cub"
+  },
+  {
+    "kind": "definition",
+    "word": "cub",
+    "text": "Think about this meaning for cub: A young bear or lion."
+  },
+  {
+    "kind": "example",
+    "word": "cub",
+    "text": "In context, cub sounds like this. The polar bear cub stayed close to its mother."
+  },
+  {
+    "kind": "spelling",
+    "word": "cub",
+    "text": "cub. Spell it with me: C, U, B."
+  },
+  {
+    "kind": "word",
+    "word": "dip",
+    "text": "dip"
+  },
+  {
+    "kind": "definition",
+    "word": "dip",
+    "text": "A clue for dip: A sauce for dunking food into."
+  },
+  {
+    "kind": "example",
+    "word": "dip",
+    "text": "A sentence with dip. She dipped her chip into the salsa dip."
+  },
+  {
+    "kind": "spelling",
+    "word": "dip",
+    "text": "dip. The letters are: D, I, P."
+  },
+  {
+    "kind": "word",
+    "word": "gum",
+    "text": "gum"
+  },
+  {
+    "kind": "definition",
+    "word": "gum",
+    "text": "Think about this meaning for gum: A chewy sweet you do not swallow."
+  },
+  {
+    "kind": "example",
+    "word": "gum",
+    "text": "In context, gum sounds like this. He chewed a piece of mint gum."
+  },
+  {
+    "kind": "spelling",
+    "word": "gum",
+    "text": "gum. The letters are: G, U, M."
+  },
+  {
+    "kind": "word",
+    "word": "lip",
+    "text": "lip"
+  },
+  {
+    "kind": "definition",
+    "word": "lip",
+    "text": "lip. The meaning is: The soft edge of your mouth."
+  },
+  {
+    "kind": "example",
+    "word": "lip",
+    "text": "Here is lip in a sentence. She pressed her lip against the cold glass."
+  },
+  {
+    "kind": "spelling",
+    "word": "lip",
+    "text": "lip. The letters are: L, I, P."
+  },
+  {
+    "kind": "word",
+    "word": "happy",
+    "text": "happy"
+  },
+  {
+    "kind": "definition",
+    "word": "happy",
+    "text": "Here is what happy means: Feeling joy or pleasure."
+  },
+  {
+    "kind": "example",
+    "word": "happy",
+    "text": "Listen for happy in this sentence. She felt happy on her birthday."
+  },
+  {
+    "kind": "spelling",
+    "word": "happy",
+    "text": "happy. Spell it with me: H, A, P, P, Y."
+  },
+  {
+    "kind": "word",
+    "word": "water",
+    "text": "water"
+  },
+  {
+    "kind": "definition",
+    "word": "water",
+    "text": "A clue for water: The clear liquid we drink."
+  },
+  {
+    "kind": "example",
+    "word": "water",
+    "text": "A sentence with water. Please pass the water jug."
+  },
+  {
+    "kind": "spelling",
+    "word": "water",
+    "text": "water. The letters are: W, A, T, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "apple",
+    "text": "apple"
+  },
+  {
+    "kind": "definition",
+    "word": "apple",
+    "text": "apple. The meaning is: A round fruit that grows on a tree."
+  },
+  {
+    "kind": "example",
+    "word": "apple",
+    "text": "Here is apple in a sentence. An apple a day keeps you well."
+  },
+  {
+    "kind": "spelling",
+    "word": "apple",
+    "text": "Listen letter by letter. apple: A, P, P, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "bread",
+    "text": "bread"
+  },
+  {
+    "kind": "definition",
+    "word": "bread",
+    "text": "bread. The meaning is: A baked food made from flour."
+  },
+  {
+    "kind": "example",
+    "word": "bread",
+    "text": "Here is bread in a sentence. He buttered a slice of warm bread."
+  },
+  {
+    "kind": "spelling",
+    "word": "bread",
+    "text": "bread. Spell it with me: B, R, E, A, D."
+  },
+  {
+    "kind": "word",
+    "word": "cloud",
+    "text": "cloud"
+  },
+  {
+    "kind": "definition",
+    "word": "cloud",
+    "text": "cloud. The meaning is: A white or gray mass floating in the sky."
+  },
+  {
+    "kind": "example",
+    "word": "cloud",
+    "text": "Here is cloud in a sentence. A cloud drifted across the sun."
+  },
+  {
+    "kind": "spelling",
+    "word": "cloud",
+    "text": "Here are the letters for cloud: C, L, O, U, D."
+  },
+  {
+    "kind": "word",
+    "word": "train",
+    "text": "train"
+  },
+  {
+    "kind": "definition",
+    "word": "train",
+    "text": "A clue for train: A long vehicle that runs on tracks."
+  },
+  {
+    "kind": "example",
+    "word": "train",
+    "text": "A sentence with train. The train pulled into the station."
+  },
+  {
+    "kind": "spelling",
+    "word": "train",
+    "text": "train. Spell it with me: T, R, A, I, N."
+  },
+  {
+    "kind": "word",
+    "word": "sheep",
+    "text": "sheep"
+  },
+  {
+    "kind": "definition",
+    "word": "sheep",
+    "text": "Definition for sheep: A woolly farm animal."
+  },
+  {
+    "kind": "example",
+    "word": "sheep",
+    "text": "Here is one example for sheep. A sheep wandered up the hillside."
+  },
+  {
+    "kind": "spelling",
+    "word": "sheep",
+    "text": "sheep. The letters are: S, H, E, E, P."
+  },
+  {
+    "kind": "word",
+    "word": "river",
+    "text": "river"
+  },
+  {
+    "kind": "definition",
+    "word": "river",
+    "text": "A clue for river: A long stream of moving water."
+  },
+  {
+    "kind": "example",
+    "word": "river",
+    "text": "A sentence with river. They picnicked beside the river."
+  },
+  {
+    "kind": "spelling",
+    "word": "river",
+    "text": "river. Spell it with me: R, I, V, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "night",
+    "text": "night"
+  },
+  {
+    "kind": "definition",
+    "word": "night",
+    "text": "Definition for night: The time when it is dark outside."
+  },
+  {
+    "kind": "example",
+    "word": "night",
+    "text": "Here is one example for night. Stars appear at night."
+  },
+  {
+    "kind": "spelling",
+    "word": "night",
+    "text": "night. Spell it with me: N, I, G, H, T."
+  },
+  {
+    "kind": "word",
+    "word": "smile",
+    "text": "smile"
+  },
+  {
+    "kind": "definition",
+    "word": "smile",
+    "text": "Definition for smile: To turn the corners of your mouth up."
+  },
+  {
+    "kind": "example",
+    "word": "smile",
+    "text": "Here is one example for smile. She gave a gentle smile."
+  },
+  {
+    "kind": "spelling",
+    "word": "smile",
+    "text": "smile. Spell it with me: S, M, I, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "money",
+    "text": "money"
+  },
+  {
+    "kind": "definition",
+    "word": "money",
+    "text": "A clue for money: Coins or bills used to buy things."
+  },
+  {
+    "kind": "example",
+    "word": "money",
+    "text": "A sentence with money. He saved his money in a jar."
+  },
+  {
+    "kind": "spelling",
+    "word": "money",
+    "text": "money. Spell it with me: M, O, N, E, Y."
+  },
+  {
+    "kind": "word",
+    "word": "dream",
+    "text": "dream"
+  },
+  {
+    "kind": "definition",
+    "word": "dream",
+    "text": "Here is what dream means: Pictures or stories your mind makes in sleep."
+  },
+  {
+    "kind": "example",
+    "word": "dream",
+    "text": "Listen for dream in this sentence. He had a strange dream last night."
+  },
+  {
+    "kind": "spelling",
+    "word": "dream",
+    "text": "dream. The letters are: D, R, E, A, M."
+  },
+  {
+    "kind": "word",
+    "word": "sugar",
+    "text": "sugar"
+  },
+  {
+    "kind": "definition",
+    "word": "sugar",
+    "text": "Here is what sugar means: Sweet white or brown grains."
+  },
+  {
+    "kind": "example",
+    "word": "sugar",
+    "text": "Listen for sugar in this sentence. She added sugar to her tea."
+  },
+  {
+    "kind": "spelling",
+    "word": "sugar",
+    "text": "Listen letter by letter. sugar: S, U, G, A, R."
+  },
+  {
+    "kind": "word",
+    "word": "plant",
+    "text": "plant"
+  },
+  {
+    "kind": "definition",
+    "word": "plant",
+    "text": "Definition for plant: A living thing that grows in soil."
+  },
+  {
+    "kind": "example",
+    "word": "plant",
+    "text": "Here is one example for plant. Please water the plant by the window."
+  },
+  {
+    "kind": "spelling",
+    "word": "plant",
+    "text": "plant. The letters are: P, L, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "color",
+    "text": "color"
+  },
+  {
+    "kind": "definition",
+    "word": "color",
+    "text": "Definition for color: The quality of something seen by the eye, like red."
+  },
+  {
+    "kind": "example",
+    "word": "color",
+    "text": "Here is one example for color. She chose her favorite color for the painting."
+  },
+  {
+    "kind": "spelling",
+    "word": "color",
+    "text": "color. The letters are: C, O, L, O, R."
+  },
+  {
+    "kind": "word",
+    "word": "storm",
+    "text": "storm"
+  },
+  {
+    "kind": "definition",
+    "word": "storm",
+    "text": "storm. The meaning is: A period of heavy rain and strong wind."
+  },
+  {
+    "kind": "example",
+    "word": "storm",
+    "text": "Here is storm in a sentence. A storm rattled the windows all night."
+  },
+  {
+    "kind": "spelling",
+    "word": "storm",
+    "text": "Here are the letters for storm: S, T, O, R, M."
+  },
+  {
+    "kind": "word",
+    "word": "funny",
+    "text": "funny"
+  },
+  {
+    "kind": "definition",
+    "word": "funny",
+    "text": "funny. The meaning is: Causing laughter or amusement."
+  },
+  {
+    "kind": "example",
+    "word": "funny",
+    "text": "Here is funny in a sentence. He made a funny face to cheer her up."
+  },
+  {
+    "kind": "spelling",
+    "word": "funny",
+    "text": "Listen letter by letter. funny: F, U, N, N, Y."
+  },
+  {
+    "kind": "word",
+    "word": "brave",
+    "text": "brave"
+  },
+  {
+    "kind": "definition",
+    "word": "brave",
+    "text": "Definition for brave: Ready to face danger without fear."
+  },
+  {
+    "kind": "example",
+    "word": "brave",
+    "text": "Here is one example for brave. The brave firefighter climbed the ladder."
+  },
+  {
+    "kind": "spelling",
+    "word": "brave",
+    "text": "brave. Spell it with me: B, R, A, V, E."
+  },
+  {
+    "kind": "word",
+    "word": "grass",
+    "text": "grass"
+  },
+  {
+    "kind": "definition",
+    "word": "grass",
+    "text": "Think about this meaning for grass: Green plants covering a lawn or field."
+  },
+  {
+    "kind": "example",
+    "word": "grass",
+    "text": "In context, grass sounds like this. They lay on the cool grass after the game."
+  },
+  {
+    "kind": "spelling",
+    "word": "grass",
+    "text": "Listen letter by letter. grass: G, R, A, S, S."
+  },
+  {
+    "kind": "word",
+    "word": "chair",
+    "text": "chair"
+  },
+  {
+    "kind": "definition",
+    "word": "chair",
+    "text": "Think about this meaning for chair: A seat with a back and four legs."
+  },
+  {
+    "kind": "example",
+    "word": "chair",
+    "text": "In context, chair sounds like this. She pulled a chair up to the table."
+  },
+  {
+    "kind": "spelling",
+    "word": "chair",
+    "text": "Here are the letters for chair: C, H, A, I, R."
+  },
+  {
+    "kind": "word",
+    "word": "above",
+    "text": "above"
+  },
+  {
+    "kind": "definition",
+    "word": "above",
+    "text": "above. The meaning is: Higher than something else."
+  },
+  {
+    "kind": "example",
+    "word": "above",
+    "text": "Here is above in a sentence. The plane flew above the clouds."
+  },
+  {
+    "kind": "spelling",
+    "word": "above",
+    "text": "Here are the letters for above: A, B, O, V, E."
+  },
+  {
+    "kind": "word",
+    "word": "below",
+    "text": "below"
+  },
+  {
+    "kind": "definition",
+    "word": "below",
+    "text": "A clue for below: Lower than something else."
+  },
+  {
+    "kind": "example",
+    "word": "below",
+    "text": "A sentence with below. Fish swam below the surface of the lake."
+  },
+  {
+    "kind": "spelling",
+    "word": "below",
+    "text": "Here are the letters for below: B, E, L, O, W."
+  },
+  {
+    "kind": "word",
+    "word": "clown",
+    "text": "clown"
+  },
+  {
+    "kind": "definition",
+    "word": "clown",
+    "text": "A clue for clown: A performer who wears silly clothes and makes people laugh."
+  },
+  {
+    "kind": "example",
+    "word": "clown",
+    "text": "A sentence with clown. The clown juggled three bright balls."
+  },
+  {
+    "kind": "spelling",
+    "word": "clown",
+    "text": "Here are the letters for clown: C, L, O, W, N."
+  },
+  {
+    "kind": "word",
+    "word": "proud",
+    "text": "proud"
+  },
+  {
+    "kind": "definition",
+    "word": "proud",
+    "text": "Think about this meaning for proud: Feeling good about something you or others have done."
+  },
+  {
+    "kind": "example",
+    "word": "proud",
+    "text": "In context, proud sounds like this. She was proud of her science project."
+  },
+  {
+    "kind": "spelling",
+    "word": "proud",
+    "text": "proud. Spell it with me: P, R, O, U, D."
+  },
+  {
+    "kind": "word",
+    "word": "feast",
+    "text": "feast"
+  },
+  {
+    "kind": "definition",
+    "word": "feast",
+    "text": "Here is what feast means: A large special meal."
+  },
+  {
+    "kind": "example",
+    "word": "feast",
+    "text": "Listen for feast in this sentence. They prepared a feast for the harvest festival."
+  },
+  {
+    "kind": "spelling",
+    "word": "feast",
+    "text": "feast. The letters are: F, E, A, S, T."
+  },
+  {
+    "kind": "word",
+    "word": "frost",
+    "text": "frost"
+  },
+  {
+    "kind": "definition",
+    "word": "frost",
+    "text": "Definition for frost: A thin layer of ice on outdoor surfaces."
+  },
+  {
+    "kind": "example",
+    "word": "frost",
+    "text": "Here is one example for frost. Frost covered the grass on the cold morning."
+  },
+  {
+    "kind": "spelling",
+    "word": "frost",
+    "text": "frost. Spell it with me: F, R, O, S, T."
+  },
+  {
+    "kind": "word",
+    "word": "greet",
+    "text": "greet"
+  },
+  {
+    "kind": "definition",
+    "word": "greet",
+    "text": "greet. The meaning is: To say hello to someone."
+  },
+  {
+    "kind": "example",
+    "word": "greet",
+    "text": "Here is greet in a sentence. He ran out to greet his grandmother at the door."
+  },
+  {
+    "kind": "spelling",
+    "word": "greet",
+    "text": "Here are the letters for greet: G, R, E, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "drip",
+    "text": "drip"
+  },
+  {
+    "kind": "definition",
+    "word": "drip",
+    "text": "Here is what drip means: To fall in small drops."
+  },
+  {
+    "kind": "example",
+    "word": "drip",
+    "text": "Listen for drip in this sentence. The faucet began to drip into the sink."
+  },
+  {
+    "kind": "spelling",
+    "word": "drip",
+    "text": "Here are the letters for drip: D, R, I, P."
+  },
+  {
+    "kind": "word",
+    "word": "flap",
+    "text": "flap"
+  },
+  {
+    "kind": "definition",
+    "word": "flap",
+    "text": "Think about this meaning for flap: To wave wings up and down."
+  },
+  {
+    "kind": "example",
+    "word": "flap",
+    "text": "In context, flap sounds like this. The bird began to flap its wings and fly away."
+  },
+  {
+    "kind": "spelling",
+    "word": "flap",
+    "text": "Here are the letters for flap: F, L, A, P."
+  },
+  {
+    "kind": "word",
+    "word": "snack",
+    "text": "snack"
+  },
+  {
+    "kind": "definition",
+    "word": "snack",
+    "text": "Definition for snack: A small amount of food eaten between meals."
+  },
+  {
+    "kind": "example",
+    "word": "snack",
+    "text": "Here is one example for snack. She had an apple as a snack."
+  },
+  {
+    "kind": "spelling",
+    "word": "snack",
+    "text": "Listen letter by letter. snack: S, N, A, C, K."
+  },
+  {
+    "kind": "word",
+    "word": "stump",
+    "text": "stump"
+  },
+  {
+    "kind": "definition",
+    "word": "stump",
+    "text": "Think about this meaning for stump: The flat base of a tree left after it is cut."
+  },
+  {
+    "kind": "example",
+    "word": "stump",
+    "text": "In context, stump sounds like this. A squirrel sat on the old tree stump."
+  },
+  {
+    "kind": "spelling",
+    "word": "stump",
+    "text": "stump. The letters are: S, T, U, M, P."
+  },
+  {
+    "kind": "word",
+    "word": "brand",
+    "text": "brand"
+  },
+  {
+    "kind": "definition",
+    "word": "brand",
+    "text": "Think about this meaning for brand: A type or maker of a product."
+  },
+  {
+    "kind": "example",
+    "word": "brand",
+    "text": "In context, brand sounds like this. That brand of cereal is her favorite."
+  },
+  {
+    "kind": "spelling",
+    "word": "brand",
+    "text": "brand. The letters are: B, R, A, N, D."
+  },
+  {
+    "kind": "word",
+    "word": "crisp",
+    "text": "crisp"
+  },
+  {
+    "kind": "definition",
+    "word": "crisp",
+    "text": "crisp. The meaning is: Firm and making a sharp sound when broken."
+  },
+  {
+    "kind": "example",
+    "word": "crisp",
+    "text": "Here is crisp in a sentence. He bit into a crisp carrot."
+  },
+  {
+    "kind": "spelling",
+    "word": "crisp",
+    "text": "crisp. The letters are: C, R, I, S, P."
+  },
+  {
+    "kind": "word",
+    "word": "shelf",
+    "text": "shelf"
+  },
+  {
+    "kind": "definition",
+    "word": "shelf",
+    "text": "shelf. The meaning is: A flat board fixed to a wall for storing things."
+  },
+  {
+    "kind": "example",
+    "word": "shelf",
+    "text": "Here is shelf in a sentence. She put the book back on the shelf."
+  },
+  {
+    "kind": "spelling",
+    "word": "shelf",
+    "text": "Listen letter by letter. shelf: S, H, E, L, F."
+  },
+  {
+    "kind": "word",
+    "word": "blank",
+    "text": "blank"
+  },
+  {
+    "kind": "definition",
+    "word": "blank",
+    "text": "blank. The meaning is: Empty; having nothing written on it."
+  },
+  {
+    "kind": "example",
+    "word": "blank",
+    "text": "Here is blank in a sentence. He stared at the blank page and began to write."
+  },
+  {
+    "kind": "spelling",
+    "word": "blank",
+    "text": "blank. Spell it with me: B, L, A, N, K."
+  },
+  {
+    "kind": "word",
+    "word": "blend",
+    "text": "blend"
+  },
+  {
+    "kind": "definition",
+    "word": "blend",
+    "text": "A clue for blend: To mix smoothly together."
+  },
+  {
+    "kind": "example",
+    "word": "blend",
+    "text": "A sentence with blend. Blend the fruit with the milk for a smoothie."
+  },
+  {
+    "kind": "spelling",
+    "word": "blend",
+    "text": "Here are the letters for blend: B, L, E, N, D."
+  },
+  {
+    "kind": "word",
+    "word": "chest",
+    "text": "chest"
+  },
+  {
+    "kind": "definition",
+    "word": "chest",
+    "text": "chest. The meaning is: A large strong box for storing things."
+  },
+  {
+    "kind": "example",
+    "word": "chest",
+    "text": "Here is chest in a sentence. He kept his treasures in a wooden chest."
+  },
+  {
+    "kind": "spelling",
+    "word": "chest",
+    "text": "Here are the letters for chest: C, H, E, S, T."
+  },
+  {
+    "kind": "word",
+    "word": "twist",
+    "text": "twist"
+  },
+  {
+    "kind": "definition",
+    "word": "twist",
+    "text": "Here is what twist means: To turn something around and around."
+  },
+  {
+    "kind": "example",
+    "word": "twist",
+    "text": "Listen for twist in this sentence. She gave the jar lid a twist to open it."
+  },
+  {
+    "kind": "spelling",
+    "word": "twist",
+    "text": "twist. The letters are: T, W, I, S, T."
+  },
+  {
+    "kind": "word",
+    "word": "float",
+    "text": "float"
+  },
+  {
+    "kind": "definition",
+    "word": "float",
+    "text": "Think about this meaning for float: To rest or move gently on water."
+  },
+  {
+    "kind": "example",
+    "word": "float",
+    "text": "In context, float sounds like this. A leaf began to float down the stream."
+  },
+  {
+    "kind": "spelling",
+    "word": "float",
+    "text": "float. Spell it with me: F, L, O, A, T."
+  },
+  {
+    "kind": "word",
+    "word": "shout",
+    "text": "shout"
+  },
+  {
+    "kind": "definition",
+    "word": "shout",
+    "text": "Definition for shout: To speak or call out very loudly."
+  },
+  {
+    "kind": "example",
+    "word": "shout",
+    "text": "Here is one example for shout. He had to shout to be heard above the wind."
+  },
+  {
+    "kind": "spelling",
+    "word": "shout",
+    "text": "Here are the letters for shout: S, H, O, U, T."
+  },
+  {
+    "kind": "word",
+    "word": "round",
+    "text": "round"
+  },
+  {
+    "kind": "definition",
+    "word": "round",
+    "text": "A clue for round: Shaped like a circle or ball."
+  },
+  {
+    "kind": "example",
+    "word": "round",
+    "text": "A sentence with round. The pebble was perfectly round and smooth."
+  },
+  {
+    "kind": "spelling",
+    "word": "round",
+    "text": "Listen letter by letter. round: R, O, U, N, D."
+  },
+  {
+    "kind": "word",
+    "word": "found",
+    "text": "found"
+  },
+  {
+    "kind": "definition",
+    "word": "found",
+    "text": "found. The meaning is: Discovered something that was lost."
+  },
+  {
+    "kind": "example",
+    "word": "found",
+    "text": "Here is found in a sentence. She found her missing shoe under the bed."
+  },
+  {
+    "kind": "spelling",
+    "word": "found",
+    "text": "Listen letter by letter. found: F, O, U, N, D."
+  },
+  {
+    "kind": "word",
+    "word": "spoon",
+    "text": "spoon"
+  },
+  {
+    "kind": "definition",
+    "word": "spoon",
+    "text": "Think about this meaning for spoon: A tool used to scoop or stir food."
+  },
+  {
+    "kind": "example",
+    "word": "spoon",
+    "text": "In context, spoon sounds like this. He stirred the oatmeal with a wooden spoon."
+  },
+  {
+    "kind": "spelling",
+    "word": "spoon",
+    "text": "Here are the letters for spoon: S, P, O, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "brush",
+    "text": "brush"
+  },
+  {
+    "kind": "definition",
+    "word": "brush",
+    "text": "Definition for brush: A tool with bristles for painting or cleaning."
+  },
+  {
+    "kind": "example",
+    "word": "brush",
+    "text": "Here is one example for brush. She used a soft brush to paint the fence."
+  },
+  {
+    "kind": "spelling",
+    "word": "brush",
+    "text": "Listen letter by letter. brush: B, R, U, S, H."
+  },
+  {
+    "kind": "word",
+    "word": "stone",
+    "text": "stone"
+  },
+  {
+    "kind": "definition",
+    "word": "stone",
+    "text": "Definition for stone: A small hard piece of rock."
+  },
+  {
+    "kind": "example",
+    "word": "stone",
+    "text": "Here is one example for stone. He skipped a flat stone across the pond."
+  },
+  {
+    "kind": "spelling",
+    "word": "stone",
+    "text": "Here are the letters for stone: S, T, O, N, E."
+  },
+  {
+    "kind": "word",
+    "word": "school",
+    "text": "school"
+  },
+  {
+    "kind": "definition",
+    "word": "school",
+    "text": "school. The meaning is: A place where children go to learn."
+  },
+  {
+    "kind": "example",
+    "word": "school",
+    "text": "Here is school in a sentence. He rides his bike to school."
+  },
+  {
+    "kind": "spelling",
+    "word": "school",
+    "text": "school. Spell it with me: S, C, H, O, O, L."
+  },
+  {
+    "kind": "word",
+    "word": "friend",
+    "text": "friend"
+  },
+  {
+    "kind": "definition",
+    "word": "friend",
+    "text": "Think about this meaning for friend: A person you like and trust."
+  },
+  {
+    "kind": "example",
+    "word": "friend",
+    "text": "In context, friend sounds like this. A good friend listens without judging."
+  },
+  {
+    "kind": "spelling",
+    "word": "friend",
+    "text": "Listen letter by letter. friend: F, R, I, E, N, D."
+  },
+  {
+    "kind": "word",
+    "word": "family",
+    "text": "family"
+  },
+  {
+    "kind": "definition",
+    "word": "family",
+    "text": "Think about this meaning for family: The people you are related to."
+  },
+  {
+    "kind": "example",
+    "word": "family",
+    "text": "In context, family sounds like this. My family eats dinner together."
+  },
+  {
+    "kind": "spelling",
+    "word": "family",
+    "text": "family. Spell it with me: F, A, M, I, L, Y."
+  },
+  {
+    "kind": "word",
+    "word": "pencil",
+    "text": "pencil"
+  },
+  {
+    "kind": "definition",
+    "word": "pencil",
+    "text": "A clue for pencil: A tool you use to write on paper."
+  },
+  {
+    "kind": "example",
+    "word": "pencil",
+    "text": "A sentence with pencil. Please sharpen your pencil."
+  },
+  {
+    "kind": "spelling",
+    "word": "pencil",
+    "text": "Here are the letters for pencil: P, E, N, C, I, L."
+  },
+  {
+    "kind": "word",
+    "word": "orange",
+    "text": "orange"
+  },
+  {
+    "kind": "definition",
+    "word": "orange",
+    "text": "Definition for orange: A round juicy fruit, also a color."
+  },
+  {
+    "kind": "example",
+    "word": "orange",
+    "text": "Here is one example for orange. He peeled an orange for lunch."
+  },
+  {
+    "kind": "spelling",
+    "word": "orange",
+    "text": "Listen letter by letter. orange: O, R, A, N, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "kitchen",
+    "text": "kitchen"
+  },
+  {
+    "kind": "definition",
+    "word": "kitchen",
+    "text": "A clue for kitchen: The room where meals are cooked."
+  },
+  {
+    "kind": "example",
+    "word": "kitchen",
+    "text": "A sentence with kitchen. The kitchen smelled of fresh bread."
+  },
+  {
+    "kind": "spelling",
+    "word": "kitchen",
+    "text": "kitchen. Spell it with me: K, I, T, C, H, E, N."
+  },
+  {
+    "kind": "word",
+    "word": "giraffe",
+    "text": "giraffe"
+  },
+  {
+    "kind": "definition",
+    "word": "giraffe",
+    "text": "A clue for giraffe: A tall African animal with a long neck."
+  },
+  {
+    "kind": "example",
+    "word": "giraffe",
+    "text": "A sentence with giraffe. A giraffe reached the highest leaves."
+  },
+  {
+    "kind": "spelling",
+    "word": "giraffe",
+    "text": "giraffe. Spell it with me: G, I, R, A, F, F, E."
+  },
+  {
+    "kind": "word",
+    "word": "guitar",
+    "text": "guitar"
+  },
+  {
+    "kind": "definition",
+    "word": "guitar",
+    "text": "Think about this meaning for guitar: A stringed musical instrument."
+  },
+  {
+    "kind": "example",
+    "word": "guitar",
+    "text": "In context, guitar sounds like this. She played the guitar at camp."
+  },
+  {
+    "kind": "spelling",
+    "word": "guitar",
+    "text": "Listen letter by letter. guitar: G, U, I, T, A, R."
+  },
+  {
+    "kind": "word",
+    "word": "window",
+    "text": "window"
+  },
+  {
+    "kind": "definition",
+    "word": "window",
+    "text": "Here is what window means: An opening in a wall, usually with glass."
+  },
+  {
+    "kind": "example",
+    "word": "window",
+    "text": "Listen for window in this sentence. Rain streaked across the window."
+  },
+  {
+    "kind": "spelling",
+    "word": "window",
+    "text": "window. Spell it with me: W, I, N, D, O, W."
+  },
+  {
+    "kind": "word",
+    "word": "rocket",
+    "text": "rocket"
+  },
+  {
+    "kind": "definition",
+    "word": "rocket",
+    "text": "rocket. The meaning is: A vehicle that launches into space."
+  },
+  {
+    "kind": "example",
+    "word": "rocket",
+    "text": "Here is rocket in a sentence. The rocket roared into the sky."
+  },
+  {
+    "kind": "spelling",
+    "word": "rocket",
+    "text": "rocket. Spell it with me: R, O, C, K, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "castle",
+    "text": "castle"
+  },
+  {
+    "kind": "definition",
+    "word": "castle",
+    "text": "Definition for castle: A large old stone building with towers."
+  },
+  {
+    "kind": "example",
+    "word": "castle",
+    "text": "Here is one example for castle. A castle stood on the cliff."
+  },
+  {
+    "kind": "spelling",
+    "word": "castle",
+    "text": "castle. Spell it with me: C, A, S, T, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "bridge",
+    "text": "bridge"
+  },
+  {
+    "kind": "definition",
+    "word": "bridge",
+    "text": "Definition for bridge: A structure built across a river or road."
+  },
+  {
+    "kind": "example",
+    "word": "bridge",
+    "text": "Here is one example for bridge. They crossed the bridge at sunset."
+  },
+  {
+    "kind": "spelling",
+    "word": "bridge",
+    "text": "Here are the letters for bridge: B, R, I, D, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "hungry",
+    "text": "hungry"
+  },
+  {
+    "kind": "definition",
+    "word": "hungry",
+    "text": "Here is what hungry means: Wanting food."
+  },
+  {
+    "kind": "example",
+    "word": "hungry",
+    "text": "Listen for hungry in this sentence. The puppy looked hungry."
+  },
+  {
+    "kind": "spelling",
+    "word": "hungry",
+    "text": "Here are the letters for hungry: H, U, N, G, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "thunder",
+    "text": "thunder"
+  },
+  {
+    "kind": "definition",
+    "word": "thunder",
+    "text": "thunder. The meaning is: The loud sound that follows lightning."
+  },
+  {
+    "kind": "example",
+    "word": "thunder",
+    "text": "Here is thunder in a sentence. Thunder rolled across the hills."
+  },
+  {
+    "kind": "spelling",
+    "word": "thunder",
+    "text": "thunder. Spell it with me: T, H, U, N, D, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "circle",
+    "text": "circle"
+  },
+  {
+    "kind": "definition",
+    "word": "circle",
+    "text": "Definition for circle: A round shape with no corners."
+  },
+  {
+    "kind": "example",
+    "word": "circle",
+    "text": "Here is one example for circle. Please stand in a circle."
+  },
+  {
+    "kind": "spelling",
+    "word": "circle",
+    "text": "circle. Spell it with me: C, I, R, C, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "desert",
+    "text": "desert"
+  },
+  {
+    "kind": "definition",
+    "word": "desert",
+    "text": "Think about this meaning for desert: A very dry area of land with little rain."
+  },
+  {
+    "kind": "example",
+    "word": "desert",
+    "text": "In context, desert sounds like this. Camels can survive in the hot desert."
+  },
+  {
+    "kind": "spelling",
+    "word": "desert",
+    "text": "Here are the letters for desert: D, E, S, E, R, T."
+  },
+  {
+    "kind": "word",
+    "word": "finger",
+    "text": "finger"
+  },
+  {
+    "kind": "definition",
+    "word": "finger",
+    "text": "A clue for finger: One of the long parts of your hand."
+  },
+  {
+    "kind": "example",
+    "word": "finger",
+    "text": "A sentence with finger. She pointed her finger at the stars."
+  },
+  {
+    "kind": "spelling",
+    "word": "finger",
+    "text": "Here are the letters for finger: F, I, N, G, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "garden",
+    "text": "garden"
+  },
+  {
+    "kind": "definition",
+    "word": "garden",
+    "text": "A clue for garden: A place where flowers or vegetables are grown."
+  },
+  {
+    "kind": "example",
+    "word": "garden",
+    "text": "A sentence with garden. They planted tomatoes in the garden."
+  },
+  {
+    "kind": "spelling",
+    "word": "garden",
+    "text": "Here are the letters for garden: G, A, R, D, E, N."
+  },
+  {
+    "kind": "word",
+    "word": "insect",
+    "text": "insect"
+  },
+  {
+    "kind": "definition",
+    "word": "insect",
+    "text": "Definition for insect: A small six-legged creature."
+  },
+  {
+    "kind": "example",
+    "word": "insect",
+    "text": "Here is one example for insect. A buzzing insect landed on the flower."
+  },
+  {
+    "kind": "spelling",
+    "word": "insect",
+    "text": "insect. Spell it with me: I, N, S, E, C, T."
+  },
+  {
+    "kind": "word",
+    "word": "jungle",
+    "text": "jungle"
+  },
+  {
+    "kind": "definition",
+    "word": "jungle",
+    "text": "A clue for jungle: A dense tropical forest."
+  },
+  {
+    "kind": "example",
+    "word": "jungle",
+    "text": "A sentence with jungle. Monkeys swung through the jungle trees."
+  },
+  {
+    "kind": "spelling",
+    "word": "jungle",
+    "text": "Here are the letters for jungle: J, U, N, G, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "kitten",
+    "text": "kitten"
+  },
+  {
+    "kind": "definition",
+    "word": "kitten",
+    "text": "A clue for kitten: A young cat."
+  },
+  {
+    "kind": "example",
+    "word": "kitten",
+    "text": "A sentence with kitten. The kitten played with the ball of yarn."
+  },
+  {
+    "kind": "spelling",
+    "word": "kitten",
+    "text": "kitten. The letters are: K, I, T, T, E, N."
+  },
+  {
+    "kind": "word",
+    "word": "lemon",
+    "text": "lemon"
+  },
+  {
+    "kind": "definition",
+    "word": "lemon",
+    "text": "Think about this meaning for lemon: A sour yellow citrus fruit."
+  },
+  {
+    "kind": "example",
+    "word": "lemon",
+    "text": "In context, lemon sounds like this. She squeezed a lemon into her water."
+  },
+  {
+    "kind": "spelling",
+    "word": "lemon",
+    "text": "lemon. The letters are: L, E, M, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "magnet",
+    "text": "magnet"
+  },
+  {
+    "kind": "definition",
+    "word": "magnet",
+    "text": "Definition for magnet: A piece of metal that attracts iron."
+  },
+  {
+    "kind": "example",
+    "word": "magnet",
+    "text": "Here is one example for magnet. The magnet pulled the paper clips toward it."
+  },
+  {
+    "kind": "spelling",
+    "word": "magnet",
+    "text": "Listen letter by letter. magnet: M, A, G, N, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "napkin",
+    "text": "napkin"
+  },
+  {
+    "kind": "definition",
+    "word": "napkin",
+    "text": "Definition for napkin: A piece of cloth or paper used at meals."
+  },
+  {
+    "kind": "example",
+    "word": "napkin",
+    "text": "Here is one example for napkin. He placed a napkin on his lap."
+  },
+  {
+    "kind": "spelling",
+    "word": "napkin",
+    "text": "napkin. The letters are: N, A, P, K, I, N."
+  },
+  {
+    "kind": "word",
+    "word": "ocean",
+    "text": "ocean"
+  },
+  {
+    "kind": "definition",
+    "word": "ocean",
+    "text": "Definition for ocean: A very large body of salt water."
+  },
+  {
+    "kind": "example",
+    "word": "ocean",
+    "text": "Here is one example for ocean. Waves crashed onto the shore of the ocean."
+  },
+  {
+    "kind": "spelling",
+    "word": "ocean",
+    "text": "Listen letter by letter. ocean: O, C, E, A, N."
+  },
+  {
+    "kind": "word",
+    "word": "parrot",
+    "text": "parrot"
+  },
+  {
+    "kind": "definition",
+    "word": "parrot",
+    "text": "Here is what parrot means: A brightly colored bird that can mimic speech."
+  },
+  {
+    "kind": "example",
+    "word": "parrot",
+    "text": "Listen for parrot in this sentence. The parrot repeated every word it heard."
+  },
+  {
+    "kind": "spelling",
+    "word": "parrot",
+    "text": "Listen letter by letter. parrot: P, A, R, R, O, T."
+  },
+  {
+    "kind": "word",
+    "word": "rabbit",
+    "text": "rabbit"
+  },
+  {
+    "kind": "definition",
+    "word": "rabbit",
+    "text": "rabbit. The meaning is: A small furry animal with long ears."
+  },
+  {
+    "kind": "example",
+    "word": "rabbit",
+    "text": "Here is rabbit in a sentence. A rabbit hopped across the snowy yard."
+  },
+  {
+    "kind": "spelling",
+    "word": "rabbit",
+    "text": "Listen letter by letter. rabbit: R, A, B, B, I, T."
+  },
+  {
+    "kind": "word",
+    "word": "shadow",
+    "text": "shadow"
+  },
+  {
+    "kind": "definition",
+    "word": "shadow",
+    "text": "Definition for shadow: A dark shape made when something blocks light."
+  },
+  {
+    "kind": "example",
+    "word": "shadow",
+    "text": "Here is one example for shadow. His shadow grew long in the afternoon sun."
+  },
+  {
+    "kind": "spelling",
+    "word": "shadow",
+    "text": "shadow. Spell it with me: S, H, A, D, O, W."
+  },
+  {
+    "kind": "word",
+    "word": "spider",
+    "text": "spider"
+  },
+  {
+    "kind": "definition",
+    "word": "spider",
+    "text": "Think about this meaning for spider: An eight-legged creature that spins webs."
+  },
+  {
+    "kind": "example",
+    "word": "spider",
+    "text": "In context, spider sounds like this. A spider hung in the corner of the barn."
+  },
+  {
+    "kind": "spelling",
+    "word": "spider",
+    "text": "Here are the letters for spider: S, P, I, D, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "ticket",
+    "text": "ticket"
+  },
+  {
+    "kind": "definition",
+    "word": "ticket",
+    "text": "Here is what ticket means: A paper that lets you enter a place or event."
+  },
+  {
+    "kind": "example",
+    "word": "ticket",
+    "text": "Listen for ticket in this sentence. She bought a ticket for the concert."
+  },
+  {
+    "kind": "spelling",
+    "word": "ticket",
+    "text": "ticket. Spell it with me: T, I, C, K, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "turtle",
+    "text": "turtle"
+  },
+  {
+    "kind": "definition",
+    "word": "turtle",
+    "text": "Think about this meaning for turtle: A reptile with a hard shell on its back."
+  },
+  {
+    "kind": "example",
+    "word": "turtle",
+    "text": "In context, turtle sounds like this. The turtle slowly made its way to the sea."
+  },
+  {
+    "kind": "spelling",
+    "word": "turtle",
+    "text": "turtle. Spell it with me: T, U, R, T, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "useful",
+    "text": "useful"
+  },
+  {
+    "kind": "definition",
+    "word": "useful",
+    "text": "A clue for useful: Helpful or able to be used for something."
+  },
+  {
+    "kind": "example",
+    "word": "useful",
+    "text": "A sentence with useful. A map is useful when you are lost."
+  },
+  {
+    "kind": "spelling",
+    "word": "useful",
+    "text": "Listen letter by letter. useful: U, S, E, F, U, L."
+  },
+  {
+    "kind": "word",
+    "word": "village",
+    "text": "village"
+  },
+  {
+    "kind": "definition",
+    "word": "village",
+    "text": "village. The meaning is: A small community of houses and people."
+  },
+  {
+    "kind": "example",
+    "word": "village",
+    "text": "Here is village in a sentence. They walked through a quiet mountain village."
+  },
+  {
+    "kind": "spelling",
+    "word": "village",
+    "text": "village. Spell it with me: V, I, L, L, A, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "walrus",
+    "text": "walrus"
+  },
+  {
+    "kind": "definition",
+    "word": "walrus",
+    "text": "A clue for walrus: A large sea animal with long tusks."
+  },
+  {
+    "kind": "example",
+    "word": "walrus",
+    "text": "A sentence with walrus. The walrus rested on the floating ice."
+  },
+  {
+    "kind": "spelling",
+    "word": "walrus",
+    "text": "Listen letter by letter. walrus: W, A, L, R, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "yellow",
+    "text": "yellow"
+  },
+  {
+    "kind": "definition",
+    "word": "yellow",
+    "text": "yellow. The meaning is: A bright color like the sun."
+  },
+  {
+    "kind": "example",
+    "word": "yellow",
+    "text": "Here is yellow in a sentence. She wore a yellow dress to the picnic."
+  },
+  {
+    "kind": "spelling",
+    "word": "yellow",
+    "text": "yellow. Spell it with me: Y, E, L, L, O, W."
+  },
+  {
+    "kind": "word",
+    "word": "zipper",
+    "text": "zipper"
+  },
+  {
+    "kind": "definition",
+    "word": "zipper",
+    "text": "Definition for zipper: A fastener with two rows of teeth that lock together."
+  },
+  {
+    "kind": "example",
+    "word": "zipper",
+    "text": "Here is one example for zipper. He pulled up the zipper on his jacket."
+  },
+  {
+    "kind": "spelling",
+    "word": "zipper",
+    "text": "zipper. Spell it with me: Z, I, P, P, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "cactus",
+    "text": "cactus"
+  },
+  {
+    "kind": "definition",
+    "word": "cactus",
+    "text": "cactus. The meaning is: A spiky plant that grows in dry places."
+  },
+  {
+    "kind": "example",
+    "word": "cactus",
+    "text": "Here is cactus in a sentence. A cactus can store water in its thick trunk."
+  },
+  {
+    "kind": "spelling",
+    "word": "cactus",
+    "text": "Here are the letters for cactus: C, A, C, T, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "candle",
+    "text": "candle"
+  },
+  {
+    "kind": "definition",
+    "word": "candle",
+    "text": "A clue for candle: A wax stick with a wick that gives light when burned."
+  },
+  {
+    "kind": "example",
+    "word": "candle",
+    "text": "A sentence with candle. She lit a candle for the birthday cake."
+  },
+  {
+    "kind": "spelling",
+    "word": "candle",
+    "text": "Here are the letters for candle: C, A, N, D, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "cherry",
+    "text": "cherry"
+  },
+  {
+    "kind": "definition",
+    "word": "cherry",
+    "text": "cherry. The meaning is: A small round red fruit."
+  },
+  {
+    "kind": "example",
+    "word": "cherry",
+    "text": "Here is cherry in a sentence. She put a cherry on top of the ice cream."
+  },
+  {
+    "kind": "spelling",
+    "word": "cherry",
+    "text": "Here are the letters for cherry: C, H, E, R, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "closet",
+    "text": "closet"
+  },
+  {
+    "kind": "definition",
+    "word": "closet",
+    "text": "A clue for closet: A small room or space for storing things."
+  },
+  {
+    "kind": "example",
+    "word": "closet",
+    "text": "A sentence with closet. He hung his coat in the closet."
+  },
+  {
+    "kind": "spelling",
+    "word": "closet",
+    "text": "closet. Spell it with me: C, L, O, S, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "donkey",
+    "text": "donkey"
+  },
+  {
+    "kind": "definition",
+    "word": "donkey",
+    "text": "A clue for donkey: A sturdy animal related to the horse."
+  },
+  {
+    "kind": "example",
+    "word": "donkey",
+    "text": "A sentence with donkey. A donkey carried heavy loads up the hill."
+  },
+  {
+    "kind": "spelling",
+    "word": "donkey",
+    "text": "donkey. Spell it with me: D, O, N, K, E, Y."
+  },
+  {
+    "kind": "word",
+    "word": "elbow",
+    "text": "elbow"
+  },
+  {
+    "kind": "definition",
+    "word": "elbow",
+    "text": "A clue for elbow: The joint in the middle of your arm."
+  },
+  {
+    "kind": "example",
+    "word": "elbow",
+    "text": "A sentence with elbow. He bumped his elbow on the doorframe."
+  },
+  {
+    "kind": "spelling",
+    "word": "elbow",
+    "text": "elbow. The letters are: E, L, B, O, W."
+  },
+  {
+    "kind": "word",
+    "word": "feather",
+    "text": "feather"
+  },
+  {
+    "kind": "definition",
+    "word": "feather",
+    "text": "Here is what feather means: A light flat growth that covers birds."
+  },
+  {
+    "kind": "example",
+    "word": "feather",
+    "text": "Listen for feather in this sentence. She found a soft blue feather on the path."
+  },
+  {
+    "kind": "spelling",
+    "word": "feather",
+    "text": "feather. The letters are: F, E, A, T, H, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "frozen",
+    "text": "frozen"
+  },
+  {
+    "kind": "definition",
+    "word": "frozen",
+    "text": "A clue for frozen: Turned to ice by cold temperature."
+  },
+  {
+    "kind": "example",
+    "word": "frozen",
+    "text": "A sentence with frozen. The pond was frozen solid by morning."
+  },
+  {
+    "kind": "spelling",
+    "word": "frozen",
+    "text": "frozen. Spell it with me: F, R, O, Z, E, N."
+  },
+  {
+    "kind": "word",
+    "word": "gravel",
+    "text": "gravel"
+  },
+  {
+    "kind": "definition",
+    "word": "gravel",
+    "text": "Definition for gravel: Small loose stones used on paths."
+  },
+  {
+    "kind": "example",
+    "word": "gravel",
+    "text": "Here is one example for gravel. Their shoes crunched on the gravel path."
+  },
+  {
+    "kind": "spelling",
+    "word": "gravel",
+    "text": "gravel. The letters are: G, R, A, V, E, L."
+  },
+  {
+    "kind": "word",
+    "word": "awesome",
+    "text": "awesome"
+  },
+  {
+    "kind": "definition",
+    "word": "awesome",
+    "text": "awesome. The meaning is: Causing great admiration or wonder."
+  },
+  {
+    "kind": "example",
+    "word": "awesome",
+    "text": "Here is awesome in a sentence. The view from the cliff was awesome."
+  },
+  {
+    "kind": "spelling",
+    "word": "awesome",
+    "text": "awesome. The letters are: A, W, E, S, O, M, E."
+  },
+  {
+    "kind": "word",
+    "word": "absence",
+    "text": "absence"
+  },
+  {
+    "kind": "definition",
+    "word": "absence",
+    "text": "Definition for absence: The state of being away."
+  },
+  {
+    "kind": "example",
+    "word": "absence",
+    "text": "Here is one example for absence. Her absence was noticed right away."
+  },
+  {
+    "kind": "spelling",
+    "word": "absence",
+    "text": "Here are the letters for absence: A, B, S, E, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "balance",
+    "text": "balance"
+  },
+  {
+    "kind": "definition",
+    "word": "balance",
+    "text": "A clue for balance: An even steady position."
+  },
+  {
+    "kind": "example",
+    "word": "balance",
+    "text": "A sentence with balance. She kept her balance on the beam."
+  },
+  {
+    "kind": "spelling",
+    "word": "balance",
+    "text": "balance. Spell it with me: B, A, L, A, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "calendar",
+    "text": "calendar"
+  },
+  {
+    "kind": "definition",
+    "word": "calendar",
+    "text": "Think about this meaning for calendar: A chart that shows the days of a year."
+  },
+  {
+    "kind": "example",
+    "word": "calendar",
+    "text": "In context, calendar sounds like this. He marked the date on the calendar."
+  },
+  {
+    "kind": "spelling",
+    "word": "calendar",
+    "text": "Listen letter by letter. calendar: C, A, L, E, N, D, A, R."
+  },
+  {
+    "kind": "word",
+    "word": "decision",
+    "text": "decision"
+  },
+  {
+    "kind": "definition",
+    "word": "decision",
+    "text": "Think about this meaning for decision: A choice made after thinking."
+  },
+  {
+    "kind": "example",
+    "word": "decision",
+    "text": "In context, decision sounds like this. It was a hard decision to make."
+  },
+  {
+    "kind": "spelling",
+    "word": "decision",
+    "text": "decision. Spell it with me: D, E, C, I, S, I, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "elephant",
+    "text": "elephant"
+  },
+  {
+    "kind": "definition",
+    "word": "elephant",
+    "text": "A clue for elephant: A very large animal with a long trunk."
+  },
+  {
+    "kind": "example",
+    "word": "elephant",
+    "text": "A sentence with elephant. An elephant sprayed water on its back."
+  },
+  {
+    "kind": "spelling",
+    "word": "elephant",
+    "text": "Here are the letters for elephant: E, L, E, P, H, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "festival",
+    "text": "festival"
+  },
+  {
+    "kind": "definition",
+    "word": "festival",
+    "text": "A clue for festival: A celebration or organized event."
+  },
+  {
+    "kind": "example",
+    "word": "festival",
+    "text": "A sentence with festival. The music festival lasted three days."
+  },
+  {
+    "kind": "spelling",
+    "word": "festival",
+    "text": "festival. Spell it with me: F, E, S, T, I, V, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "gallery",
+    "text": "gallery"
+  },
+  {
+    "kind": "definition",
+    "word": "gallery",
+    "text": "Definition for gallery: A room where art is shown."
+  },
+  {
+    "kind": "example",
+    "word": "gallery",
+    "text": "Here is one example for gallery. They wandered through the gallery."
+  },
+  {
+    "kind": "spelling",
+    "word": "gallery",
+    "text": "Listen letter by letter. gallery: G, A, L, L, E, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "harvest",
+    "text": "harvest"
+  },
+  {
+    "kind": "definition",
+    "word": "harvest",
+    "text": "Definition for harvest: The gathering of ripe crops."
+  },
+  {
+    "kind": "example",
+    "word": "harvest",
+    "text": "Here is one example for harvest. The apple harvest began in fall."
+  },
+  {
+    "kind": "spelling",
+    "word": "harvest",
+    "text": "Here are the letters for harvest: H, A, R, V, E, S, T."
+  },
+  {
+    "kind": "word",
+    "word": "imagine",
+    "text": "imagine"
+  },
+  {
+    "kind": "definition",
+    "word": "imagine",
+    "text": "Definition for imagine: To picture something in your mind."
+  },
+  {
+    "kind": "example",
+    "word": "imagine",
+    "text": "Here is one example for imagine. Imagine a world full of flying whales."
+  },
+  {
+    "kind": "spelling",
+    "word": "imagine",
+    "text": "Listen letter by letter. imagine: I, M, A, G, I, N, E."
+  },
+  {
+    "kind": "word",
+    "word": "journey",
+    "text": "journey"
+  },
+  {
+    "kind": "definition",
+    "word": "journey",
+    "text": "journey. The meaning is: A trip from one place to another."
+  },
+  {
+    "kind": "example",
+    "word": "journey",
+    "text": "Here is journey in a sentence. Their journey took three long days."
+  },
+  {
+    "kind": "spelling",
+    "word": "journey",
+    "text": "journey. Spell it with me: J, O, U, R, N, E, Y."
+  },
+  {
+    "kind": "word",
+    "word": "library",
+    "text": "library"
+  },
+  {
+    "kind": "definition",
+    "word": "library",
+    "text": "Think about this meaning for library: A place where books are kept to read."
+  },
+  {
+    "kind": "example",
+    "word": "library",
+    "text": "In context, library sounds like this. She borrowed a novel from the library."
+  },
+  {
+    "kind": "spelling",
+    "word": "library",
+    "text": "library. The letters are: L, I, B, R, A, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "magical",
+    "text": "magical"
+  },
+  {
+    "kind": "definition",
+    "word": "magical",
+    "text": "magical. The meaning is: Having or using magic; wonderful."
+  },
+  {
+    "kind": "example",
+    "word": "magical",
+    "text": "Here is magical in a sentence. The garden felt magical at dawn."
+  },
+  {
+    "kind": "spelling",
+    "word": "magical",
+    "text": "magical. Spell it with me: M, A, G, I, C, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "neutral",
+    "text": "neutral"
+  },
+  {
+    "kind": "definition",
+    "word": "neutral",
+    "text": "neutral. The meaning is: Not taking a side."
+  },
+  {
+    "kind": "example",
+    "word": "neutral",
+    "text": "Here is neutral in a sentence. The judge must stay neutral."
+  },
+  {
+    "kind": "spelling",
+    "word": "neutral",
+    "text": "neutral. The letters are: N, E, U, T, R, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "obstacle",
+    "text": "obstacle"
+  },
+  {
+    "kind": "definition",
+    "word": "obstacle",
+    "text": "Definition for obstacle: Something that blocks the way."
+  },
+  {
+    "kind": "example",
+    "word": "obstacle",
+    "text": "Here is one example for obstacle. The fallen tree was an obstacle on the trail."
+  },
+  {
+    "kind": "spelling",
+    "word": "obstacle",
+    "text": "obstacle. The letters are: O, B, S, T, A, C, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "patience",
+    "text": "patience"
+  },
+  {
+    "kind": "definition",
+    "word": "patience",
+    "text": "Definition for patience: The ability to wait calmly."
+  },
+  {
+    "kind": "example",
+    "word": "patience",
+    "text": "Here is one example for patience. Learning to ride a bike takes patience."
+  },
+  {
+    "kind": "spelling",
+    "word": "patience",
+    "text": "Here are the letters for patience: P, A, T, I, E, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "qualify",
+    "text": "qualify"
+  },
+  {
+    "kind": "definition",
+    "word": "qualify",
+    "text": "Think about this meaning for qualify: To meet the conditions for something."
+  },
+  {
+    "kind": "example",
+    "word": "qualify",
+    "text": "In context, qualify sounds like this. You must qualify by scoring above eighty."
+  },
+  {
+    "kind": "spelling",
+    "word": "qualify",
+    "text": "Here are the letters for qualify: Q, U, A, L, I, F, Y."
+  },
+  {
+    "kind": "word",
+    "word": "rapidly",
+    "text": "rapidly"
+  },
+  {
+    "kind": "definition",
+    "word": "rapidly",
+    "text": "Definition for rapidly: Moving or happening very quickly."
+  },
+  {
+    "kind": "example",
+    "word": "rapidly",
+    "text": "Here is one example for rapidly. The river rose rapidly after the storm."
+  },
+  {
+    "kind": "spelling",
+    "word": "rapidly",
+    "text": "Here are the letters for rapidly: R, A, P, I, D, L, Y."
+  },
+  {
+    "kind": "word",
+    "word": "scenery",
+    "text": "scenery"
+  },
+  {
+    "kind": "definition",
+    "word": "scenery",
+    "text": "A clue for scenery: The natural features of a landscape."
+  },
+  {
+    "kind": "example",
+    "word": "scenery",
+    "text": "A sentence with scenery. The mountain scenery took her breath away."
+  },
+  {
+    "kind": "spelling",
+    "word": "scenery",
+    "text": "scenery. The letters are: S, C, E, N, E, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "tropical",
+    "text": "tropical"
+  },
+  {
+    "kind": "definition",
+    "word": "tropical",
+    "text": "tropical. The meaning is: Belonging to the hot region near the equator."
+  },
+  {
+    "kind": "example",
+    "word": "tropical",
+    "text": "Here is tropical in a sentence. Parrots live in tropical forests."
+  },
+  {
+    "kind": "spelling",
+    "word": "tropical",
+    "text": "tropical. Spell it with me: T, R, O, P, I, C, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "uniform",
+    "text": "uniform"
+  },
+  {
+    "kind": "definition",
+    "word": "uniform",
+    "text": "Here is what uniform means: A set of matching clothes worn by a group."
+  },
+  {
+    "kind": "example",
+    "word": "uniform",
+    "text": "Listen for uniform in this sentence. Every student wore the school uniform."
+  },
+  {
+    "kind": "spelling",
+    "word": "uniform",
+    "text": "uniform. Spell it with me: U, N, I, F, O, R, M."
+  },
+  {
+    "kind": "word",
+    "word": "venture",
+    "text": "venture"
+  },
+  {
+    "kind": "definition",
+    "word": "venture",
+    "text": "A clue for venture: A risky or bold project."
+  },
+  {
+    "kind": "example",
+    "word": "venture",
+    "text": "A sentence with venture. Their new business was an exciting venture."
+  },
+  {
+    "kind": "spelling",
+    "word": "venture",
+    "text": "venture. The letters are: V, E, N, T, U, R, E."
+  },
+  {
+    "kind": "word",
+    "word": "whisper",
+    "text": "whisper"
+  },
+  {
+    "kind": "definition",
+    "word": "whisper",
+    "text": "whisper. The meaning is: To speak very softly."
+  },
+  {
+    "kind": "example",
+    "word": "whisper",
+    "text": "Here is whisper in a sentence. She leaned over to whisper in his ear."
+  },
+  {
+    "kind": "spelling",
+    "word": "whisper",
+    "text": "Listen letter by letter. whisper: W, H, I, S, P, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "academy",
+    "text": "academy"
+  },
+  {
+    "kind": "definition",
+    "word": "academy",
+    "text": "Here is what academy means: A school or place of learning."
+  },
+  {
+    "kind": "example",
+    "word": "academy",
+    "text": "Listen for academy in this sentence. He enrolled at the local science academy."
+  },
+  {
+    "kind": "spelling",
+    "word": "academy",
+    "text": "academy. Spell it with me: A, C, A, D, E, M, Y."
+  },
+  {
+    "kind": "word",
+    "word": "cabinet",
+    "text": "cabinet"
+  },
+  {
+    "kind": "definition",
+    "word": "cabinet",
+    "text": "cabinet. The meaning is: A piece of furniture with doors and shelves."
+  },
+  {
+    "kind": "example",
+    "word": "cabinet",
+    "text": "Here is cabinet in a sentence. She stored the plates in the kitchen cabinet."
+  },
+  {
+    "kind": "spelling",
+    "word": "cabinet",
+    "text": "cabinet. Spell it with me: C, A, B, I, N, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "capture",
+    "text": "capture"
+  },
+  {
+    "kind": "definition",
+    "word": "capture",
+    "text": "capture. The meaning is: To catch and hold something."
+  },
+  {
+    "kind": "example",
+    "word": "capture",
+    "text": "Here is capture in a sentence. The photographer hoped to capture the sunset."
+  },
+  {
+    "kind": "spelling",
+    "word": "capture",
+    "text": "Listen letter by letter. capture: C, A, P, T, U, R, E."
+  },
+  {
+    "kind": "word",
+    "word": "chapter",
+    "text": "chapter"
+  },
+  {
+    "kind": "definition",
+    "word": "chapter",
+    "text": "A clue for chapter: A section of a book."
+  },
+  {
+    "kind": "example",
+    "word": "chapter",
+    "text": "A sentence with chapter. He read one chapter before turning off the light."
+  },
+  {
+    "kind": "spelling",
+    "word": "chapter",
+    "text": "Here are the letters for chapter: C, H, A, P, T, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "comfort",
+    "text": "comfort"
+  },
+  {
+    "kind": "definition",
+    "word": "comfort",
+    "text": "Here is what comfort means: A feeling of ease and wellbeing."
+  },
+  {
+    "kind": "example",
+    "word": "comfort",
+    "text": "Listen for comfort in this sentence. A warm blanket brought comfort on the cold night."
+  },
+  {
+    "kind": "spelling",
+    "word": "comfort",
+    "text": "comfort. Spell it with me: C, O, M, F, O, R, T."
+  },
+  {
+    "kind": "word",
+    "word": "culture",
+    "text": "culture"
+  },
+  {
+    "kind": "definition",
+    "word": "culture",
+    "text": "Here is what culture means: The customs and beliefs of a group of people."
+  },
+  {
+    "kind": "example",
+    "word": "culture",
+    "text": "Listen for culture in this sentence. The festival celebrated the local culture."
+  },
+  {
+    "kind": "spelling",
+    "word": "culture",
+    "text": "Listen letter by letter. culture: C, U, L, T, U, R, E."
+  },
+  {
+    "kind": "word",
+    "word": "deliver",
+    "text": "deliver"
+  },
+  {
+    "kind": "definition",
+    "word": "deliver",
+    "text": "Here is what deliver means: To carry something to a person or place."
+  },
+  {
+    "kind": "example",
+    "word": "deliver",
+    "text": "Listen for deliver in this sentence. The courier will deliver the package by noon."
+  },
+  {
+    "kind": "spelling",
+    "word": "deliver",
+    "text": "Here are the letters for deliver: D, E, L, I, V, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "explore",
+    "text": "explore"
+  },
+  {
+    "kind": "definition",
+    "word": "explore",
+    "text": "Definition for explore: To travel to discover new places."
+  },
+  {
+    "kind": "example",
+    "word": "explore",
+    "text": "Here is one example for explore. They set out to explore the old forest."
+  },
+  {
+    "kind": "spelling",
+    "word": "explore",
+    "text": "explore. The letters are: E, X, P, L, O, R, E."
+  },
+  {
+    "kind": "word",
+    "word": "foreign",
+    "text": "foreign"
+  },
+  {
+    "kind": "definition",
+    "word": "foreign",
+    "text": "A clue for foreign: Belonging to another country."
+  },
+  {
+    "kind": "example",
+    "word": "foreign",
+    "text": "A sentence with foreign. She enjoyed trying foreign foods at the market."
+  },
+  {
+    "kind": "spelling",
+    "word": "foreign",
+    "text": "foreign. Spell it with me: F, O, R, E, I, G, N."
+  },
+  {
+    "kind": "word",
+    "word": "genuine",
+    "text": "genuine"
+  },
+  {
+    "kind": "definition",
+    "word": "genuine",
+    "text": "Definition for genuine: Real and not fake."
+  },
+  {
+    "kind": "example",
+    "word": "genuine",
+    "text": "Here is one example for genuine. The antique dealer confirmed it was a genuine coin."
+  },
+  {
+    "kind": "spelling",
+    "word": "genuine",
+    "text": "genuine. The letters are: G, E, N, U, I, N, E."
+  },
+  {
+    "kind": "word",
+    "word": "horizon",
+    "text": "horizon"
+  },
+  {
+    "kind": "definition",
+    "word": "horizon",
+    "text": "horizon. The meaning is: The line where the sky meets the land."
+  },
+  {
+    "kind": "example",
+    "word": "horizon",
+    "text": "Here is horizon in a sentence. A ship appeared on the distant horizon."
+  },
+  {
+    "kind": "spelling",
+    "word": "horizon",
+    "text": "horizon. The letters are: H, O, R, I, Z, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "insects",
+    "text": "insects"
+  },
+  {
+    "kind": "definition",
+    "word": "insects",
+    "text": "Think about this meaning for insects: Small creatures with six legs and three body parts."
+  },
+  {
+    "kind": "example",
+    "word": "insects",
+    "text": "In context, insects sounds like this. Many insects help flowers grow by carrying pollen."
+  },
+  {
+    "kind": "spelling",
+    "word": "insects",
+    "text": "insects. The letters are: I, N, S, E, C, T, S."
+  },
+  {
+    "kind": "word",
+    "word": "lantern",
+    "text": "lantern"
+  },
+  {
+    "kind": "definition",
+    "word": "lantern",
+    "text": "Here is what lantern means: A portable light inside a case."
+  },
+  {
+    "kind": "example",
+    "word": "lantern",
+    "text": "Listen for lantern in this sentence. He carried a lantern through the dark cave."
+  },
+  {
+    "kind": "spelling",
+    "word": "lantern",
+    "text": "Listen letter by letter. lantern: L, A, N, T, E, R, N."
+  },
+  {
+    "kind": "word",
+    "word": "measure",
+    "text": "measure"
+  },
+  {
+    "kind": "definition",
+    "word": "measure",
+    "text": "Here is what measure means: To find the size or amount of something."
+  },
+  {
+    "kind": "example",
+    "word": "measure",
+    "text": "Listen for measure in this sentence. Use a ruler to measure the length of the board."
+  },
+  {
+    "kind": "spelling",
+    "word": "measure",
+    "text": "Listen letter by letter. measure: M, E, A, S, U, R, E."
+  },
+  {
+    "kind": "word",
+    "word": "natural",
+    "text": "natural"
+  },
+  {
+    "kind": "definition",
+    "word": "natural",
+    "text": "Here is what natural means: Made by nature rather than by people."
+  },
+  {
+    "kind": "example",
+    "word": "natural",
+    "text": "Listen for natural in this sentence. The park preserved the natural wetlands."
+  },
+  {
+    "kind": "spelling",
+    "word": "natural",
+    "text": "Here are the letters for natural: N, A, T, U, R, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "observe",
+    "text": "observe"
+  },
+  {
+    "kind": "definition",
+    "word": "observe",
+    "text": "A clue for observe: To watch carefully."
+  },
+  {
+    "kind": "example",
+    "word": "observe",
+    "text": "A sentence with observe. Scientists observe the stars through a telescope."
+  },
+  {
+    "kind": "spelling",
+    "word": "observe",
+    "text": "observe. Spell it with me: O, B, S, E, R, V, E."
+  },
+  {
+    "kind": "word",
+    "word": "popular",
+    "text": "popular"
+  },
+  {
+    "kind": "definition",
+    "word": "popular",
+    "text": "popular. The meaning is: Liked by many people."
+  },
+  {
+    "kind": "example",
+    "word": "popular",
+    "text": "Here is popular in a sentence. The new game was popular at school."
+  },
+  {
+    "kind": "spelling",
+    "word": "popular",
+    "text": "Here are the letters for popular: P, O, P, U, L, A, R."
+  },
+  {
+    "kind": "word",
+    "word": "product",
+    "text": "product"
+  },
+  {
+    "kind": "definition",
+    "word": "product",
+    "text": "Definition for product: Something that is made or grown to be sold."
+  },
+  {
+    "kind": "example",
+    "word": "product",
+    "text": "Here is one example for product. The factory produced a new product every month."
+  },
+  {
+    "kind": "spelling",
+    "word": "product",
+    "text": "product. The letters are: P, R, O, D, U, C, T."
+  },
+  {
+    "kind": "word",
+    "word": "quarter",
+    "text": "quarter"
+  },
+  {
+    "kind": "definition",
+    "word": "quarter",
+    "text": "Definition for quarter: One of four equal parts."
+  },
+  {
+    "kind": "example",
+    "word": "quarter",
+    "text": "Here is one example for quarter. She cut the orange into quarters."
+  },
+  {
+    "kind": "spelling",
+    "word": "quarter",
+    "text": "quarter. Spell it with me: Q, U, A, R, T, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "railway",
+    "text": "railway"
+  },
+  {
+    "kind": "definition",
+    "word": "railway",
+    "text": "A clue for railway: A track on which trains travel."
+  },
+  {
+    "kind": "example",
+    "word": "railway",
+    "text": "A sentence with railway. The old railway crossed the valley."
+  },
+  {
+    "kind": "spelling",
+    "word": "railway",
+    "text": "Here are the letters for railway: R, A, I, L, W, A, Y."
+  },
+  {
+    "kind": "word",
+    "word": "society",
+    "text": "society"
+  },
+  {
+    "kind": "definition",
+    "word": "society",
+    "text": "Here is what society means: A group of people living together."
+  },
+  {
+    "kind": "example",
+    "word": "society",
+    "text": "Listen for society in this sentence. Science benefits all of society."
+  },
+  {
+    "kind": "spelling",
+    "word": "society",
+    "text": "society. Spell it with me: S, O, C, I, E, T, Y."
+  },
+  {
+    "kind": "word",
+    "word": "weather",
+    "text": "weather"
+  },
+  {
+    "kind": "definition",
+    "word": "weather",
+    "text": "A clue for weather: The state of the atmosphere at a given time."
+  },
+  {
+    "kind": "example",
+    "word": "weather",
+    "text": "A sentence with weather. Check the weather before planning a picnic."
+  },
+  {
+    "kind": "spelling",
+    "word": "weather",
+    "text": "weather. Spell it with me: W, E, A, T, H, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "accurate",
+    "text": "accurate"
+  },
+  {
+    "kind": "definition",
+    "word": "accurate",
+    "text": "accurate. The meaning is: Free from error; exactly right."
+  },
+  {
+    "kind": "example",
+    "word": "accurate",
+    "text": "Here is accurate in a sentence. Her answer was accurate to the last decimal."
+  },
+  {
+    "kind": "spelling",
+    "word": "accurate",
+    "text": "accurate. Spell it with me: A, C, C, U, R, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "beautiful",
+    "text": "beautiful"
+  },
+  {
+    "kind": "definition",
+    "word": "beautiful",
+    "text": "beautiful. The meaning is: Pleasing to the eye or ear."
+  },
+  {
+    "kind": "example",
+    "word": "beautiful",
+    "text": "Here is beautiful in a sentence. Sunset painted a beautiful sky."
+  },
+  {
+    "kind": "spelling",
+    "word": "beautiful",
+    "text": "Here are the letters for beautiful: B, E, A, U, T, I, F, U, L."
+  },
+  {
+    "kind": "word",
+    "word": "courage",
+    "text": "courage"
+  },
+  {
+    "kind": "definition",
+    "word": "courage",
+    "text": "Here is what courage means: The ability to face fear or pain."
+  },
+  {
+    "kind": "example",
+    "word": "courage",
+    "text": "Listen for courage in this sentence. It took courage to speak up."
+  },
+  {
+    "kind": "spelling",
+    "word": "courage",
+    "text": "Listen letter by letter. courage: C, O, U, R, A, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "disease",
+    "text": "disease"
+  },
+  {
+    "kind": "definition",
+    "word": "disease",
+    "text": "Definition for disease: An illness or sickness."
+  },
+  {
+    "kind": "example",
+    "word": "disease",
+    "text": "Here is one example for disease. The doctor treated the rare disease."
+  },
+  {
+    "kind": "spelling",
+    "word": "disease",
+    "text": "disease. Spell it with me: D, I, S, E, A, S, E."
+  },
+  {
+    "kind": "word",
+    "word": "emerald",
+    "text": "emerald"
+  },
+  {
+    "kind": "definition",
+    "word": "emerald",
+    "text": "Here is what emerald means: A bright green precious stone."
+  },
+  {
+    "kind": "example",
+    "word": "emerald",
+    "text": "Listen for emerald in this sentence. The ring held a single emerald."
+  },
+  {
+    "kind": "spelling",
+    "word": "emerald",
+    "text": "emerald. Spell it with me: E, M, E, R, A, L, D."
+  },
+  {
+    "kind": "word",
+    "word": "fragile",
+    "text": "fragile"
+  },
+  {
+    "kind": "definition",
+    "word": "fragile",
+    "text": "Here is what fragile means: Easily broken or damaged."
+  },
+  {
+    "kind": "example",
+    "word": "fragile",
+    "text": "Listen for fragile in this sentence. Handle the fragile vase with care."
+  },
+  {
+    "kind": "spelling",
+    "word": "fragile",
+    "text": "fragile. Spell it with me: F, R, A, G, I, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "hesitate",
+    "text": "hesitate"
+  },
+  {
+    "kind": "definition",
+    "word": "hesitate",
+    "text": "hesitate. The meaning is: To pause before doing something."
+  },
+  {
+    "kind": "example",
+    "word": "hesitate",
+    "text": "Here is hesitate in a sentence. Do not hesitate to ask for help."
+  },
+  {
+    "kind": "spelling",
+    "word": "hesitate",
+    "text": "Here are the letters for hesitate: H, E, S, I, T, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "illusion",
+    "text": "illusion"
+  },
+  {
+    "kind": "definition",
+    "word": "illusion",
+    "text": "Here is what illusion means: Something that tricks the eye or mind."
+  },
+  {
+    "kind": "example",
+    "word": "illusion",
+    "text": "Listen for illusion in this sentence. The mirror created an illusion of depth."
+  },
+  {
+    "kind": "spelling",
+    "word": "illusion",
+    "text": "Here are the letters for illusion: I, L, L, U, S, I, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "jewelry",
+    "text": "jewelry"
+  },
+  {
+    "kind": "definition",
+    "word": "jewelry",
+    "text": "jewelry. The meaning is: Decorative items worn on the body."
+  },
+  {
+    "kind": "example",
+    "word": "jewelry",
+    "text": "Here is jewelry in a sentence. She polished her grandmother's jewelry."
+  },
+  {
+    "kind": "spelling",
+    "word": "jewelry",
+    "text": "Listen letter by letter. jewelry: J, E, W, E, L, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "kingdom",
+    "text": "kingdom"
+  },
+  {
+    "kind": "definition",
+    "word": "kingdom",
+    "text": "kingdom. The meaning is: A country ruled by a king or queen."
+  },
+  {
+    "kind": "example",
+    "word": "kingdom",
+    "text": "Here is kingdom in a sentence. The kingdom stretched to the sea."
+  },
+  {
+    "kind": "spelling",
+    "word": "kingdom",
+    "text": "kingdom. The letters are: K, I, N, G, D, O, M."
+  },
+  {
+    "kind": "word",
+    "word": "laundry",
+    "text": "laundry"
+  },
+  {
+    "kind": "definition",
+    "word": "laundry",
+    "text": "A clue for laundry: Clothes that need washing."
+  },
+  {
+    "kind": "example",
+    "word": "laundry",
+    "text": "A sentence with laundry. The laundry piled up all week."
+  },
+  {
+    "kind": "spelling",
+    "word": "laundry",
+    "text": "Here are the letters for laundry: L, A, U, N, D, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "mystery",
+    "text": "mystery"
+  },
+  {
+    "kind": "definition",
+    "word": "mystery",
+    "text": "Think about this meaning for mystery: Something that is hard to understand."
+  },
+  {
+    "kind": "example",
+    "word": "mystery",
+    "text": "In context, mystery sounds like this. The missing key became a mystery."
+  },
+  {
+    "kind": "spelling",
+    "word": "mystery",
+    "text": "mystery. The letters are: M, Y, S, T, E, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "nuisance",
+    "text": "nuisance"
+  },
+  {
+    "kind": "definition",
+    "word": "nuisance",
+    "text": "A clue for nuisance: A thing that is annoying."
+  },
+  {
+    "kind": "example",
+    "word": "nuisance",
+    "text": "A sentence with nuisance. The buzzing fly was a nuisance."
+  },
+  {
+    "kind": "spelling",
+    "word": "nuisance",
+    "text": "nuisance. Spell it with me: N, U, I, S, A, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "organize",
+    "text": "organize"
+  },
+  {
+    "kind": "definition",
+    "word": "organize",
+    "text": "Definition for organize: To arrange in an orderly way."
+  },
+  {
+    "kind": "example",
+    "word": "organize",
+    "text": "Here is one example for organize. Please organize your books by color."
+  },
+  {
+    "kind": "spelling",
+    "word": "organize",
+    "text": "organize. The letters are: O, R, G, A, N, I, Z, E."
+  },
+  {
+    "kind": "word",
+    "word": "patriot",
+    "text": "patriot"
+  },
+  {
+    "kind": "definition",
+    "word": "patriot",
+    "text": "patriot. The meaning is: A person who loves and defends their country."
+  },
+  {
+    "kind": "example",
+    "word": "patriot",
+    "text": "Here is patriot in a sentence. The patriot raised the flag with pride."
+  },
+  {
+    "kind": "spelling",
+    "word": "patriot",
+    "text": "patriot. The letters are: P, A, T, R, I, O, T."
+  },
+  {
+    "kind": "word",
+    "word": "quantity",
+    "text": "quantity"
+  },
+  {
+    "kind": "definition",
+    "word": "quantity",
+    "text": "Think about this meaning for quantity: An amount or number of something."
+  },
+  {
+    "kind": "example",
+    "word": "quantity",
+    "text": "In context, quantity sounds like this. We need a large quantity of flour for the bake sale."
+  },
+  {
+    "kind": "spelling",
+    "word": "quantity",
+    "text": "quantity. The letters are: Q, U, A, N, T, I, T, Y."
+  },
+  {
+    "kind": "word",
+    "word": "reluctant",
+    "text": "reluctant"
+  },
+  {
+    "kind": "definition",
+    "word": "reluctant",
+    "text": "reluctant. The meaning is: Unwilling to do something."
+  },
+  {
+    "kind": "example",
+    "word": "reluctant",
+    "text": "Here is reluctant in a sentence. He was reluctant to leave the warm fire."
+  },
+  {
+    "kind": "spelling",
+    "word": "reluctant",
+    "text": "Listen letter by letter. reluctant: R, E, L, U, C, T, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "service",
+    "text": "service"
+  },
+  {
+    "kind": "definition",
+    "word": "service",
+    "text": "Think about this meaning for service: An act of helping others."
+  },
+  {
+    "kind": "example",
+    "word": "service",
+    "text": "In context, service sounds like this. She volunteered her service at the shelter."
+  },
+  {
+    "kind": "spelling",
+    "word": "service",
+    "text": "Here are the letters for service: S, E, R, V, I, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "talented",
+    "text": "talented"
+  },
+  {
+    "kind": "definition",
+    "word": "talented",
+    "text": "Definition for talented: Having a natural ability to do something well."
+  },
+  {
+    "kind": "example",
+    "word": "talented",
+    "text": "Here is one example for talented. The talented musician played five instruments."
+  },
+  {
+    "kind": "spelling",
+    "word": "talented",
+    "text": "talented. The letters are: T, A, L, E, N, T, E, D."
+  },
+  {
+    "kind": "word",
+    "word": "universe",
+    "text": "universe"
+  },
+  {
+    "kind": "definition",
+    "word": "universe",
+    "text": "Here is what universe means: All of space and everything in it."
+  },
+  {
+    "kind": "example",
+    "word": "universe",
+    "text": "Listen for universe in this sentence. Scientists study the expanding universe."
+  },
+  {
+    "kind": "spelling",
+    "word": "universe",
+    "text": "Here are the letters for universe: U, N, I, V, E, R, S, E."
+  },
+  {
+    "kind": "word",
+    "word": "valuable",
+    "text": "valuable"
+  },
+  {
+    "kind": "definition",
+    "word": "valuable",
+    "text": "valuable. The meaning is: Worth a great deal of money or importance."
+  },
+  {
+    "kind": "example",
+    "word": "valuable",
+    "text": "Here is valuable in a sentence. Good friends are more valuable than gold."
+  },
+  {
+    "kind": "spelling",
+    "word": "valuable",
+    "text": "Listen letter by letter. valuable: V, A, L, U, A, B, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "wanderer",
+    "text": "wanderer"
+  },
+  {
+    "kind": "definition",
+    "word": "wanderer",
+    "text": "Definition for wanderer: A person who travels without a fixed destination."
+  },
+  {
+    "kind": "example",
+    "word": "wanderer",
+    "text": "Here is one example for wanderer. The wanderer slept under the open stars."
+  },
+  {
+    "kind": "spelling",
+    "word": "wanderer",
+    "text": "Listen letter by letter. wanderer: W, A, N, D, E, R, E, R."
+  },
+  {
+    "kind": "word",
+    "word": "yearning",
+    "text": "yearning"
+  },
+  {
+    "kind": "definition",
+    "word": "yearning",
+    "text": "A clue for yearning: A strong desire or longing."
+  },
+  {
+    "kind": "example",
+    "word": "yearning",
+    "text": "A sentence with yearning. She felt a yearning to visit the sea again."
+  },
+  {
+    "kind": "spelling",
+    "word": "yearning",
+    "text": "Here are the letters for yearning: Y, E, A, R, N, I, N, G."
+  },
+  {
+    "kind": "word",
+    "word": "abundant",
+    "text": "abundant"
+  },
+  {
+    "kind": "definition",
+    "word": "abundant",
+    "text": "Definition for abundant: Present in very great quantities."
+  },
+  {
+    "kind": "example",
+    "word": "abundant",
+    "text": "Here is one example for abundant. The orchard was abundant with ripe apples."
+  },
+  {
+    "kind": "spelling",
+    "word": "abundant",
+    "text": "Here are the letters for abundant: A, B, U, N, D, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "cheerful",
+    "text": "cheerful"
+  },
+  {
+    "kind": "definition",
+    "word": "cheerful",
+    "text": "cheerful. The meaning is: Noticeably happy and optimistic."
+  },
+  {
+    "kind": "example",
+    "word": "cheerful",
+    "text": "Here is cheerful in a sentence. His cheerful greeting brightened the room."
+  },
+  {
+    "kind": "spelling",
+    "word": "cheerful",
+    "text": "cheerful. Spell it with me: C, H, E, E, R, F, U, L."
+  },
+  {
+    "kind": "word",
+    "word": "commute",
+    "text": "commute"
+  },
+  {
+    "kind": "definition",
+    "word": "commute",
+    "text": "Here is what commute means: A journey made regularly between home and work."
+  },
+  {
+    "kind": "example",
+    "word": "commute",
+    "text": "Listen for commute in this sentence. Her daily commute takes forty minutes by train."
+  },
+  {
+    "kind": "spelling",
+    "word": "commute",
+    "text": "Listen letter by letter. commute: C, O, M, M, U, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "deserve",
+    "text": "deserve"
+  },
+  {
+    "kind": "definition",
+    "word": "deserve",
+    "text": "Think about this meaning for deserve: To be worthy of something."
+  },
+  {
+    "kind": "example",
+    "word": "deserve",
+    "text": "In context, deserve sounds like this. After all that hard work, you deserve a rest."
+  },
+  {
+    "kind": "spelling",
+    "word": "deserve",
+    "text": "Listen letter by letter. deserve: D, E, S, E, R, V, E."
+  },
+  {
+    "kind": "word",
+    "word": "enormous",
+    "text": "enormous"
+  },
+  {
+    "kind": "definition",
+    "word": "enormous",
+    "text": "Definition for enormous: Very large in size."
+  },
+  {
+    "kind": "example",
+    "word": "enormous",
+    "text": "Here is one example for enormous. The enormous whale breached beside the boat."
+  },
+  {
+    "kind": "spelling",
+    "word": "enormous",
+    "text": "enormous. Spell it with me: E, N, O, R, M, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "ferocious",
+    "text": "ferocious"
+  },
+  {
+    "kind": "definition",
+    "word": "ferocious",
+    "text": "Think about this meaning for ferocious: Savagely fierce or violent."
+  },
+  {
+    "kind": "example",
+    "word": "ferocious",
+    "text": "In context, ferocious sounds like this. A ferocious storm swept through the coast."
+  },
+  {
+    "kind": "spelling",
+    "word": "ferocious",
+    "text": "ferocious. The letters are: F, E, R, O, C, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "graceful",
+    "text": "graceful"
+  },
+  {
+    "kind": "definition",
+    "word": "graceful",
+    "text": "A clue for graceful: Having elegance and ease of movement."
+  },
+  {
+    "kind": "example",
+    "word": "graceful",
+    "text": "A sentence with graceful. The dancer took graceful steps across the stage."
+  },
+  {
+    "kind": "spelling",
+    "word": "graceful",
+    "text": "Here are the letters for graceful: G, R, A, C, E, F, U, L."
+  },
+  {
+    "kind": "word",
+    "word": "heritage",
+    "text": "heritage"
+  },
+  {
+    "kind": "definition",
+    "word": "heritage",
+    "text": "Here is what heritage means: Traditions passed down through generations."
+  },
+  {
+    "kind": "example",
+    "word": "heritage",
+    "text": "Listen for heritage in this sentence. The festival celebrated their cultural heritage."
+  },
+  {
+    "kind": "spelling",
+    "word": "heritage",
+    "text": "heritage. The letters are: H, E, R, I, T, A, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "innocent",
+    "text": "innocent"
+  },
+  {
+    "kind": "definition",
+    "word": "innocent",
+    "text": "Here is what innocent means: Not guilty; free from blame."
+  },
+  {
+    "kind": "example",
+    "word": "innocent",
+    "text": "Listen for innocent in this sentence. The jury found the defendant innocent."
+  },
+  {
+    "kind": "spelling",
+    "word": "innocent",
+    "text": "Listen letter by letter. innocent: I, N, N, O, C, E, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "jealousy",
+    "text": "jealousy"
+  },
+  {
+    "kind": "definition",
+    "word": "jealousy",
+    "text": "Definition for jealousy: Envy of what someone else has."
+  },
+  {
+    "kind": "example",
+    "word": "jealousy",
+    "text": "Here is one example for jealousy. Jealousy can damage a friendship."
+  },
+  {
+    "kind": "spelling",
+    "word": "jealousy",
+    "text": "Listen letter by letter. jealousy: J, E, A, L, O, U, S, Y."
+  },
+  {
+    "kind": "word",
+    "word": "luminous",
+    "text": "luminous"
+  },
+  {
+    "kind": "definition",
+    "word": "luminous",
+    "text": "Definition for luminous: Giving off or reflecting bright light."
+  },
+  {
+    "kind": "example",
+    "word": "luminous",
+    "text": "Here is one example for luminous. Fireflies produced a soft luminous glow."
+  },
+  {
+    "kind": "spelling",
+    "word": "luminous",
+    "text": "luminous. Spell it with me: L, U, M, I, N, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "moisture",
+    "text": "moisture"
+  },
+  {
+    "kind": "definition",
+    "word": "moisture",
+    "text": "Think about this meaning for moisture: Water or liquid in the air or a substance."
+  },
+  {
+    "kind": "example",
+    "word": "moisture",
+    "text": "In context, moisture sounds like this. The moisture in the air made the bread soft."
+  },
+  {
+    "kind": "spelling",
+    "word": "moisture",
+    "text": "moisture. Spell it with me: M, O, I, S, T, U, R, E."
+  },
+  {
+    "kind": "word",
+    "word": "nourish",
+    "text": "nourish"
+  },
+  {
+    "kind": "definition",
+    "word": "nourish",
+    "text": "Definition for nourish: To provide food and care needed to grow."
+  },
+  {
+    "kind": "example",
+    "word": "nourish",
+    "text": "Here is one example for nourish. Good soil will nourish the seedlings."
+  },
+  {
+    "kind": "spelling",
+    "word": "nourish",
+    "text": "nourish. Spell it with me: N, O, U, R, I, S, H."
+  },
+  {
+    "kind": "word",
+    "word": "physical",
+    "text": "physical"
+  },
+  {
+    "kind": "definition",
+    "word": "physical",
+    "text": "Think about this meaning for physical: Relating to the body rather than the mind."
+  },
+  {
+    "kind": "example",
+    "word": "physical",
+    "text": "In context, physical sounds like this. Daily exercise is good for physical health."
+  },
+  {
+    "kind": "spelling",
+    "word": "physical",
+    "text": "physical. The letters are: P, H, Y, S, I, C, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "realized",
+    "text": "realized"
+  },
+  {
+    "kind": "definition",
+    "word": "realized",
+    "text": "Think about this meaning for realized: Became fully aware of something."
+  },
+  {
+    "kind": "example",
+    "word": "realized",
+    "text": "In context, realized sounds like this. She realized she had left her keys inside."
+  },
+  {
+    "kind": "spelling",
+    "word": "realized",
+    "text": "Listen letter by letter. realized: R, E, A, L, I, Z, E, D."
+  },
+  {
+    "kind": "word",
+    "word": "stubborn",
+    "text": "stubborn"
+  },
+  {
+    "kind": "definition",
+    "word": "stubborn",
+    "text": "Definition for stubborn: Refusing to change despite pressure."
+  },
+  {
+    "kind": "example",
+    "word": "stubborn",
+    "text": "Here is one example for stubborn. The stubborn mule would not move an inch."
+  },
+  {
+    "kind": "spelling",
+    "word": "stubborn",
+    "text": "stubborn. The letters are: S, T, U, B, B, O, R, N."
+  },
+  {
+    "kind": "word",
+    "word": "sympathy",
+    "text": "sympathy"
+  },
+  {
+    "kind": "definition",
+    "word": "sympathy",
+    "text": "Definition for sympathy: Feeling sorry for someone's trouble."
+  },
+  {
+    "kind": "example",
+    "word": "sympathy",
+    "text": "Here is one example for sympathy. He expressed his sympathy after her loss."
+  },
+  {
+    "kind": "spelling",
+    "word": "sympathy",
+    "text": "Here are the letters for sympathy: S, Y, M, P, A, T, H, Y."
+  },
+  {
+    "kind": "word",
+    "word": "tranquil",
+    "text": "tranquil"
+  },
+  {
+    "kind": "definition",
+    "word": "tranquil",
+    "text": "Definition for tranquil: Free from disturbance; calm."
+  },
+  {
+    "kind": "example",
+    "word": "tranquil",
+    "text": "Here is one example for tranquil. The lake was tranquil in the early morning."
+  },
+  {
+    "kind": "spelling",
+    "word": "tranquil",
+    "text": "Listen letter by letter. tranquil: T, R, A, N, Q, U, I, L."
+  },
+  {
+    "kind": "word",
+    "word": "ultimate",
+    "text": "ultimate"
+  },
+  {
+    "kind": "definition",
+    "word": "ultimate",
+    "text": "Think about this meaning for ultimate: Being the best or most extreme."
+  },
+  {
+    "kind": "example",
+    "word": "ultimate",
+    "text": "In context, ultimate sounds like this. Winning the championship was her ultimate goal."
+  },
+  {
+    "kind": "spelling",
+    "word": "ultimate",
+    "text": "Here are the letters for ultimate: U, L, T, I, M, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "vertical",
+    "text": "vertical"
+  },
+  {
+    "kind": "definition",
+    "word": "vertical",
+    "text": "Definition for vertical: Going straight up and down."
+  },
+  {
+    "kind": "example",
+    "word": "vertical",
+    "text": "Here is one example for vertical. The cliff face was nearly vertical."
+  },
+  {
+    "kind": "spelling",
+    "word": "vertical",
+    "text": "Listen letter by letter. vertical: V, E, R, T, I, C, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "withdraw",
+    "text": "withdraw"
+  },
+  {
+    "kind": "definition",
+    "word": "withdraw",
+    "text": "A clue for withdraw: To pull back or take out."
+  },
+  {
+    "kind": "example",
+    "word": "withdraw",
+    "text": "A sentence with withdraw. She decided to withdraw from the competition."
+  },
+  {
+    "kind": "spelling",
+    "word": "withdraw",
+    "text": "Listen letter by letter. withdraw: W, I, T, H, D, R, A, W."
+  },
+  {
+    "kind": "word",
+    "word": "zeppelin",
+    "text": "zeppelin"
+  },
+  {
+    "kind": "definition",
+    "word": "zeppelin",
+    "text": "Definition for zeppelin: A large cigar-shaped airship."
+  },
+  {
+    "kind": "example",
+    "word": "zeppelin",
+    "text": "Here is one example for zeppelin. The zeppelin floated slowly over the city."
+  },
+  {
+    "kind": "spelling",
+    "word": "zeppelin",
+    "text": "zeppelin. The letters are: Z, E, P, P, E, L, I, N."
+  },
+  {
+    "kind": "word",
+    "word": "acquaintance",
+    "text": "acquaintance"
+  },
+  {
+    "kind": "definition",
+    "word": "acquaintance",
+    "text": "Definition for acquaintance: A person one knows only slightly."
+  },
+  {
+    "kind": "example",
+    "word": "acquaintance",
+    "text": "Here is one example for acquaintance. He is an acquaintance from work, not a close friend."
+  },
+  {
+    "kind": "spelling",
+    "word": "acquaintance",
+    "text": "acquaintance. The letters are: A, C, Q, U, A, I, N, T, A, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "bureaucracy",
+    "text": "bureaucracy"
+  },
+  {
+    "kind": "definition",
+    "word": "bureaucracy",
+    "text": "Definition for bureaucracy: A system of government with many offices and rules."
+  },
+  {
+    "kind": "example",
+    "word": "bureaucracy",
+    "text": "Here is one example for bureaucracy. The bureaucracy slowed the permit process."
+  },
+  {
+    "kind": "spelling",
+    "word": "bureaucracy",
+    "text": "Listen letter by letter. bureaucracy: B, U, R, E, A, U, C, R, A, C, Y."
+  },
+  {
+    "kind": "word",
+    "word": "conscience",
+    "text": "conscience"
+  },
+  {
+    "kind": "definition",
+    "word": "conscience",
+    "text": "A clue for conscience: A sense of right and wrong."
+  },
+  {
+    "kind": "example",
+    "word": "conscience",
+    "text": "A sentence with conscience. Her conscience would not let her lie."
+  },
+  {
+    "kind": "spelling",
+    "word": "conscience",
+    "text": "Listen letter by letter. conscience: C, O, N, S, C, I, E, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "deceive",
+    "text": "deceive"
+  },
+  {
+    "kind": "definition",
+    "word": "deceive",
+    "text": "Think about this meaning for deceive: To make someone believe something untrue."
+  },
+  {
+    "kind": "example",
+    "word": "deceive",
+    "text": "In context, deceive sounds like this. He would never deceive a close friend."
+  },
+  {
+    "kind": "spelling",
+    "word": "deceive",
+    "text": "Here are the letters for deceive: D, E, C, E, I, V, E."
+  },
+  {
+    "kind": "word",
+    "word": "embarrass",
+    "text": "embarrass"
+  },
+  {
+    "kind": "definition",
+    "word": "embarrass",
+    "text": "A clue for embarrass: To make someone feel uncomfortable."
+  },
+  {
+    "kind": "example",
+    "word": "embarrass",
+    "text": "A sentence with embarrass. I didn't mean to embarrass you."
+  },
+  {
+    "kind": "spelling",
+    "word": "embarrass",
+    "text": "Listen letter by letter. embarrass: E, M, B, A, R, R, A, S, S."
+  },
+  {
+    "kind": "word",
+    "word": "fluorescent",
+    "text": "fluorescent"
+  },
+  {
+    "kind": "definition",
+    "word": "fluorescent",
+    "text": "fluorescent. The meaning is: Giving off bright light when hit by energy."
+  },
+  {
+    "kind": "example",
+    "word": "fluorescent",
+    "text": "Here is fluorescent in a sentence. The hallway glowed under fluorescent bulbs."
+  },
+  {
+    "kind": "spelling",
+    "word": "fluorescent",
+    "text": "fluorescent. Spell it with me: F, L, U, O, R, E, S, C, E, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "guarantee",
+    "text": "guarantee"
+  },
+  {
+    "kind": "definition",
+    "word": "guarantee",
+    "text": "guarantee. The meaning is: A formal promise that something will happen."
+  },
+  {
+    "kind": "example",
+    "word": "guarantee",
+    "text": "Here is guarantee in a sentence. The shop offered a full guarantee."
+  },
+  {
+    "kind": "spelling",
+    "word": "guarantee",
+    "text": "guarantee. Spell it with me: G, U, A, R, A, N, T, E, E."
+  },
+  {
+    "kind": "word",
+    "word": "harassment",
+    "text": "harassment"
+  },
+  {
+    "kind": "definition",
+    "word": "harassment",
+    "text": "Definition for harassment: The act of repeatedly bothering someone."
+  },
+  {
+    "kind": "example",
+    "word": "harassment",
+    "text": "Here is one example for harassment. The company has a clear anti-harassment policy."
+  },
+  {
+    "kind": "spelling",
+    "word": "harassment",
+    "text": "Listen letter by letter. harassment: H, A, R, A, S, S, M, E, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "inevitable",
+    "text": "inevitable"
+  },
+  {
+    "kind": "definition",
+    "word": "inevitable",
+    "text": "Here is what inevitable means: Sure to happen; unavoidable."
+  },
+  {
+    "kind": "example",
+    "word": "inevitable",
+    "text": "Listen for inevitable in this sentence. An eventual goodbye felt inevitable."
+  },
+  {
+    "kind": "spelling",
+    "word": "inevitable",
+    "text": "inevitable. The letters are: I, N, E, V, I, T, A, B, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "perseverance",
+    "text": "perseverance"
+  },
+  {
+    "kind": "definition",
+    "word": "perseverance",
+    "text": "Definition for perseverance: Continuing to try despite difficulty."
+  },
+  {
+    "kind": "example",
+    "word": "perseverance",
+    "text": "Here is one example for perseverance. Her perseverance carried her through the long project."
+  },
+  {
+    "kind": "spelling",
+    "word": "perseverance",
+    "text": "perseverance. The letters are: P, E, R, S, E, V, E, R, A, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "knowledgeable",
+    "text": "knowledgeable"
+  },
+  {
+    "kind": "definition",
+    "word": "knowledgeable",
+    "text": "knowledgeable. The meaning is: Having a lot of information about a subject."
+  },
+  {
+    "kind": "example",
+    "word": "knowledgeable",
+    "text": "Here is knowledgeable in a sentence. She is knowledgeable about tropical plants."
+  },
+  {
+    "kind": "spelling",
+    "word": "knowledgeable",
+    "text": "knowledgeable. Spell it with me: K, N, O, W, L, E, D, G, E, A, B, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "legitimate",
+    "text": "legitimate"
+  },
+  {
+    "kind": "definition",
+    "word": "legitimate",
+    "text": "A clue for legitimate: Conforming to what is accepted or required."
+  },
+  {
+    "kind": "example",
+    "word": "legitimate",
+    "text": "A sentence with legitimate. He had a legitimate reason to leave early."
+  },
+  {
+    "kind": "spelling",
+    "word": "legitimate",
+    "text": "Here are the letters for legitimate: L, E, G, I, T, I, M, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "miscellaneous",
+    "text": "miscellaneous"
+  },
+  {
+    "kind": "definition",
+    "word": "miscellaneous",
+    "text": "Here is what miscellaneous means: Of various kinds; mixed."
+  },
+  {
+    "kind": "example",
+    "word": "miscellaneous",
+    "text": "Listen for miscellaneous in this sentence. The drawer held miscellaneous tools."
+  },
+  {
+    "kind": "spelling",
+    "word": "miscellaneous",
+    "text": "Listen letter by letter. miscellaneous: M, I, S, C, E, L, L, A, N, E, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "necessary",
+    "text": "necessary"
+  },
+  {
+    "kind": "definition",
+    "word": "necessary",
+    "text": "Think about this meaning for necessary: Needed to achieve a certain result."
+  },
+  {
+    "kind": "example",
+    "word": "necessary",
+    "text": "In context, necessary sounds like this. A passport is necessary for the trip."
+  },
+  {
+    "kind": "spelling",
+    "word": "necessary",
+    "text": "necessary. The letters are: N, E, C, E, S, S, A, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "occurrence",
+    "text": "occurrence"
+  },
+  {
+    "kind": "definition",
+    "word": "occurrence",
+    "text": "Here is what occurrence means: A happening or event."
+  },
+  {
+    "kind": "example",
+    "word": "occurrence",
+    "text": "Listen for occurrence in this sentence. Thunder is a common occurrence here."
+  },
+  {
+    "kind": "spelling",
+    "word": "occurrence",
+    "text": "Here are the letters for occurrence: O, C, C, U, R, R, E, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "perceive",
+    "text": "perceive"
+  },
+  {
+    "kind": "definition",
+    "word": "perceive",
+    "text": "A clue for perceive: To become aware of through the senses or mind."
+  },
+  {
+    "kind": "example",
+    "word": "perceive",
+    "text": "A sentence with perceive. She could perceive a subtle change in his tone."
+  },
+  {
+    "kind": "spelling",
+    "word": "perceive",
+    "text": "Here are the letters for perceive: P, E, R, C, E, I, V, E."
+  },
+  {
+    "kind": "word",
+    "word": "privilege",
+    "text": "privilege"
+  },
+  {
+    "kind": "definition",
+    "word": "privilege",
+    "text": "Here is what privilege means: A special right granted to some people."
+  },
+  {
+    "kind": "example",
+    "word": "privilege",
+    "text": "Listen for privilege in this sentence. Attending the concert was a great privilege."
+  },
+  {
+    "kind": "spelling",
+    "word": "privilege",
+    "text": "Here are the letters for privilege: P, R, I, V, I, L, E, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "recommend",
+    "text": "recommend"
+  },
+  {
+    "kind": "definition",
+    "word": "recommend",
+    "text": "Definition for recommend: To suggest something as a good choice."
+  },
+  {
+    "kind": "example",
+    "word": "recommend",
+    "text": "Here is one example for recommend. The librarian would recommend a book to every visitor."
+  },
+  {
+    "kind": "spelling",
+    "word": "recommend",
+    "text": "recommend. Spell it with me: R, E, C, O, M, M, E, N, D."
+  },
+  {
+    "kind": "word",
+    "word": "sufficient",
+    "text": "sufficient"
+  },
+  {
+    "kind": "definition",
+    "word": "sufficient",
+    "text": "Here is what sufficient means: Enough for the purpose."
+  },
+  {
+    "kind": "example",
+    "word": "sufficient",
+    "text": "Listen for sufficient in this sentence. Is the light sufficient for reading?"
+  },
+  {
+    "kind": "spelling",
+    "word": "sufficient",
+    "text": "Listen letter by letter. sufficient: S, U, F, F, I, C, I, E, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "technique",
+    "text": "technique"
+  },
+  {
+    "kind": "definition",
+    "word": "technique",
+    "text": "Definition for technique: A way of doing something skillfully."
+  },
+  {
+    "kind": "example",
+    "word": "technique",
+    "text": "Here is one example for technique. The artist had a unique painting technique."
+  },
+  {
+    "kind": "spelling",
+    "word": "technique",
+    "text": "technique. Spell it with me: T, E, C, H, N, I, Q, U, E."
+  },
+  {
+    "kind": "word",
+    "word": "unanimous",
+    "text": "unanimous"
+  },
+  {
+    "kind": "definition",
+    "word": "unanimous",
+    "text": "A clue for unanimous: Agreed by everyone."
+  },
+  {
+    "kind": "example",
+    "word": "unanimous",
+    "text": "A sentence with unanimous. The vote to add recess was unanimous."
+  },
+  {
+    "kind": "spelling",
+    "word": "unanimous",
+    "text": "unanimous. The letters are: U, N, A, N, I, M, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "vulnerable",
+    "text": "vulnerable"
+  },
+  {
+    "kind": "definition",
+    "word": "vulnerable",
+    "text": "Definition for vulnerable: Open to harm or attack."
+  },
+  {
+    "kind": "example",
+    "word": "vulnerable",
+    "text": "Here is one example for vulnerable. Young animals are vulnerable to predators."
+  },
+  {
+    "kind": "spelling",
+    "word": "vulnerable",
+    "text": "vulnerable. Spell it with me: V, U, L, N, E, R, A, B, L, E."
+  },
+  {
+    "kind": "word",
+    "word": "adversary",
+    "text": "adversary"
+  },
+  {
+    "kind": "definition",
+    "word": "adversary",
+    "text": "A clue for adversary: An opponent or enemy."
+  },
+  {
+    "kind": "example",
+    "word": "adversary",
+    "text": "A sentence with adversary. She faced her adversary in the final match."
+  },
+  {
+    "kind": "spelling",
+    "word": "adversary",
+    "text": "Here are the letters for adversary: A, D, V, E, R, S, A, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "coincidence",
+    "text": "coincidence"
+  },
+  {
+    "kind": "definition",
+    "word": "coincidence",
+    "text": "Think about this meaning for coincidence: A surprising event that happens by chance."
+  },
+  {
+    "kind": "example",
+    "word": "coincidence",
+    "text": "In context, coincidence sounds like this. Meeting twins on twin day was a coincidence."
+  },
+  {
+    "kind": "spelling",
+    "word": "coincidence",
+    "text": "coincidence. Spell it with me: C, O, I, N, C, I, D, E, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "discipline",
+    "text": "discipline"
+  },
+  {
+    "kind": "definition",
+    "word": "discipline",
+    "text": "Here is what discipline means: Training that produces obedience or skill."
+  },
+  {
+    "kind": "example",
+    "word": "discipline",
+    "text": "Listen for discipline in this sentence. Success in sport requires discipline and practice."
+  },
+  {
+    "kind": "spelling",
+    "word": "discipline",
+    "text": "discipline. Spell it with me: D, I, S, C, I, P, L, I, N, E."
+  },
+  {
+    "kind": "word",
+    "word": "exaggerate",
+    "text": "exaggerate"
+  },
+  {
+    "kind": "definition",
+    "word": "exaggerate",
+    "text": "Think about this meaning for exaggerate: To make something seem larger than it is."
+  },
+  {
+    "kind": "example",
+    "word": "exaggerate",
+    "text": "In context, exaggerate sounds like this. He tends to exaggerate when telling stories."
+  },
+  {
+    "kind": "spelling",
+    "word": "exaggerate",
+    "text": "exaggerate. The letters are: E, X, A, G, G, E, R, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "fascinate",
+    "text": "fascinate"
+  },
+  {
+    "kind": "definition",
+    "word": "fascinate",
+    "text": "Think about this meaning for fascinate: To attract and hold attention strongly."
+  },
+  {
+    "kind": "example",
+    "word": "fascinate",
+    "text": "In context, fascinate sounds like this. Ancient ruins fascinate archaeologists worldwide."
+  },
+  {
+    "kind": "spelling",
+    "word": "fascinate",
+    "text": "Listen letter by letter. fascinate: F, A, S, C, I, N, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "humiliate",
+    "text": "humiliate"
+  },
+  {
+    "kind": "definition",
+    "word": "humiliate",
+    "text": "humiliate. The meaning is: To make someone feel deeply ashamed."
+  },
+  {
+    "kind": "example",
+    "word": "humiliate",
+    "text": "Here is humiliate in a sentence. The prank was meant to humiliate the student."
+  },
+  {
+    "kind": "spelling",
+    "word": "humiliate",
+    "text": "humiliate. Spell it with me: H, U, M, I, L, I, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "illiterate",
+    "text": "illiterate"
+  },
+  {
+    "kind": "definition",
+    "word": "illiterate",
+    "text": "illiterate. The meaning is: Unable to read or write."
+  },
+  {
+    "kind": "example",
+    "word": "illiterate",
+    "text": "Here is illiterate in a sentence. Programs were set up to help illiterate adults."
+  },
+  {
+    "kind": "spelling",
+    "word": "illiterate",
+    "text": "Here are the letters for illiterate: I, L, L, I, T, E, R, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "jeopardize",
+    "text": "jeopardize"
+  },
+  {
+    "kind": "definition",
+    "word": "jeopardize",
+    "text": "Think about this meaning for jeopardize: To put into danger."
+  },
+  {
+    "kind": "example",
+    "word": "jeopardize",
+    "text": "In context, jeopardize sounds like this. Cheating can jeopardize your entire career."
+  },
+  {
+    "kind": "spelling",
+    "word": "jeopardize",
+    "text": "Here are the letters for jeopardize: J, E, O, P, A, R, D, I, Z, E."
+  },
+  {
+    "kind": "word",
+    "word": "malicious",
+    "text": "malicious"
+  },
+  {
+    "kind": "definition",
+    "word": "malicious",
+    "text": "Think about this meaning for malicious: Intending to do harm."
+  },
+  {
+    "kind": "example",
+    "word": "malicious",
+    "text": "In context, malicious sounds like this. The malicious gossip spread quickly."
+  },
+  {
+    "kind": "spelling",
+    "word": "malicious",
+    "text": "Listen letter by letter. malicious: M, A, L, I, C, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "negotiate",
+    "text": "negotiate"
+  },
+  {
+    "kind": "definition",
+    "word": "negotiate",
+    "text": "negotiate. The meaning is: To discuss to reach an agreement."
+  },
+  {
+    "kind": "example",
+    "word": "negotiate",
+    "text": "Here is negotiate in a sentence. The two leaders agreed to negotiate a peace deal."
+  },
+  {
+    "kind": "spelling",
+    "word": "negotiate",
+    "text": "Listen letter by letter. negotiate: N, E, G, O, T, I, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "opposition",
+    "text": "opposition"
+  },
+  {
+    "kind": "definition",
+    "word": "opposition",
+    "text": "Definition for opposition: Resistance or conflict against something."
+  },
+  {
+    "kind": "example",
+    "word": "opposition",
+    "text": "Here is one example for opposition. The plan faced strong opposition from the council."
+  },
+  {
+    "kind": "spelling",
+    "word": "opposition",
+    "text": "Listen letter by letter. opposition: O, P, P, O, S, I, T, I, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "phenomenon",
+    "text": "phenomenon"
+  },
+  {
+    "kind": "definition",
+    "word": "phenomenon",
+    "text": "A clue for phenomenon: A fact or event observed in nature."
+  },
+  {
+    "kind": "example",
+    "word": "phenomenon",
+    "text": "A sentence with phenomenon. The northern lights are a stunning natural phenomenon."
+  },
+  {
+    "kind": "spelling",
+    "word": "phenomenon",
+    "text": "phenomenon. The letters are: P, H, E, N, O, M, E, N, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "resilience",
+    "text": "resilience"
+  },
+  {
+    "kind": "definition",
+    "word": "resilience",
+    "text": "resilience. The meaning is: The ability to recover quickly from difficulties."
+  },
+  {
+    "kind": "example",
+    "word": "resilience",
+    "text": "Here is resilience in a sentence. Her resilience helped her through a tough year."
+  },
+  {
+    "kind": "spelling",
+    "word": "resilience",
+    "text": "Here are the letters for resilience: R, E, S, I, L, I, E, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "sarcastic",
+    "text": "sarcastic"
+  },
+  {
+    "kind": "definition",
+    "word": "sarcastic",
+    "text": "sarcastic. The meaning is: Using sharp remarks to mock or wound."
+  },
+  {
+    "kind": "example",
+    "word": "sarcastic",
+    "text": "Here is sarcastic in a sentence. His sarcastic comment stung more than he intended."
+  },
+  {
+    "kind": "spelling",
+    "word": "sarcastic",
+    "text": "Here are the letters for sarcastic: S, A, R, C, A, S, T, I, C."
+  },
+  {
+    "kind": "word",
+    "word": "tributary",
+    "text": "tributary"
+  },
+  {
+    "kind": "definition",
+    "word": "tributary",
+    "text": "Definition for tributary: A smaller river that flows into a larger one."
+  },
+  {
+    "kind": "example",
+    "word": "tributary",
+    "text": "Here is one example for tributary. The creek is a tributary of the main river."
+  },
+  {
+    "kind": "spelling",
+    "word": "tributary",
+    "text": "Listen letter by letter. tributary: T, R, I, B, U, T, A, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "unscathed",
+    "text": "unscathed"
+  },
+  {
+    "kind": "definition",
+    "word": "unscathed",
+    "text": "Think about this meaning for unscathed: Without suffering any injury or damage."
+  },
+  {
+    "kind": "example",
+    "word": "unscathed",
+    "text": "In context, unscathed sounds like this. He walked away from the accident unscathed."
+  },
+  {
+    "kind": "spelling",
+    "word": "unscathed",
+    "text": "unscathed. The letters are: U, N, S, C, A, T, H, E, D."
+  },
+  {
+    "kind": "word",
+    "word": "vivacious",
+    "text": "vivacious"
+  },
+  {
+    "kind": "definition",
+    "word": "vivacious",
+    "text": "vivacious. The meaning is: Attractively lively and animated."
+  },
+  {
+    "kind": "example",
+    "word": "vivacious",
+    "text": "Here is vivacious in a sentence. Her vivacious personality lit up the room."
+  },
+  {
+    "kind": "spelling",
+    "word": "vivacious",
+    "text": "Here are the letters for vivacious: V, I, V, A, C, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "whimsical",
+    "text": "whimsical"
+  },
+  {
+    "kind": "definition",
+    "word": "whimsical",
+    "text": "Think about this meaning for whimsical: Playfully quaint or fanciful."
+  },
+  {
+    "kind": "example",
+    "word": "whimsical",
+    "text": "In context, whimsical sounds like this. The illustrator had a whimsical drawing style."
+  },
+  {
+    "kind": "spelling",
+    "word": "whimsical",
+    "text": "whimsical. The letters are: W, H, I, M, S, I, C, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "xenophobia",
+    "text": "xenophobia"
+  },
+  {
+    "kind": "definition",
+    "word": "xenophobia",
+    "text": "xenophobia. The meaning is: Fear or dislike of people from other countries."
+  },
+  {
+    "kind": "example",
+    "word": "xenophobia",
+    "text": "Here is xenophobia in a sentence. The speaker urged the crowd to reject xenophobia."
+  },
+  {
+    "kind": "spelling",
+    "word": "xenophobia",
+    "text": "Here are the letters for xenophobia: X, E, N, O, P, H, O, B, I, A."
+  },
+  {
+    "kind": "word",
+    "word": "yearningly",
+    "text": "yearningly"
+  },
+  {
+    "kind": "definition",
+    "word": "yearningly",
+    "text": "yearningly. The meaning is: In a way that shows deep longing."
+  },
+  {
+    "kind": "example",
+    "word": "yearningly",
+    "text": "Here is yearningly in a sentence. She gazed yearningly at the photograph of home."
+  },
+  {
+    "kind": "spelling",
+    "word": "yearningly",
+    "text": "Listen letter by letter. yearningly: Y, E, A, R, N, I, N, G, L, Y."
+  },
+  {
+    "kind": "word",
+    "word": "zealously",
+    "text": "zealously"
+  },
+  {
+    "kind": "definition",
+    "word": "zealously",
+    "text": "Here is what zealously means: With great energy and enthusiasm."
+  },
+  {
+    "kind": "example",
+    "word": "zealously",
+    "text": "Listen for zealously in this sentence. He zealously defended his position in the debate."
+  },
+  {
+    "kind": "spelling",
+    "word": "zealously",
+    "text": "zealously. Spell it with me: Z, E, A, L, O, U, S, L, Y."
+  },
+  {
+    "kind": "word",
+    "word": "camouflage",
+    "text": "camouflage"
+  },
+  {
+    "kind": "definition",
+    "word": "camouflage",
+    "text": "Definition for camouflage: Disguise by blending into surroundings."
+  },
+  {
+    "kind": "example",
+    "word": "camouflage",
+    "text": "Here is one example for camouflage. The chameleon used camouflage to hide on the bark."
+  },
+  {
+    "kind": "spelling",
+    "word": "camouflage",
+    "text": "camouflage. Spell it with me: C, A, M, O, U, F, L, A, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "choreograph",
+    "text": "choreograph"
+  },
+  {
+    "kind": "definition",
+    "word": "choreograph",
+    "text": "Definition for choreograph: To compose and arrange dance movements."
+  },
+  {
+    "kind": "example",
+    "word": "choreograph",
+    "text": "Here is one example for choreograph. She was asked to choreograph the school show."
+  },
+  {
+    "kind": "spelling",
+    "word": "choreograph",
+    "text": "choreograph. Spell it with me: C, H, O, R, E, O, G, R, A, P, H."
+  },
+  {
+    "kind": "word",
+    "word": "accommodate",
+    "text": "accommodate"
+  },
+  {
+    "kind": "definition",
+    "word": "accommodate",
+    "text": "Think about this meaning for accommodate: To provide lodging or adjust for."
+  },
+  {
+    "kind": "example",
+    "word": "accommodate",
+    "text": "In context, accommodate sounds like this. The hotel can accommodate fifty guests."
+  },
+  {
+    "kind": "spelling",
+    "word": "accommodate",
+    "text": "accommodate. The letters are: A, C, C, O, M, M, O, D, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "bourgeois",
+    "text": "bourgeois"
+  },
+  {
+    "kind": "definition",
+    "word": "bourgeois",
+    "text": "Here is what bourgeois means: Belonging to the middle class; sometimes used critically."
+  },
+  {
+    "kind": "example",
+    "word": "bourgeois",
+    "text": "Listen for bourgeois in this sentence. He rejected what he called bourgeois values."
+  },
+  {
+    "kind": "spelling",
+    "word": "bourgeois",
+    "text": "Here are the letters for bourgeois: B, O, U, R, G, E, O, I, S."
+  },
+  {
+    "kind": "word",
+    "word": "catastrophe",
+    "text": "catastrophe"
+  },
+  {
+    "kind": "definition",
+    "word": "catastrophe",
+    "text": "catastrophe. The meaning is: A sudden great disaster."
+  },
+  {
+    "kind": "example",
+    "word": "catastrophe",
+    "text": "Here is catastrophe in a sentence. The flood was an economic catastrophe."
+  },
+  {
+    "kind": "spelling",
+    "word": "catastrophe",
+    "text": "catastrophe. Spell it with me: C, A, T, A, S, T, R, O, P, H, E."
+  },
+  {
+    "kind": "word",
+    "word": "dilettante",
+    "text": "dilettante"
+  },
+  {
+    "kind": "definition",
+    "word": "dilettante",
+    "text": "Definition for dilettante: A person who takes up an art or subject casually."
+  },
+  {
+    "kind": "example",
+    "word": "dilettante",
+    "text": "Here is one example for dilettante. As a dilettante, he dabbled but never mastered."
+  },
+  {
+    "kind": "spelling",
+    "word": "dilettante",
+    "text": "dilettante. Spell it with me: D, I, L, E, T, T, A, N, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "ecstasy",
+    "text": "ecstasy"
+  },
+  {
+    "kind": "definition",
+    "word": "ecstasy",
+    "text": "ecstasy. The meaning is: Overwhelming happiness."
+  },
+  {
+    "kind": "example",
+    "word": "ecstasy",
+    "text": "Here is ecstasy in a sentence. She danced in pure ecstasy."
+  },
+  {
+    "kind": "spelling",
+    "word": "ecstasy",
+    "text": "ecstasy. Spell it with me: E, C, S, T, A, S, Y."
+  },
+  {
+    "kind": "word",
+    "word": "facetious",
+    "text": "facetious"
+  },
+  {
+    "kind": "definition",
+    "word": "facetious",
+    "text": "Definition for facetious: Not meant to be taken seriously."
+  },
+  {
+    "kind": "example",
+    "word": "facetious",
+    "text": "Here is one example for facetious. His facetious remark made the teacher frown."
+  },
+  {
+    "kind": "spelling",
+    "word": "facetious",
+    "text": "facetious. The letters are: F, A, C, E, T, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "garrulous",
+    "text": "garrulous"
+  },
+  {
+    "kind": "definition",
+    "word": "garrulous",
+    "text": "A clue for garrulous: Excessively talkative."
+  },
+  {
+    "kind": "example",
+    "word": "garrulous",
+    "text": "A sentence with garrulous. The garrulous guest kept everyone late."
+  },
+  {
+    "kind": "spelling",
+    "word": "garrulous",
+    "text": "garrulous. Spell it with me: G, A, R, R, U, L, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "hypothesis",
+    "text": "hypothesis"
+  },
+  {
+    "kind": "definition",
+    "word": "hypothesis",
+    "text": "Definition for hypothesis: A proposed explanation to be tested."
+  },
+  {
+    "kind": "example",
+    "word": "hypothesis",
+    "text": "Here is one example for hypothesis. Her hypothesis was confirmed by the data."
+  },
+  {
+    "kind": "spelling",
+    "word": "hypothesis",
+    "text": "hypothesis. Spell it with me: H, Y, P, O, T, H, E, S, I, S."
+  },
+  {
+    "kind": "word",
+    "word": "idiosyncrasy",
+    "text": "idiosyncrasy"
+  },
+  {
+    "kind": "definition",
+    "word": "idiosyncrasy",
+    "text": "A clue for idiosyncrasy: A peculiar habit of an individual."
+  },
+  {
+    "kind": "example",
+    "word": "idiosyncrasy",
+    "text": "A sentence with idiosyncrasy. Tapping his pen was an idiosyncrasy of his."
+  },
+  {
+    "kind": "spelling",
+    "word": "idiosyncrasy",
+    "text": "Here are the letters for idiosyncrasy: I, D, I, O, S, Y, N, C, R, A, S, Y."
+  },
+  {
+    "kind": "word",
+    "word": "juxtapose",
+    "text": "juxtapose"
+  },
+  {
+    "kind": "definition",
+    "word": "juxtapose",
+    "text": "Here is what juxtapose means: To place close together for comparison."
+  },
+  {
+    "kind": "example",
+    "word": "juxtapose",
+    "text": "Listen for juxtapose in this sentence. The exhibit juxtaposes old masters with modern art."
+  },
+  {
+    "kind": "spelling",
+    "word": "juxtapose",
+    "text": "juxtapose. The letters are: J, U, X, T, A, P, O, S, E."
+  },
+  {
+    "kind": "word",
+    "word": "kaleidoscope",
+    "text": "kaleidoscope"
+  },
+  {
+    "kind": "definition",
+    "word": "kaleidoscope",
+    "text": "A clue for kaleidoscope: A tube with mirrors showing changing patterns."
+  },
+  {
+    "kind": "example",
+    "word": "kaleidoscope",
+    "text": "A sentence with kaleidoscope. A kaleidoscope shows endless patterns."
+  },
+  {
+    "kind": "spelling",
+    "word": "kaleidoscope",
+    "text": "kaleidoscope. The letters are: K, A, L, E, I, D, O, S, C, O, P, E."
+  },
+  {
+    "kind": "word",
+    "word": "labyrinth",
+    "text": "labyrinth"
+  },
+  {
+    "kind": "definition",
+    "word": "labyrinth",
+    "text": "A clue for labyrinth: A complicated maze."
+  },
+  {
+    "kind": "example",
+    "word": "labyrinth",
+    "text": "A sentence with labyrinth. The palace was a labyrinth of corridors."
+  },
+  {
+    "kind": "spelling",
+    "word": "labyrinth",
+    "text": "labyrinth. The letters are: L, A, B, Y, R, I, N, T, H."
+  },
+  {
+    "kind": "word",
+    "word": "mischievous",
+    "text": "mischievous"
+  },
+  {
+    "kind": "definition",
+    "word": "mischievous",
+    "text": "Think about this meaning for mischievous: Causing or showing a fondness for trouble or pranks."
+  },
+  {
+    "kind": "example",
+    "word": "mischievous",
+    "text": "In context, mischievous sounds like this. The mischievous kitten knocked over the vase."
+  },
+  {
+    "kind": "spelling",
+    "word": "mischievous",
+    "text": "mischievous. The letters are: M, I, S, C, H, I, E, V, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "nonchalant",
+    "text": "nonchalant"
+  },
+  {
+    "kind": "definition",
+    "word": "nonchalant",
+    "text": "Think about this meaning for nonchalant: Calmly unconcerned."
+  },
+  {
+    "kind": "example",
+    "word": "nonchalant",
+    "text": "In context, nonchalant sounds like this. He gave a nonchalant shrug."
+  },
+  {
+    "kind": "spelling",
+    "word": "nonchalant",
+    "text": "Listen letter by letter. nonchalant: N, O, N, C, H, A, L, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "ostentatious",
+    "text": "ostentatious"
+  },
+  {
+    "kind": "definition",
+    "word": "ostentatious",
+    "text": "Think about this meaning for ostentatious: Marked by flashy display."
+  },
+  {
+    "kind": "example",
+    "word": "ostentatious",
+    "text": "In context, ostentatious sounds like this. The ostentatious mansion drew every eye."
+  },
+  {
+    "kind": "spelling",
+    "word": "ostentatious",
+    "text": "Listen letter by letter. ostentatious: O, S, T, E, N, T, A, T, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "paraphernalia",
+    "text": "paraphernalia"
+  },
+  {
+    "kind": "definition",
+    "word": "paraphernalia",
+    "text": "A clue for paraphernalia: Miscellaneous articles or equipment."
+  },
+  {
+    "kind": "example",
+    "word": "paraphernalia",
+    "text": "A sentence with paraphernalia. The magician arrived with all his paraphernalia."
+  },
+  {
+    "kind": "spelling",
+    "word": "paraphernalia",
+    "text": "paraphernalia. Spell it with me: P, A, R, A, P, H, E, R, N, A, L, I, A."
+  },
+  {
+    "kind": "word",
+    "word": "quizzical",
+    "text": "quizzical"
+  },
+  {
+    "kind": "definition",
+    "word": "quizzical",
+    "text": "A clue for quizzical: Showing mild puzzlement."
+  },
+  {
+    "kind": "example",
+    "word": "quizzical",
+    "text": "A sentence with quizzical. She gave him a quizzical look across the table."
+  },
+  {
+    "kind": "spelling",
+    "word": "quizzical",
+    "text": "Listen letter by letter. quizzical: Q, U, I, Z, Z, I, C, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "reconnaissance",
+    "text": "reconnaissance"
+  },
+  {
+    "kind": "definition",
+    "word": "reconnaissance",
+    "text": "Definition for reconnaissance: Military observation of a region."
+  },
+  {
+    "kind": "example",
+    "word": "reconnaissance",
+    "text": "Here is one example for reconnaissance. Scouts performed reconnaissance before the troops advanced."
+  },
+  {
+    "kind": "spelling",
+    "word": "reconnaissance",
+    "text": "Listen letter by letter. reconnaissance: R, E, C, O, N, N, A, I, S, S, A, N, C, E."
+  },
+  {
+    "kind": "word",
+    "word": "surreptitious",
+    "text": "surreptitious"
+  },
+  {
+    "kind": "definition",
+    "word": "surreptitious",
+    "text": "Think about this meaning for surreptitious: Kept secret due to impropriety."
+  },
+  {
+    "kind": "example",
+    "word": "surreptitious",
+    "text": "In context, surreptitious sounds like this. He cast a surreptitious glance at the answer sheet."
+  },
+  {
+    "kind": "spelling",
+    "word": "surreptitious",
+    "text": "Listen letter by letter. surreptitious: S, U, R, R, E, P, T, I, T, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "tenacious",
+    "text": "tenacious"
+  },
+  {
+    "kind": "definition",
+    "word": "tenacious",
+    "text": "Definition for tenacious: Not giving up; persistent."
+  },
+  {
+    "kind": "example",
+    "word": "tenacious",
+    "text": "Here is one example for tenacious. A tenacious player, she never left the field."
+  },
+  {
+    "kind": "spelling",
+    "word": "tenacious",
+    "text": "tenacious. The letters are: T, E, N, A, C, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "ubiquitous",
+    "text": "ubiquitous"
+  },
+  {
+    "kind": "definition",
+    "word": "ubiquitous",
+    "text": "ubiquitous. The meaning is: Seemingly present everywhere."
+  },
+  {
+    "kind": "example",
+    "word": "ubiquitous",
+    "text": "Here is ubiquitous in a sentence. Smartphones have become ubiquitous in daily life."
+  },
+  {
+    "kind": "spelling",
+    "word": "ubiquitous",
+    "text": "Listen letter by letter. ubiquitous: U, B, I, Q, U, I, T, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "venomous",
+    "text": "venomous"
+  },
+  {
+    "kind": "definition",
+    "word": "venomous",
+    "text": "A clue for venomous: Producing or injecting a harmful poison."
+  },
+  {
+    "kind": "example",
+    "word": "venomous",
+    "text": "A sentence with venomous. The venomous snake coiled in the dry grass."
+  },
+  {
+    "kind": "spelling",
+    "word": "venomous",
+    "text": "venomous. Spell it with me: V, E, N, O, M, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "whimsicality",
+    "text": "whimsicality"
+  },
+  {
+    "kind": "definition",
+    "word": "whimsicality",
+    "text": "Here is what whimsicality means: The quality of being playfully fanciful."
+  },
+  {
+    "kind": "example",
+    "word": "whimsicality",
+    "text": "Listen for whimsicality in this sentence. The garden was designed with great whimsicality."
+  },
+  {
+    "kind": "spelling",
+    "word": "whimsicality",
+    "text": "whimsicality. The letters are: W, H, I, M, S, I, C, A, L, I, T, Y."
+  },
+  {
+    "kind": "word",
+    "word": "xenial",
+    "text": "xenial"
+  },
+  {
+    "kind": "definition",
+    "word": "xenial",
+    "text": "Definition for xenial: Of or relating to hospitality."
+  },
+  {
+    "kind": "example",
+    "word": "xenial",
+    "text": "Here is one example for xenial. The ambassador embodied the xenial spirit of her country."
+  },
+  {
+    "kind": "spelling",
+    "word": "xenial",
+    "text": "xenial. The letters are: X, E, N, I, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "yielding",
+    "text": "yielding"
+  },
+  {
+    "kind": "definition",
+    "word": "yielding",
+    "text": "Here is what yielding means: Giving way under pressure; compliant."
+  },
+  {
+    "kind": "example",
+    "word": "yielding",
+    "text": "Listen for yielding in this sentence. The yielding soil made it easy to plant seeds."
+  },
+  {
+    "kind": "spelling",
+    "word": "yielding",
+    "text": "Here are the letters for yielding: Y, I, E, L, D, I, N, G."
+  },
+  {
+    "kind": "word",
+    "word": "zephyr",
+    "text": "zephyr"
+  },
+  {
+    "kind": "definition",
+    "word": "zephyr",
+    "text": "Here is what zephyr means: A soft gentle breeze."
+  },
+  {
+    "kind": "example",
+    "word": "zephyr",
+    "text": "Listen for zephyr in this sentence. A warm zephyr stirred the curtains."
+  },
+  {
+    "kind": "spelling",
+    "word": "zephyr",
+    "text": "zephyr. Spell it with me: Z, E, P, H, Y, R."
+  },
+  {
+    "kind": "word",
+    "word": "archipelago",
+    "text": "archipelago"
+  },
+  {
+    "kind": "definition",
+    "word": "archipelago",
+    "text": "archipelago. The meaning is: A group of islands."
+  },
+  {
+    "kind": "example",
+    "word": "archipelago",
+    "text": "Here is archipelago in a sentence. They sailed through the tropical archipelago."
+  },
+  {
+    "kind": "spelling",
+    "word": "archipelago",
+    "text": "Here are the letters for archipelago: A, R, C, H, I, P, E, L, A, G, O."
+  },
+  {
+    "kind": "word",
+    "word": "Byzantine",
+    "text": "Byzantine"
+  },
+  {
+    "kind": "definition",
+    "word": "Byzantine",
+    "text": "Here is what Byzantine means: Excessively complicated or detailed."
+  },
+  {
+    "kind": "example",
+    "word": "Byzantine",
+    "text": "Listen for Byzantine in this sentence. The rulebook was a Byzantine document no one fully understood."
+  },
+  {
+    "kind": "spelling",
+    "word": "Byzantine",
+    "text": "Byzantine. Spell it with me: B, Y, Z, A, N, T, I, N, E."
+  },
+  {
+    "kind": "word",
+    "word": "clandestine",
+    "text": "clandestine"
+  },
+  {
+    "kind": "definition",
+    "word": "clandestine",
+    "text": "clandestine. The meaning is: Done in secret."
+  },
+  {
+    "kind": "example",
+    "word": "clandestine",
+    "text": "Here is clandestine in a sentence. The spies held a clandestine meeting at midnight."
+  },
+  {
+    "kind": "spelling",
+    "word": "clandestine",
+    "text": "clandestine. Spell it with me: C, L, A, N, D, E, S, T, I, N, E."
+  },
+  {
+    "kind": "word",
+    "word": "denouement",
+    "text": "denouement"
+  },
+  {
+    "kind": "definition",
+    "word": "denouement",
+    "text": "Here is what denouement means: The final resolution of a plot."
+  },
+  {
+    "kind": "example",
+    "word": "denouement",
+    "text": "Listen for denouement in this sentence. The mystery's denouement surprised the whole audience."
+  },
+  {
+    "kind": "spelling",
+    "word": "denouement",
+    "text": "denouement. Spell it with me: D, E, N, O, U, E, M, E, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "ephemeral",
+    "text": "ephemeral"
+  },
+  {
+    "kind": "definition",
+    "word": "ephemeral",
+    "text": "Here is what ephemeral means: Lasting for a very short time."
+  },
+  {
+    "kind": "example",
+    "word": "ephemeral",
+    "text": "Listen for ephemeral in this sentence. The beauty of cherry blossoms is ephemeral."
+  },
+  {
+    "kind": "spelling",
+    "word": "ephemeral",
+    "text": "Here are the letters for ephemeral: E, P, H, E, M, E, R, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "filigree",
+    "text": "filigree"
+  },
+  {
+    "kind": "definition",
+    "word": "filigree",
+    "text": "Here is what filigree means: Delicate ornamental work of twisted wire."
+  },
+  {
+    "kind": "example",
+    "word": "filigree",
+    "text": "Listen for filigree in this sentence. A gold filigree bracelet was on display."
+  },
+  {
+    "kind": "spelling",
+    "word": "filigree",
+    "text": "filigree. The letters are: F, I, L, I, G, R, E, E."
+  },
+  {
+    "kind": "word",
+    "word": "grandiloquent",
+    "text": "grandiloquent"
+  },
+  {
+    "kind": "definition",
+    "word": "grandiloquent",
+    "text": "Think about this meaning for grandiloquent: Pompous and overly elaborate in speech."
+  },
+  {
+    "kind": "example",
+    "word": "grandiloquent",
+    "text": "In context, grandiloquent sounds like this. His grandiloquent speech put half the audience to sleep."
+  },
+  {
+    "kind": "spelling",
+    "word": "grandiloquent",
+    "text": "grandiloquent. The letters are: G, R, A, N, D, I, L, O, Q, U, E, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "halcyon",
+    "text": "halcyon"
+  },
+  {
+    "kind": "definition",
+    "word": "halcyon",
+    "text": "Definition for halcyon: Denoting a period of happiness in the past."
+  },
+  {
+    "kind": "example",
+    "word": "halcyon",
+    "text": "Here is one example for halcyon. She looked back on those halcyon days with fondness."
+  },
+  {
+    "kind": "spelling",
+    "word": "halcyon",
+    "text": "halcyon. Spell it with me: H, A, L, C, Y, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "insouciant",
+    "text": "insouciant"
+  },
+  {
+    "kind": "definition",
+    "word": "insouciant",
+    "text": "Here is what insouciant means: Showing a casual lack of concern."
+  },
+  {
+    "kind": "example",
+    "word": "insouciant",
+    "text": "Listen for insouciant in this sentence. His insouciant wave dismissed the whole problem."
+  },
+  {
+    "kind": "spelling",
+    "word": "insouciant",
+    "text": "Here are the letters for insouciant: I, N, S, O, U, C, I, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "juggernaut",
+    "text": "juggernaut"
+  },
+  {
+    "kind": "definition",
+    "word": "juggernaut",
+    "text": "juggernaut. The meaning is: A large overwhelming force."
+  },
+  {
+    "kind": "example",
+    "word": "juggernaut",
+    "text": "Here is juggernaut in a sentence. The company became a juggernaut in the streaming market."
+  },
+  {
+    "kind": "spelling",
+    "word": "juggernaut",
+    "text": "Listen letter by letter. juggernaut: J, U, G, G, E, R, N, A, U, T."
+  },
+  {
+    "kind": "word",
+    "word": "lachrymose",
+    "text": "lachrymose"
+  },
+  {
+    "kind": "definition",
+    "word": "lachrymose",
+    "text": "lachrymose. The meaning is: Tearful or given to weeping."
+  },
+  {
+    "kind": "example",
+    "word": "lachrymose",
+    "text": "Here is lachrymose in a sentence. The lachrymose farewell left everyone with wet eyes."
+  },
+  {
+    "kind": "spelling",
+    "word": "lachrymose",
+    "text": "Here are the letters for lachrymose: L, A, C, H, R, Y, M, O, S, E."
+  },
+  {
+    "kind": "word",
+    "word": "melancholy",
+    "text": "melancholy"
+  },
+  {
+    "kind": "definition",
+    "word": "melancholy",
+    "text": "melancholy. The meaning is: Deep sadness, often without clear cause."
+  },
+  {
+    "kind": "example",
+    "word": "melancholy",
+    "text": "Here is melancholy in a sentence. An autumn rain always brought him a sense of melancholy."
+  },
+  {
+    "kind": "spelling",
+    "word": "melancholy",
+    "text": "Listen letter by letter. melancholy: M, E, L, A, N, C, H, O, L, Y."
+  },
+  {
+    "kind": "word",
+    "word": "naivete",
+    "text": "naivete"
+  },
+  {
+    "kind": "definition",
+    "word": "naivete",
+    "text": "naivete. The meaning is: Lack of experience or sophistication."
+  },
+  {
+    "kind": "example",
+    "word": "naivete",
+    "text": "Here is naivete in a sentence. Her naivete made her trust every stranger she met."
+  },
+  {
+    "kind": "spelling",
+    "word": "naivete",
+    "text": "Listen letter by letter. naivete: N, A, I, V, E, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "obfuscate",
+    "text": "obfuscate"
+  },
+  {
+    "kind": "definition",
+    "word": "obfuscate",
+    "text": "A clue for obfuscate: To make unclear or confusing."
+  },
+  {
+    "kind": "example",
+    "word": "obfuscate",
+    "text": "A sentence with obfuscate. The politician tried to obfuscate the scandal."
+  },
+  {
+    "kind": "spelling",
+    "word": "obfuscate",
+    "text": "obfuscate. Spell it with me: O, B, F, U, S, C, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "pellucid",
+    "text": "pellucid"
+  },
+  {
+    "kind": "definition",
+    "word": "pellucid",
+    "text": "Here is what pellucid means: Translucently clear."
+  },
+  {
+    "kind": "example",
+    "word": "pellucid",
+    "text": "Listen for pellucid in this sentence. The river ran pellucid over the pale stones."
+  },
+  {
+    "kind": "spelling",
+    "word": "pellucid",
+    "text": "Listen letter by letter. pellucid: P, E, L, L, U, C, I, D."
+  },
+  {
+    "kind": "word",
+    "word": "querulous",
+    "text": "querulous"
+  },
+  {
+    "kind": "definition",
+    "word": "querulous",
+    "text": "querulous. The meaning is: Complaining in a petulant way."
+  },
+  {
+    "kind": "example",
+    "word": "querulous",
+    "text": "Here is querulous in a sentence. The querulous child refused every suggestion."
+  },
+  {
+    "kind": "spelling",
+    "word": "querulous",
+    "text": "Here are the letters for querulous: Q, U, E, R, U, L, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "recondite",
+    "text": "recondite"
+  },
+  {
+    "kind": "definition",
+    "word": "recondite",
+    "text": "Here is what recondite means: Not known by many people; obscure."
+  },
+  {
+    "kind": "example",
+    "word": "recondite",
+    "text": "Listen for recondite in this sentence. Her thesis examined a recondite chapter of history."
+  },
+  {
+    "kind": "spelling",
+    "word": "recondite",
+    "text": "Here are the letters for recondite: R, E, C, O, N, D, I, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "sesquipedalian",
+    "text": "sesquipedalian"
+  },
+  {
+    "kind": "definition",
+    "word": "sesquipedalian",
+    "text": "Here is what sesquipedalian means: Using or characterized by long words."
+  },
+  {
+    "kind": "example",
+    "word": "sesquipedalian",
+    "text": "Listen for sesquipedalian in this sentence. Her writing is intentionally sesquipedalian."
+  },
+  {
+    "kind": "spelling",
+    "word": "sesquipedalian",
+    "text": "sesquipedalian. Spell it with me: S, E, S, Q, U, I, P, E, D, A, L, I, A, N."
+  },
+  {
+    "kind": "word",
+    "word": "temerity",
+    "text": "temerity"
+  },
+  {
+    "kind": "definition",
+    "word": "temerity",
+    "text": "Here is what temerity means: Excessive boldness or rashness."
+  },
+  {
+    "kind": "example",
+    "word": "temerity",
+    "text": "Listen for temerity in this sentence. He had the temerity to argue with the judge."
+  },
+  {
+    "kind": "spelling",
+    "word": "temerity",
+    "text": "Here are the letters for temerity: T, E, M, E, R, I, T, Y."
+  },
+  {
+    "kind": "word",
+    "word": "umbrage",
+    "text": "umbrage"
+  },
+  {
+    "kind": "definition",
+    "word": "umbrage",
+    "text": "A clue for umbrage: Offense or annoyance."
+  },
+  {
+    "kind": "example",
+    "word": "umbrage",
+    "text": "A sentence with umbrage. She took umbrage at the careless remark."
+  },
+  {
+    "kind": "spelling",
+    "word": "umbrage",
+    "text": "umbrage. The letters are: U, M, B, R, A, G, E."
+  },
+  {
+    "kind": "word",
+    "word": "pneumonoultramicroscopicsilicovolcanoconiosis",
+    "text": "pneumonoultramicroscopicsilicovolcanoconiosis"
+  },
+  {
+    "kind": "definition",
+    "word": "pneumonoultramicroscopicsilicovolcanoconiosis",
+    "text": "A clue for pneumonoultramicroscopicsilicovolcanoconiosis: A lung disease caused by inhaling very fine silica dust."
+  },
+  {
+    "kind": "example",
+    "word": "pneumonoultramicroscopicsilicovolcanoconiosis",
+    "text": "A sentence with pneumonoultramicroscopicsilicovolcanoconiosis. Miners can develop pneumonoultramicroscopicsilicovolcanoconiosis."
+  },
+  {
+    "kind": "spelling",
+    "word": "pneumonoultramicroscopicsilicovolcanoconiosis",
+    "text": "pneumonoultramicroscopicsilicovolcanoconiosis. Spell it with me: P, N, E, U, M, O, N, O, U, L, T, R, A, M, I, C, R, O, S, C, O, P, I, C, S, I, L, I, C, O, V, O, L, C, A, N, O, C, O, N, I, O, S, I, S."
+  },
+  {
+    "kind": "word",
+    "word": "onomatopoeia",
+    "text": "onomatopoeia"
+  },
+  {
+    "kind": "definition",
+    "word": "onomatopoeia",
+    "text": "onomatopoeia. The meaning is: A word that imitates the sound it represents."
+  },
+  {
+    "kind": "example",
+    "word": "onomatopoeia",
+    "text": "Here is onomatopoeia in a sentence. Buzz and hiss are examples of onomatopoeia."
+  },
+  {
+    "kind": "spelling",
+    "word": "onomatopoeia",
+    "text": "onomatopoeia. The letters are: O, N, O, M, A, T, O, P, O, E, I, A."
+  },
+  {
+    "kind": "word",
+    "word": "chiaroscuro",
+    "text": "chiaroscuro"
+  },
+  {
+    "kind": "definition",
+    "word": "chiaroscuro",
+    "text": "A clue for chiaroscuro: Use of strong contrasts between light and dark in art."
+  },
+  {
+    "kind": "example",
+    "word": "chiaroscuro",
+    "text": "A sentence with chiaroscuro. The painting was famous for its chiaroscuro."
+  },
+  {
+    "kind": "spelling",
+    "word": "chiaroscuro",
+    "text": "chiaroscuro. Spell it with me: C, H, I, A, R, O, S, C, U, R, O."
+  },
+  {
+    "kind": "word",
+    "word": "zeitgeist",
+    "text": "zeitgeist"
+  },
+  {
+    "kind": "definition",
+    "word": "zeitgeist",
+    "text": "Definition for zeitgeist: The defining spirit or mood of a particular period."
+  },
+  {
+    "kind": "example",
+    "word": "zeitgeist",
+    "text": "Here is one example for zeitgeist. The film captured the zeitgeist of the decade."
+  },
+  {
+    "kind": "spelling",
+    "word": "zeitgeist",
+    "text": "Listen letter by letter. zeitgeist: Z, E, I, T, G, E, I, S, T."
+  },
+  {
+    "kind": "word",
+    "word": "cynosure",
+    "text": "cynosure"
+  },
+  {
+    "kind": "definition",
+    "word": "cynosure",
+    "text": "Here is what cynosure means: A person or thing that is the center of attention."
+  },
+  {
+    "kind": "example",
+    "word": "cynosure",
+    "text": "Listen for cynosure in this sentence. The soloist was the cynosure of all eyes."
+  },
+  {
+    "kind": "spelling",
+    "word": "cynosure",
+    "text": "cynosure. Spell it with me: C, Y, N, O, S, U, R, E."
+  },
+  {
+    "kind": "word",
+    "word": "quokka",
+    "text": "quokka"
+  },
+  {
+    "kind": "definition",
+    "word": "quokka",
+    "text": "Think about this meaning for quokka: A small marsupial native to Western Australia."
+  },
+  {
+    "kind": "example",
+    "word": "quokka",
+    "text": "In context, quokka sounds like this. A curious quokka hopped onto the path."
+  },
+  {
+    "kind": "spelling",
+    "word": "quokka",
+    "text": "Listen letter by letter. quokka: Q, U, O, K, K, A."
+  },
+  {
+    "kind": "word",
+    "word": "xanthochroic",
+    "text": "xanthochroic"
+  },
+  {
+    "kind": "definition",
+    "word": "xanthochroic",
+    "text": "xanthochroic. The meaning is: Having yellow coloration, often of skin or hair."
+  },
+  {
+    "kind": "example",
+    "word": "xanthochroic",
+    "text": "Here is xanthochroic in a sentence. The bird had a xanthochroic belly."
+  },
+  {
+    "kind": "spelling",
+    "word": "xanthochroic",
+    "text": "Listen letter by letter. xanthochroic: X, A, N, T, H, O, C, H, R, O, I, C."
+  },
+  {
+    "kind": "word",
+    "word": "rhinoceros",
+    "text": "rhinoceros"
+  },
+  {
+    "kind": "definition",
+    "word": "rhinoceros",
+    "text": "A clue for rhinoceros: A large plant-eating mammal with a horn on its nose."
+  },
+  {
+    "kind": "example",
+    "word": "rhinoceros",
+    "text": "A sentence with rhinoceros. A rhinoceros charged across the clearing."
+  },
+  {
+    "kind": "spelling",
+    "word": "rhinoceros",
+    "text": "rhinoceros. Spell it with me: R, H, I, N, O, C, E, R, O, S."
+  },
+  {
+    "kind": "word",
+    "word": "hieroglyphic",
+    "text": "hieroglyphic"
+  },
+  {
+    "kind": "definition",
+    "word": "hieroglyphic",
+    "text": "hieroglyphic. The meaning is: A stylized picture standing for a word or sound."
+  },
+  {
+    "kind": "example",
+    "word": "hieroglyphic",
+    "text": "Here is hieroglyphic in a sentence. The hieroglyphic carvings told a pharaoh's story."
+  },
+  {
+    "kind": "spelling",
+    "word": "hieroglyphic",
+    "text": "Here are the letters for hieroglyphic: H, I, E, R, O, G, L, Y, P, H, I, C."
+  },
+  {
+    "kind": "word",
+    "word": "mellifluous",
+    "text": "mellifluous"
+  },
+  {
+    "kind": "definition",
+    "word": "mellifluous",
+    "text": "A clue for mellifluous: Sweet or musical; pleasant to hear."
+  },
+  {
+    "kind": "example",
+    "word": "mellifluous",
+    "text": "A sentence with mellifluous. Her mellifluous voice filled the room."
+  },
+  {
+    "kind": "spelling",
+    "word": "mellifluous",
+    "text": "mellifluous. The letters are: M, E, L, L, I, F, L, U, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "perspicacious",
+    "text": "perspicacious"
+  },
+  {
+    "kind": "definition",
+    "word": "perspicacious",
+    "text": "A clue for perspicacious: Having keen mental perception and understanding."
+  },
+  {
+    "kind": "example",
+    "word": "perspicacious",
+    "text": "A sentence with perspicacious. Her perspicacious answer impressed the judges."
+  },
+  {
+    "kind": "spelling",
+    "word": "perspicacious",
+    "text": "Listen letter by letter. perspicacious: P, E, R, S, P, I, C, A, C, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "obsequious",
+    "text": "obsequious"
+  },
+  {
+    "kind": "definition",
+    "word": "obsequious",
+    "text": "Here is what obsequious means: Obedient or attentive to an excessive degree."
+  },
+  {
+    "kind": "example",
+    "word": "obsequious",
+    "text": "Listen for obsequious in this sentence. The obsequious assistant agreed with every word."
+  },
+  {
+    "kind": "spelling",
+    "word": "obsequious",
+    "text": "Here are the letters for obsequious: O, B, S, E, Q, U, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "quintessential",
+    "text": "quintessential"
+  },
+  {
+    "kind": "definition",
+    "word": "quintessential",
+    "text": "Here is what quintessential means: Representing the most perfect example of a quality."
+  },
+  {
+    "kind": "example",
+    "word": "quintessential",
+    "text": "Listen for quintessential in this sentence. He is the quintessential small-town mayor."
+  },
+  {
+    "kind": "spelling",
+    "word": "quintessential",
+    "text": "quintessential. The letters are: Q, U, I, N, T, E, S, S, E, N, T, I, A, L."
+  },
+  {
+    "kind": "word",
+    "word": "vicissitude",
+    "text": "vicissitude"
+  },
+  {
+    "kind": "definition",
+    "word": "vicissitude",
+    "text": "Think about this meaning for vicissitude: A change of circumstances, often unwelcome."
+  },
+  {
+    "kind": "example",
+    "word": "vicissitude",
+    "text": "In context, vicissitude sounds like this. They stayed hopeful through every vicissitude of the journey."
+  },
+  {
+    "kind": "spelling",
+    "word": "vicissitude",
+    "text": "Listen letter by letter. vicissitude: V, I, C, I, S, S, I, T, U, D, E."
+  },
+  {
+    "kind": "word",
+    "word": "soliloquy",
+    "text": "soliloquy"
+  },
+  {
+    "kind": "definition",
+    "word": "soliloquy",
+    "text": "Here is what soliloquy means: A speech made aloud to oneself, especially on stage."
+  },
+  {
+    "kind": "example",
+    "word": "soliloquy",
+    "text": "Listen for soliloquy in this sentence. Hamlet's soliloquy is one of the most famous in drama."
+  },
+  {
+    "kind": "spelling",
+    "word": "soliloquy",
+    "text": "Here are the letters for soliloquy: S, O, L, I, L, O, Q, U, Y."
+  },
+  {
+    "kind": "word",
+    "word": "concatenate",
+    "text": "concatenate"
+  },
+  {
+    "kind": "definition",
+    "word": "concatenate",
+    "text": "Think about this meaning for concatenate: To link things together in a chain or series."
+  },
+  {
+    "kind": "example",
+    "word": "concatenate",
+    "text": "In context, concatenate sounds like this. You can concatenate two strings in most programming languages."
+  },
+  {
+    "kind": "spelling",
+    "word": "concatenate",
+    "text": "Here are the letters for concatenate: C, O, N, C, A, T, E, N, A, T, E."
+  },
+  {
+    "kind": "word",
+    "word": "defenestration",
+    "text": "defenestration"
+  },
+  {
+    "kind": "definition",
+    "word": "defenestration",
+    "text": "A clue for defenestration: The act of throwing someone out of a window."
+  },
+  {
+    "kind": "example",
+    "word": "defenestration",
+    "text": "A sentence with defenestration. The coup ended in the defenestration of the minister."
+  },
+  {
+    "kind": "spelling",
+    "word": "defenestration",
+    "text": "defenestration. The letters are: D, E, F, E, N, E, S, T, R, A, T, I, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "eleemosynary",
+    "text": "eleemosynary"
+  },
+  {
+    "kind": "definition",
+    "word": "eleemosynary",
+    "text": "A clue for eleemosynary: Relating to or dependent on charity."
+  },
+  {
+    "kind": "example",
+    "word": "eleemosynary",
+    "text": "A sentence with eleemosynary. The hospital was founded as an eleemosynary institution."
+  },
+  {
+    "kind": "spelling",
+    "word": "eleemosynary",
+    "text": "Here are the letters for eleemosynary: E, L, E, E, M, O, S, Y, N, A, R, Y."
+  },
+  {
+    "kind": "word",
+    "word": "flibbertigibbet",
+    "text": "flibbertigibbet"
+  },
+  {
+    "kind": "definition",
+    "word": "flibbertigibbet",
+    "text": "flibbertigibbet. The meaning is: A talkative, flighty, or scatterbrained person."
+  },
+  {
+    "kind": "example",
+    "word": "flibbertigibbet",
+    "text": "Here is flibbertigibbet in a sentence. Her teacher kindly called her a charming flibbertigibbet."
+  },
+  {
+    "kind": "spelling",
+    "word": "flibbertigibbet",
+    "text": "Listen letter by letter. flibbertigibbet: F, L, I, B, B, E, R, T, I, G, I, B, B, E, T."
+  },
+  {
+    "kind": "word",
+    "word": "gewgaw",
+    "text": "gewgaw"
+  },
+  {
+    "kind": "definition",
+    "word": "gewgaw",
+    "text": "Think about this meaning for gewgaw: A showy but worthless or insubstantial thing."
+  },
+  {
+    "kind": "example",
+    "word": "gewgaw",
+    "text": "In context, gewgaw sounds like this. The souvenir shop was full of cheap gewgaws."
+  },
+  {
+    "kind": "spelling",
+    "word": "gewgaw",
+    "text": "gewgaw. Spell it with me: G, E, W, G, A, W."
+  },
+  {
+    "kind": "word",
+    "word": "hippopotamus",
+    "text": "hippopotamus"
+  },
+  {
+    "kind": "definition",
+    "word": "hippopotamus",
+    "text": "Think about this meaning for hippopotamus: A large semi-aquatic African mammal."
+  },
+  {
+    "kind": "example",
+    "word": "hippopotamus",
+    "text": "In context, hippopotamus sounds like this. A hippopotamus waded in the river at dusk."
+  },
+  {
+    "kind": "spelling",
+    "word": "hippopotamus",
+    "text": "Here are the letters for hippopotamus: H, I, P, P, O, P, O, T, A, M, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "ichthyology",
+    "text": "ichthyology"
+  },
+  {
+    "kind": "definition",
+    "word": "ichthyology",
+    "text": "ichthyology. The meaning is: The branch of zoology concerned with fish."
+  },
+  {
+    "kind": "example",
+    "word": "ichthyology",
+    "text": "Here is ichthyology in a sentence. Her passion for ichthyology began at a young age."
+  },
+  {
+    "kind": "spelling",
+    "word": "ichthyology",
+    "text": "Here are the letters for ichthyology: I, C, H, T, H, Y, O, L, O, G, Y."
+  },
+  {
+    "kind": "word",
+    "word": "jejune",
+    "text": "jejune"
+  },
+  {
+    "kind": "definition",
+    "word": "jejune",
+    "text": "Definition for jejune: Naive, simplistic, or superficial."
+  },
+  {
+    "kind": "example",
+    "word": "jejune",
+    "text": "Here is one example for jejune. The critic dismissed the film as jejune entertainment."
+  },
+  {
+    "kind": "spelling",
+    "word": "jejune",
+    "text": "Here are the letters for jejune: J, E, J, U, N, E."
+  },
+  {
+    "kind": "word",
+    "word": "knickknack",
+    "text": "knickknack"
+  },
+  {
+    "kind": "definition",
+    "word": "knickknack",
+    "text": "Here is what knickknack means: A small worthless object used for decoration."
+  },
+  {
+    "kind": "example",
+    "word": "knickknack",
+    "text": "Listen for knickknack in this sentence. Shelves of knickknacks lined the old cottage."
+  },
+  {
+    "kind": "spelling",
+    "word": "knickknack",
+    "text": "knickknack. Spell it with me: K, N, I, C, K, K, N, A, C, K."
+  },
+  {
+    "kind": "word",
+    "word": "logomachy",
+    "text": "logomachy"
+  },
+  {
+    "kind": "definition",
+    "word": "logomachy",
+    "text": "Here is what logomachy means: An argument over words or their meaning."
+  },
+  {
+    "kind": "example",
+    "word": "logomachy",
+    "text": "Listen for logomachy in this sentence. The debate soon descended into pure logomachy."
+  },
+  {
+    "kind": "spelling",
+    "word": "logomachy",
+    "text": "Here are the letters for logomachy: L, O, G, O, M, A, C, H, Y."
+  },
+  {
+    "kind": "word",
+    "word": "mnemonic",
+    "text": "mnemonic"
+  },
+  {
+    "kind": "definition",
+    "word": "mnemonic",
+    "text": "mnemonic. The meaning is: A device to aid memory, such as a rhyme."
+  },
+  {
+    "kind": "example",
+    "word": "mnemonic",
+    "text": "Here is mnemonic in a sentence. He used a mnemonic to remember the planets in order."
+  },
+  {
+    "kind": "spelling",
+    "word": "mnemonic",
+    "text": "Listen letter by letter. mnemonic: M, N, E, M, O, N, I, C."
+  },
+  {
+    "kind": "word",
+    "word": "nacreous",
+    "text": "nacreous"
+  },
+  {
+    "kind": "definition",
+    "word": "nacreous",
+    "text": "Think about this meaning for nacreous: Having a pearly luster."
+  },
+  {
+    "kind": "example",
+    "word": "nacreous",
+    "text": "In context, nacreous sounds like this. The clouds at sunrise had a nacreous shimmer."
+  },
+  {
+    "kind": "spelling",
+    "word": "nacreous",
+    "text": "Listen letter by letter. nacreous: N, A, C, R, E, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "ophthalmology",
+    "text": "ophthalmology"
+  },
+  {
+    "kind": "definition",
+    "word": "ophthalmology",
+    "text": "Here is what ophthalmology means: The branch of medicine dealing with the eyes."
+  },
+  {
+    "kind": "example",
+    "word": "ophthalmology",
+    "text": "Listen for ophthalmology in this sentence. She specialized in ophthalmology after medical school."
+  },
+  {
+    "kind": "spelling",
+    "word": "ophthalmology",
+    "text": "Here are the letters for ophthalmology: O, P, H, T, H, A, L, M, O, L, O, G, Y."
+  },
+  {
+    "kind": "word",
+    "word": "parsimonious",
+    "text": "parsimonious"
+  },
+  {
+    "kind": "definition",
+    "word": "parsimonious",
+    "text": "Definition for parsimonious: Unwilling to spend money; very frugal."
+  },
+  {
+    "kind": "example",
+    "word": "parsimonious",
+    "text": "Here is one example for parsimonious. The parsimonious landlord refused to fix the heating."
+  },
+  {
+    "kind": "spelling",
+    "word": "parsimonious",
+    "text": "Here are the letters for parsimonious: P, A, R, S, I, M, O, N, I, O, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "quaff",
+    "text": "quaff"
+  },
+  {
+    "kind": "definition",
+    "word": "quaff",
+    "text": "Here is what quaff means: To drink heartily."
+  },
+  {
+    "kind": "example",
+    "word": "quaff",
+    "text": "Listen for quaff in this sentence. He sat down to quaff a cold glass of water after the race."
+  },
+  {
+    "kind": "spelling",
+    "word": "quaff",
+    "text": "Here are the letters for quaff: Q, U, A, F, F."
+  },
+  {
+    "kind": "word",
+    "word": "recalcitrant",
+    "text": "recalcitrant"
+  },
+  {
+    "kind": "definition",
+    "word": "recalcitrant",
+    "text": "recalcitrant. The meaning is: Stubbornly resistant to authority."
+  },
+  {
+    "kind": "example",
+    "word": "recalcitrant",
+    "text": "Here is recalcitrant in a sentence. The recalcitrant mule refused to move an inch."
+  },
+  {
+    "kind": "spelling",
+    "word": "recalcitrant",
+    "text": "recalcitrant. Spell it with me: R, E, C, A, L, C, I, T, R, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "sycophant",
+    "text": "sycophant"
+  },
+  {
+    "kind": "definition",
+    "word": "sycophant",
+    "text": "sycophant. The meaning is: A person who flatters others to gain advantage."
+  },
+  {
+    "kind": "example",
+    "word": "sycophant",
+    "text": "Here is sycophant in a sentence. Every sycophant in the court praised the king's bad idea."
+  },
+  {
+    "kind": "spelling",
+    "word": "sycophant",
+    "text": "Here are the letters for sycophant: S, Y, C, O, P, H, A, N, T."
+  },
+  {
+    "kind": "word",
+    "word": "tintinnabulation",
+    "text": "tintinnabulation"
+  },
+  {
+    "kind": "definition",
+    "word": "tintinnabulation",
+    "text": "Here is what tintinnabulation means: The ringing or sound of bells."
+  },
+  {
+    "kind": "example",
+    "word": "tintinnabulation",
+    "text": "Listen for tintinnabulation in this sentence. The tintinnabulation of church bells filled the valley."
+  },
+  {
+    "kind": "spelling",
+    "word": "tintinnabulation",
+    "text": "tintinnabulation. The letters are: T, I, N, T, I, N, N, A, B, U, L, A, T, I, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "ululation",
+    "text": "ululation"
+  },
+  {
+    "kind": "definition",
+    "word": "ululation",
+    "text": "Here is what ululation means: A howling or wailing as a form of expression."
+  },
+  {
+    "kind": "example",
+    "word": "ululation",
+    "text": "Listen for ululation in this sentence. The ululation of the crowd echoed across the stadium."
+  },
+  {
+    "kind": "spelling",
+    "word": "ululation",
+    "text": "ululation. The letters are: U, L, U, L, A, T, I, O, N."
+  },
+  {
+    "kind": "word",
+    "word": "verisimilitude",
+    "text": "verisimilitude"
+  },
+  {
+    "kind": "definition",
+    "word": "verisimilitude",
+    "text": "Definition for verisimilitude: The appearance of being true or real."
+  },
+  {
+    "kind": "example",
+    "word": "verisimilitude",
+    "text": "Here is one example for verisimilitude. Good historical fiction depends on verisimilitude."
+  },
+  {
+    "kind": "spelling",
+    "word": "verisimilitude",
+    "text": "verisimilitude. The letters are: V, E, R, I, S, I, M, I, L, I, T, U, D, E."
+  },
+  {
+    "kind": "word",
+    "word": "wunderkind",
+    "text": "wunderkind"
+  },
+  {
+    "kind": "definition",
+    "word": "wunderkind",
+    "text": "wunderkind. The meaning is: A person who achieves great success at a young age."
+  },
+  {
+    "kind": "example",
+    "word": "wunderkind",
+    "text": "Here is wunderkind in a sentence. The chess wunderkind became a grandmaster at twelve."
+  },
+  {
+    "kind": "spelling",
+    "word": "wunderkind",
+    "text": "Here are the letters for wunderkind: W, U, N, D, E, R, K, I, N, D."
+  },
+  {
+    "kind": "word",
+    "word": "xylography",
+    "text": "xylography"
+  },
+  {
+    "kind": "definition",
+    "word": "xylography",
+    "text": "Definition for xylography: The art of engraving on wood."
+  },
+  {
+    "kind": "example",
+    "word": "xylography",
+    "text": "Here is one example for xylography. Xylography was used to print books before movable type."
+  },
+  {
+    "kind": "spelling",
+    "word": "xylography",
+    "text": "xylography. The letters are: X, Y, L, O, G, R, A, P, H, Y."
+  },
+  {
+    "kind": "word",
+    "word": "yarely",
+    "text": "yarely"
+  },
+  {
+    "kind": "definition",
+    "word": "yarely",
+    "text": "Think about this meaning for yarely: In a nimble and ready manner."
+  },
+  {
+    "kind": "example",
+    "word": "yarely",
+    "text": "In context, yarely sounds like this. The sailor moved yarely across the pitching deck."
+  },
+  {
+    "kind": "spelling",
+    "word": "yarely",
+    "text": "yarely. Spell it with me: Y, A, R, E, L, Y."
+  },
+  {
+    "kind": "word",
+    "word": "zeugma",
+    "text": "zeugma"
+  },
+  {
+    "kind": "definition",
+    "word": "zeugma",
+    "text": "Here is what zeugma means: A figure of speech applying a word to two nouns in different senses."
+  },
+  {
+    "kind": "example",
+    "word": "zeugma",
+    "text": "Listen for zeugma in this sentence. She left in a hurry and a taxi is an example of zeugma."
+  },
+  {
+    "kind": "spelling",
+    "word": "zeugma",
+    "text": "Here are the letters for zeugma: Z, E, U, G, M, A."
+  },
+  {
+    "kind": "word",
+    "word": "aegrotat",
+    "text": "aegrotat"
+  },
+  {
+    "kind": "definition",
+    "word": "aegrotat",
+    "text": "aegrotat. The meaning is: An unclassified degree awarded to a candidate too ill to sit finals."
+  },
+  {
+    "kind": "example",
+    "word": "aegrotat",
+    "text": "Here is aegrotat in a sentence. He received an aegrotat after his illness during exam week."
+  },
+  {
+    "kind": "spelling",
+    "word": "aegrotat",
+    "text": "aegrotat. The letters are: A, E, G, R, O, T, A, T."
+  },
+  {
+    "kind": "word",
+    "word": "borborygmus",
+    "text": "borborygmus"
+  },
+  {
+    "kind": "definition",
+    "word": "borborygmus",
+    "text": "A clue for borborygmus: A rumbling sound made by the stomach."
+  },
+  {
+    "kind": "example",
+    "word": "borborygmus",
+    "text": "A sentence with borborygmus. His borborygmus was audible across the quiet library."
+  },
+  {
+    "kind": "spelling",
+    "word": "borborygmus",
+    "text": "Here are the letters for borborygmus: B, O, R, B, O, R, Y, G, M, U, S."
+  },
+  {
+    "kind": "word",
+    "word": "crepuscular",
+    "text": "crepuscular"
+  },
+  {
+    "kind": "definition",
+    "word": "crepuscular",
+    "text": "A clue for crepuscular: Active or appearing at twilight."
+  },
+  {
+    "kind": "example",
+    "word": "crepuscular",
+    "text": "A sentence with crepuscular. Deer are crepuscular, grazing at dusk and dawn."
+  },
+  {
+    "kind": "spelling",
+    "word": "crepuscular",
+    "text": "crepuscular. The letters are: C, R, E, P, U, S, C, U, L, A, R."
+  },
+  {
+    "kind": "word",
+    "word": "deasil",
+    "text": "deasil"
+  },
+  {
+    "kind": "definition",
+    "word": "deasil",
+    "text": "Definition for deasil: In the direction of the sun; clockwise."
+  },
+  {
+    "kind": "example",
+    "word": "deasil",
+    "text": "Here is one example for deasil. The ritual required walking deasil around the stone circle."
+  },
+  {
+    "kind": "spelling",
+    "word": "deasil",
+    "text": "Listen letter by letter. deasil: D, E, A, S, I, L."
+  },
+  {
+    "kind": "word",
+    "word": "floccinaucinihilipilification",
+    "text": "floccinaucinihilipilification"
+  },
+  {
+    "kind": "definition",
+    "word": "floccinaucinihilipilification",
+    "text": "A clue for floccinaucinihilipilification: The act of regarding something as worthless."
+  },
+  {
+    "kind": "example",
+    "word": "floccinaucinihilipilification",
+    "text": "A sentence with floccinaucinihilipilification. His floccinaucinihilipilification of art annoyed the curator."
+  },
+  {
+    "kind": "spelling",
+    "word": "floccinaucinihilipilification",
+    "text": "floccinaucinihilipilification. Spell it with me: F, L, O, C, C, I, N, A, U, C, I, N, I, H, I, L, I, P, I, L, I, F, I, C, A, T, I, O, N."
+  },
+  {
+    "kind": "phrase",
+    "stub": "great",
+    "text": "Great!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "nice_work",
+    "text": "Nice work!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "perfect",
+    "text": "Perfect!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "amazing",
+    "text": "Amazing!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "you_got_it",
+    "text": "You got it!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "wonderful",
+    "text": "Wonderful!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "excellent",
+    "text": "Excellent!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "awesome",
+    "text": "Awesome!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "brilliant",
+    "text": "Brilliant!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "fantastic",
+    "text": "Fantastic!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "super_job",
+    "text": "Super job!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "way_to_go",
+    "text": "Way to go!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "nailed_it",
+    "text": "Nailed it!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "great_spelling",
+    "text": "Great spelling!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "well_done",
+    "text": "Well done!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "keep_it_up",
+    "text": "Keep it up!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "sharp_work",
+    "text": "Sharp work!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "smart_spelling",
+    "text": "Smart spelling!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "smooth_spelling",
+    "text": "Smooth spelling!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "strong_spelling",
+    "text": "Strong spelling!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "spelling_star",
+    "text": "Spelling star!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "lovely_work",
+    "text": "Lovely work!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "bright_work",
+    "text": "Bright work!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "that_was_clear",
+    "text": "That was clear!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "beautifully_done",
+    "text": "Beautifully done!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "you_spelled_that_well",
+    "text": "You spelled that well!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "not_quite",
+    "text": "Not quite."
+  },
+  {
+    "kind": "phrase",
+    "stub": "almost",
+    "text": "Almost."
+  },
+  {
+    "kind": "phrase",
+    "stub": "close_one",
+    "text": "Close one."
+  },
+  {
+    "kind": "phrase",
+    "stub": "good_try",
+    "text": "Good try."
+  },
+  {
+    "kind": "phrase",
+    "stub": "so_close",
+    "text": "So close."
+  },
+  {
+    "kind": "phrase",
+    "stub": "keep_trying",
+    "text": "Keep trying."
+  },
+  {
+    "kind": "phrase",
+    "stub": "good_effort",
+    "text": "Good effort."
+  },
+  {
+    "kind": "phrase",
+    "stub": "almost_there",
+    "text": "Almost there."
+  },
+  {
+    "kind": "phrase",
+    "stub": "close_try",
+    "text": "Close try."
+  },
+  {
+    "kind": "phrase",
+    "stub": "check_the_letters",
+    "text": "Check the letters."
+  },
+  {
+    "kind": "phrase",
+    "stub": "no_worries",
+    "text": "No worries."
+  },
+  {
+    "kind": "phrase",
+    "stub": "try_again",
+    "text": "Let's try that one again."
+  },
+  {
+    "kind": "phrase",
+    "stub": "give_it_another_go",
+    "text": "Give it another go."
+  },
+  {
+    "kind": "phrase",
+    "stub": "one_more_try",
+    "text": "One more try."
+  },
+  {
+    "kind": "phrase",
+    "stub": "reset_and_try",
+    "text": "Reset and try again."
+  },
+  {
+    "kind": "phrase",
+    "stub": "lets_try_again",
+    "text": "Let's try again."
+  },
+  {
+    "kind": "phrase",
+    "stub": "on_fire",
+    "text": "On fire!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "three_row",
+    "text": "Three in a row!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "unstoppable",
+    "text": "Unstoppable!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "hot_streak",
+    "text": "Hot streak!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "five_row",
+    "text": "Five in a row!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "champion",
+    "text": "Champion spelling!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "buzzing_along",
+    "text": "You're buzzing along!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "streak_star",
+    "text": "Streak star!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "smooth_run",
+    "text": "Smooth run!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "great_rhythm",
+    "text": "Great rhythm!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "keep_going",
+    "text": "Keep going!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "streak_power",
+    "text": "Streak power!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "lets_begin",
+    "text": "Let's begin."
+  },
+  {
+    "kind": "phrase",
+    "stub": "test_complete",
+    "text": "Test complete!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "new_best",
+    "text": "New personal best!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "lesson_done",
+    "text": "Lesson done!"
+  },
+  {
+    "kind": "phrase",
+    "stub": "nice_practice",
+    "text": "Nice practice!"
+  }
+]

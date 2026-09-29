@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -14,7 +15,7 @@ extension VoiceQualityLabel on VoiceQuality {
   String get label {
     switch (this) {
       case VoiceQuality.device:
-        return 'Device';
+        return 'Bee Buddy';
       case VoiceQuality.studio:
         return 'Studio';
     }
@@ -23,9 +24,9 @@ extension VoiceQualityLabel on VoiceQuality {
   String get description {
     switch (this) {
       case VoiceQuality.device:
-        return 'Natural bundled clips with enhanced device fallback.';
+        return 'Natural bundled clips for catalog words and clues; device voice for custom content.';
       case VoiceQuality.studio:
-        return 'Premium studio voice, with bundled and device fallback.';
+        return 'Selected online voice for custom words; catalog words use Bee Buddy.';
     }
   }
 }
@@ -83,16 +84,15 @@ extension VoiceSpeedRate on VoiceSpeed {
     }
   }
 
-  /// OpenAI speech "speed" param (0.25-4.0). Going below 1.0 produces
-  /// stretched / slurry audio — keep everything at natural pace or above.
+  /// Gentle rate changes apply consistently to included and online audio.
   double get openAiRate {
     switch (this) {
       case VoiceSpeed.calm:
-        return 1.00;
+        return 0.88;
       case VoiceSpeed.normal:
-        return 1.10;
+        return 1.00;
       case VoiceSpeed.fast:
-        return 1.25;
+        return 1.15;
     }
   }
 
@@ -115,9 +115,37 @@ extension VoiceSpeedRate on VoiceSpeed {
 class TtsService {
   static const _preferredAndroidEngine = 'com.google.android.tts';
 
-  final _tts = FlutterTts();
-  final _openai = OpenAiTtsService();
-  final _bundled = BundledTtsService();
+  final FlutterTts _tts;
+  final OpenAiTtsService _openai;
+  final BundledTtsService _bundled;
+  int _speechGeneration = 0;
+  bool _disposed = false;
+  Future<void> _stops = Future.value();
+  TtsService({
+    FlutterTts? device,
+    OpenAiTtsService? online,
+    BundledTtsService? bundled,
+  }) : _tts = device ?? FlutterTts(),
+       _openai = online ?? OpenAiTtsService(),
+       _bundled = bundled ?? BundledTtsService();
+  bool _current(int token) => !_disposed && token == _speechGeneration;
+  Future<void> _stopEngines() {
+    _stops = _stops.catchError((_) {}).then((_) async {
+      await Future.wait([
+        _openai.stop(),
+        _bundled.stop(),
+        _tts.stop().then<void>((_) {}).catchError((_) {}),
+      ]);
+    });
+    return _stops;
+  }
+
+  Future<int> _beginSpeech() async {
+    final token = ++_speechGeneration;
+    await _stopEngines();
+    return token;
+  }
+
   bool _ready = false;
   // Single-flight init: flutter_tts's Android plugin queues method calls made
   // before the engine's onInit fires and iterates that queue inside
@@ -270,28 +298,50 @@ class TtsService {
     return mapped;
   }
 
-  Future<bool> _tryStudio(String sentence) async {
+  Future<bool> _tryStudio(String sentence, {double? rate}) async {
     if (!OpenAiTtsService.hasKey) return false;
     return _openai.speak(
       sentence,
       voice: _openAiVoice,
-      speed: _speed.openAiRate,
+      speed: rate ?? _speed.openAiRate,
     );
   }
 
-  /// Say [sentence]. Studio priority: cloud voice, then device TTS.
+  /// Bundled core content comes first for every learner. Only custom or
+  /// unbundled text uses the entitlement-gated online voice, then device TTS.
   Future<void> _sayWithFallback(
     String sentence, {
     required bool premium,
+    int? requestToken,
+    double? rate,
   }) async {
-    final useStudio = premium && _quality == VoiceQuality.studio;
-    if (useStudio) {
-      final ok = await _tryStudio(sentence);
-      if (ok) return;
+    final token = requestToken ?? await _beginSpeech();
+    if (!_current(token)) return;
+    if (await _bundled.hasText(sentence)) {
+      if (!_current(token)) return;
+      final okay = await _bundled.playText(
+        sentence,
+        speed: rate ?? _speed.openAiRate,
+      );
+      if (okay || !_current(token)) return;
     }
-    await _ensureReady();
-    await _applyDeviceVoiceTuning();
-    await _tts.speak(sentence);
+    if (!_current(token)) return;
+    if (premium && _quality == VoiceQuality.studio) {
+      final okay = await _tryStudio(sentence, rate: rate);
+      if (okay || !_current(token)) return;
+    }
+    if (!_current(token)) return;
+    try {
+      await _ensureReady();
+      if (!_current(token)) return;
+      await _applyDeviceVoiceTuning();
+      if (!_current(token)) return;
+      if (rate != null) await _tts.setSpeechRate(.34);
+      if (!_current(token)) return;
+      await _tts.speak(sentence);
+    } catch (_) {
+      // An unavailable device voice must not break the visible practice flow.
+    }
   }
 
   static const _wordPromptTemplates = ['{word}'];
@@ -426,32 +476,40 @@ class TtsService {
     variant: _wordSeed(word) % _spellOutPromptTemplates.length,
   );
 
-  /// Pronounce a word. Studio builds try the selected cloud voice first so
-  /// testers can hear voice differences on every word. Bundled assets and
-  /// device TTS stay as graceful fallback.
-  ///
-  /// [skipBundled] exists for "say it slower": the bundled MP3s are recorded
-  /// at one fixed speed, so a slow repeat must go to a rate-aware engine or
-  /// the hint audibly does nothing.
+  /// Every core word uses the included natural voice, including slow replay.
+  /// [skipBundled] is a legacy slow-repeat flag. It now slows the included
+  /// recording rather than bypassing it for a lower quality device voice.
   Future<void> speakWord(
     String word, {
     bool premium = false,
     bool skipBundled = false,
   }) async {
-    final useRemoteStudio =
-        premium && _quality == VoiceQuality.studio && OpenAiTtsService.hasKey;
-    final prompt = _wordPrompt(word);
-    if (useRemoteStudio && await _tryStudio(prompt)) return;
-
-    if (!skipBundled && await _bundled.hasWord(word)) {
-      final played = await _bundled.playWord(word);
-      if (played) return;
+    final token = await _beginSpeech();
+    if (!_current(token)) return;
+    if (await _bundled.hasWord(word)) {
+      if (!_current(token)) return;
+      final played = await _bundled.playWord(
+        word,
+        speed: skipBundled ? .75 : _speed.openAiRate,
+      );
+      if (played || !_current(token)) return;
     }
-    await _sayWithFallback(prompt, premium: premium);
+    if (_current(token)) {
+      await _sayWithFallback(
+        _wordPrompt(word),
+        premium: premium,
+        requestToken: token,
+        rate: skipBundled ? .75 : null,
+      );
+    }
   }
 
+  /// A deliberately slower replay, including when the saved speed is Calm.
+  Future<void> speakSlowText(String text, {bool premium = false}) =>
+      _sayWithFallback(text.trim(), premium: premium, rate: .75);
+
   /// Say an arbitrary sentence — Number Bee questions, facts, rank-up
-  /// lines. Same studio→device routing as every other utterance.
+  /// lines. Included recording first, then entitlement-gated custom voice.
   Future<void> speakText(String text, {bool premium = false}) =>
       _sayWithFallback(text.trim(), premium: premium);
 
@@ -476,30 +534,35 @@ class TtsService {
   /// asset stub (e.g. 'great', 'new_best'). Falls back to flutter_tts using
   /// the stub with underscores turned into spaces.
   Future<void> playPhrase(String stub, {bool premium = false}) async {
+    final token = await _beginSpeech();
+    if (!_current(token)) return;
     if (await _bundled.hasPhrase(stub)) {
-      final played = await _bundled.playPhrase(stub);
-      if (played) return;
+      if (!_current(token)) return;
+      final played = await _bundled.playPhrase(stub, speed: _speed.openAiRate);
+      if (played || !_current(token)) return;
     }
-    await _ensureReady();
-    await _tts.speak(stub.replaceAll('_', ' '));
+    if (_current(token)) {
+      await _sayWithFallback(
+        stub.replaceAll('_', ' '),
+        premium: premium,
+        requestToken: token,
+      );
+    }
   }
 
   Future<void> stop() async {
-    await _openai.stop();
-    await _bundled.stop();
-    // Always stop the device engine too: during init (_ready still false) a
-    // speak may already be queued on the platform side, and skipping stop()
-    // here let it play over the next screen.
-    try {
-      await _tts.stop();
-    } catch (_) {
-      // Stopping an engine that never initialized is not worth surfacing.
-    }
+    ++_speechGeneration;
+    await _stopEngines();
   }
 
   void dispose() {
-    _tts.stop();
-    _openai.dispose();
-    _bundled.dispose();
+    _disposed = true;
+    ++_speechGeneration;
+    unawaited(
+      _stopEngines().then((_) {
+        _openai.dispose();
+        _bundled.dispose();
+      }),
+    );
   }
 }

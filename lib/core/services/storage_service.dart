@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:spellbee/core/models/adventure.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/core/models/learning_history.dart';
 import 'package:spellbee/core/models/player_stats.dart';
@@ -11,6 +12,19 @@ import 'package:spellbee/core/services/tts_service.dart';
 class StorageService {
   final SharedPreferences _prefs;
   StorageService(this._prefs);
+
+  static const _kAdventures = 'sb.adventures.v1';
+  AdventureProgress loadAdventures() =>
+      AdventureProgress(_prefs.getStringList(_kAdventures) ?? const []);
+
+  Future<void> saveAdventures(AdventureProgress progress) async {
+    if (!await _prefs.setStringList(
+      _kAdventures,
+      progress.completed.toList(),
+    )) {
+      throw StateError('Could not save adventure progress');
+    }
+  }
 
   // ── Custom word lists ──────────────────────────────────────────────
 

@@ -241,10 +241,10 @@ class CustomListsScreen extends ConsumerWidget {
     showDialog(
       context: c,
       builder: (ctx) => AlertDialog(
-        title: const Text('Free list limit'),
+        title: const Text('Keep another school list'),
         content: const Text(
-          'You can create up to 3 custom lists on the free tier. Upgrade to '
-          'Premium for unlimited parent-curated lists.',
+          'Your three free lists are ready to practise anytime. Premium adds '
+          'unlimited lists, so every new school week has a place.',
         ),
         actions: [
           TextButton(
@@ -255,9 +255,12 @@ class CustomListsScreen extends ConsumerWidget {
             style: FilledButton.styleFrom(backgroundColor: AppTheme.violet),
             onPressed: () async {
               Navigator.pop(ctx);
-              await Navigator.of(
-                c,
-              ).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+              await Navigator.of(c).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const PaywallScreen(source: PaywallSource.customLists),
+                ),
+              );
             },
             child: const Text('See Premium'),
           ),

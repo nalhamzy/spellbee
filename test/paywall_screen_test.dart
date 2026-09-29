@@ -41,8 +41,10 @@ void main() {
   Future<ProviderContainer> mount(
     WidgetTester tester, {
     bool screenshot = false,
+    bool premium = false,
     double width = 430,
     double textScale = 1,
+    PaywallSource source = PaywallSource.general,
   }) async {
     tester.view.physicalSize = Size(width, 1400);
     tester.view.devicePixelRatio = 1;
@@ -50,6 +52,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final container = ProviderContainer(
       overrides: [
+        isPremiumProvider.overrideWithValue(premium),
         iapServiceProvider.overrideWithValue(service),
         iapProductsProvider.overrideWith((ref) async => products),
       ],
@@ -66,7 +69,7 @@ void main() {
             ).copyWith(textScaler: TextScaler.linear(textScale)),
             child: child!,
           ),
-          home: PaywallScreen(screenshotMode: screenshot),
+          home: PaywallScreen(screenshotMode: screenshot, source: source),
         ),
       ),
     );
@@ -74,12 +77,159 @@ void main() {
     return container;
   }
 
+  Future<void> approveParent(WidgetTester tester) async {
+    final challenge = tester
+        .widget<Text>(find.byKey(const Key('parent-challenge')))
+        .data!;
+    final numbers = RegExp(
+      r'\d+',
+    ).allMatches(challenge).map((m) => int.parse(m.group(0)!)).toList();
+    await tester.enterText(
+      find.byKey(const Key('parent-answer')),
+      '${numbers[0] * numbers[1]}',
+    );
+    await tester.tap(find.text('Continue to store'));
+    await tester.pumpAndSettle();
+  }
+
   Future<void> buy(WidgetTester tester, String label) async {
     final button = find.widgetWithText(FilledButton, label);
     await tester.ensureVisible(button);
     await tester.tap(button);
-    await tester.pump();
+    await tester.pumpAndSettle();
+    await approveParent(tester);
   }
+
+  testWidgets('verified access replaces the purchase controls', (tester) async {
+    products = [plan(IapProductIds.premiumYearly, 'AED 109.99')];
+    final container = await mount(tester);
+    container.updateOverrides([
+      isPremiumProvider.overrideWithValue(true),
+      iapServiceProvider.overrideWithValue(service),
+      iapProductsProvider.overrideWith((ref) async => products),
+    ]);
+    await tester.pumpAndSettle();
+    expect(find.text('Premium is ready'), findsOneWidget);
+    expect(find.text('Continue with yearly'), findsNothing);
+    expect(service.bought, isEmpty);
+  });
+
+  testWidgets('an existing subscriber is not offered a second purchase', (
+    tester,
+  ) async {
+    await mount(tester, premium: true);
+    expect(find.text('Premium is ready'), findsOneWidget);
+    expect(find.text('Continue with yearly'), findsNothing);
+  });
+
+  testWidgets('a delayed restore during parent approval cannot buy again', (
+    tester,
+  ) async {
+    products = [plan(IapProductIds.premiumYearly, 'AED 109.99')];
+    final container = await mount(tester);
+    final button = find.widgetWithText(FilledButton, 'Continue with yearly');
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    container.updateOverrides([
+      isPremiumProvider.overrideWithValue(true),
+      iapServiceProvider.overrideWithValue(service),
+      iapProductsProvider.overrideWith((ref) async => products),
+    ]);
+    await tester.pumpAndSettle();
+    await approveParent(tester);
+    expect(service.bought, isEmpty);
+    expect(find.text('Premium is ready'), findsOneWidget);
+  });
+
+  testWidgets('a child cannot launch the store without parent approval', (
+    tester,
+  ) async {
+    products = [plan(IapProductIds.premiumYearly, 'AED 109.99')];
+    await mount(tester);
+    final button = find.widgetWithText(FilledButton, 'Continue with yearly');
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(service.bought, isEmpty);
+    await tester.enterText(find.byKey(const Key('parent-answer')), '0');
+    await tester.tap(find.text('Continue to store'));
+    await tester.pumpAndSettle();
+    expect(service.bought, isEmpty);
+    expect(find.text('Please ask a grown-up to help.'), findsOneWidget);
+    await tester.tap(find.text('Not now'));
+    await tester.pumpAndSettle();
+    expect(service.bought, isEmpty);
+    await buy(tester, 'Continue with yearly');
+    expect(service.bought, [IapProductIds.premiumYearly]);
+  });
+
+  testWidgets('annual is primary and monthly is an accessible secondary plan', (
+    tester,
+  ) async {
+    products = [
+      plan(IapProductIds.premiumYearly, 'AED 109.99'),
+      plan(IapProductIds.premiumLifetime, 'AED 179.99'),
+      plan(IapProductIds.premiumMonthly, 'AED 18.99'),
+    ];
+    await mount(tester);
+    expect(find.text('Premium Monthly'), findsNothing);
+    expect(find.textContaining('AED 109.99 per year'), findsOneWidget);
+    await tester.ensureVisible(find.text('Prefer monthly? See plan'));
+    await tester.tap(find.text('Prefer monthly? See plan'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Premium Monthly'));
+    await tester.tap(find.text('Premium Monthly'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('AED 18.99 per month'), findsOneWidget);
+    await buy(tester, 'Continue with monthly');
+    expect(service.bought, [IapProductIds.premiumMonthly]);
+  });
+
+  testWidgets('adventure context preserves the honest free core', (
+    tester,
+  ) async {
+    await mount(tester, source: PaywallSource.adventures);
+    expect(find.textContaining('Keep exploring together'), findsOneWidget);
+    expect(find.textContaining('All three Bee Adventures'), findsOneWidget);
+    expect(find.textContaining('Always included free:'), findsOneWidget);
+    expect(find.text('POPULAR'), findsNothing);
+    expect(find.textContaining('free trial'), findsNothing);
+  });
+
+  testWidgets('unrecognized products cannot become purchase options', (
+    tester,
+  ) async {
+    products = [plan('another_app_yearly', 'AED 1.99')];
+    await mount(tester);
+    expect(find.text('AED 1.99'), findsNothing);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Continue with yearly'),
+          )
+          .onPressed,
+      isNull,
+    );
+  });
+
+  testWidgets('three incorrect parent answers dismiss without buying', (
+    tester,
+  ) async {
+    products = [plan(IapProductIds.premiumYearly, 'AED 109.99')];
+    await mount(tester);
+    final button = find.widgetWithText(FilledButton, 'Continue with yearly');
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 3; i++) {
+      await tester.enterText(find.byKey(const Key('parent-answer')), '0');
+      await tester.tap(find.text('Continue to store'));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('A moment for grown-ups'), findsNothing);
+    expect(service.bought, isEmpty);
+  });
 
   testWidgets(
     'monthly-only response hides missing plans and buys the shown plan',
@@ -91,7 +241,7 @@ void main() {
       expect(find.text('AED 18.99'), findsOneWidget);
       expect(find.textContaining('AED 18.99 per month'), findsOneWidget);
       expect(find.textContaining('Google Play'), findsOneWidget);
-      await buy(tester, 'Start Premium');
+      await buy(tester, 'Continue with monthly');
       expect(service.bought, [IapProductIds.premiumMonthly]);
     },
   );
@@ -103,7 +253,7 @@ void main() {
     await mount(tester);
     expect(find.text('Premium Yearly'), findsNothing);
     expect(find.textContaining('AED 179.99 one-time purchase'), findsOneWidget);
-    await buy(tester, 'Pay Once & Unlock');
+    await buy(tester, 'Unlock with one payment');
     expect(service.bought, [IapProductIds.premiumLifetime]);
   });
 
@@ -114,7 +264,7 @@ void main() {
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'Start Premium'),
+            find.widgetWithText(FilledButton, 'Continue with yearly'),
           )
           .onPressed,
       isNull,
@@ -126,7 +276,7 @@ void main() {
     products = [plan(IapProductIds.premiumYearly, 'AED 109.99')];
     container.invalidate(iapProductsProvider);
     await tester.pumpAndSettle();
-    await buy(tester, 'Start Premium');
+    await buy(tester, 'Continue with yearly');
     expect(service.bought, [IapProductIds.premiumYearly]);
   });
 
@@ -137,7 +287,7 @@ void main() {
     container.invalidate(iapProductsProvider);
     await tester.pumpAndSettle();
     expect(find.text('Premium Yearly'), findsNothing);
-    await buy(tester, 'Start Premium');
+    await buy(tester, 'Continue with monthly');
     expect(service.bought, [IapProductIds.premiumMonthly]);
   });
 
@@ -147,7 +297,7 @@ void main() {
     products = [plan(IapProductIds.premiumYearly, 'AED 109.99')];
     service.buyGate = Completer<void>();
     await mount(tester);
-    await buy(tester, 'Start Premium');
+    await buy(tester, 'Continue with yearly');
     expect(
       tester
           .widget<FilledButton>(
@@ -162,7 +312,7 @@ void main() {
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'Start Premium'),
+            find.widgetWithText(FilledButton, 'Continue with yearly'),
           )
           .onPressed,
       isNotNull,
@@ -201,7 +351,7 @@ void main() {
     await tester.tap(find.text('Premium Lifetime'));
     await tester.pumpAndSettle();
     expect(find.textContaining('AED 179.99 one-time purchase'), findsOneWidget);
-    await buy(tester, 'Pay Once & Unlock');
+    await buy(tester, 'Unlock with one payment');
     expect(service.bought, [IapProductIds.premiumLifetime]);
   });
 
@@ -224,7 +374,7 @@ void main() {
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'Start Premium'),
+            find.widgetWithText(FilledButton, 'Continue with yearly'),
           )
           .onPressed,
       isNull,

@@ -153,6 +153,12 @@ void main() {
   ) async {
     final c = await seeded();
     await pumpAt(tester, host(c, const DashboardScreen()));
+    expect(find.text('BEE ADVENTURES'), findsOneWidget);
+    await tester.dragUntilVisible(
+      find.textContaining('Worker Bee'),
+      find.byType(ListView),
+      const Offset(0, -200),
+    );
     expect(find.textContaining('Worker Bee'), findsWidgets);
     // The dashboard is a lazy ListView: scroll each section into view so
     // every card actually lays out at phone width (that is the point).

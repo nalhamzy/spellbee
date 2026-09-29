@@ -63,7 +63,13 @@ const allowedVoices = new Set([
   "verse",
 ]);
 
-const allowedModels = new Set(["gpt-4o-mini-tts", "tts-1", "tts-1-hd"]);
+const allowedModels = new Set(["gpt-4o-mini-tts", "gpt-4o-mini-tts-2025-12-15", "tts-1", "tts-1-hd"]);
+const buddyInstructions = "You are Bee Buddy, a bright and friendly fictional spelling companion. " +
+  "Use clear natural American English, gentle playful curiosity, and a warm adult voice. " +
+  "Read exactly the supplied text. Pronounce each word accurately. " +
+  "For a single word, say only that word once. For capital letters separated by commas, " +
+  "say each letter name separately with a short pause. Never add words, sing, shout, " +
+  "use baby talk, distort pitch, or imitate a real child.";
 
 exports.spellbeeTts = onRequest(
   {
@@ -141,6 +147,7 @@ exports.spellbeeTts = onRequest(
           input,
           response_format: "mp3",
           speed,
+          ...(model.startsWith("gpt-4o-mini-tts") ? {instructions: buddyInstructions} : {}),
         }),
       });
 

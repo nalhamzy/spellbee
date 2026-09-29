@@ -62,6 +62,8 @@ class TestScreen extends ConsumerStatefulWidget {
   final RoundKind kind;
   final int? level;
   final InputMode initialMode;
+  final String? returnLabel;
+  final String? completionMessage;
 
   /// Optional callback invoked after stats are saved and the test completes
   /// successfully (all words answered). Used by the daily-word flow to
@@ -80,6 +82,8 @@ class TestScreen extends ConsumerStatefulWidget {
     this.kind = RoundKind.practice,
     this.level,
     this.initialMode = InputMode.keyboard,
+    this.returnLabel,
+    this.completionMessage,
   });
 
   @override
@@ -734,6 +738,10 @@ class _TestScreenState extends ConsumerState<TestScreen>
           result: result,
           title: widget.title,
           outcome: outcome,
+          returnLabel: widget.returnLabel,
+          completionMessage: result.correct == result.total
+              ? widget.completionMessage
+              : null,
         ),
       ),
     );
@@ -767,21 +775,15 @@ class _TestScreenState extends ConsumerState<TestScreen>
   }
 
   Future<void> _slowRepeat() async {
-    // Temporarily force Calm speed for this single read. Skip the bundled
-    // MP3s — they are recorded at one fixed speed, so routing through them
-    // made "say it slower" audibly identical for the ~60 most common words.
-    final tts = _tts;
-    final previous = ref.read(voiceSpeedProvider);
+    // A one-shot slower replay leaves the saved preference untouched and uses
+    // the same clear recording, even when the child's default pace is Calm.
     _speakEpoch++;
-    await tts.setSpeed(VoiceSpeed.calm);
     final prompt = _w.prompt;
     if (prompt != null) {
-      await tts.speakText(prompt, premium: _premium);
+      await _tts.speakSlowText(prompt, premium: _premium);
     } else {
-      await tts.speakWord(_w.text, premium: _premium, skipBundled: true);
+      await _tts.speakWord(_w.text, premium: _premium, skipBundled: true);
     }
-    // Restore user's chosen speed afterward.
-    await tts.setSpeed(previous);
   }
 
   void _revealFirstLetter() {

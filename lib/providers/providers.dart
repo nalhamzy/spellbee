@@ -148,22 +148,13 @@ class DayTickNotifier extends Notifier<int> {
   }
 }
 
-/// All catalog words flattened into a single list, sorted deterministically.
-/// Computed once — same order every app session.
-List<Word> _allCatalogWords() {
-  final words = <Word>[];
-  for (final level in (kWordsCatalog.keys.toList()..sort())) {
-    words.addAll(kWordsCatalog[level] ?? []);
-  }
-  return words;
-}
-
-/// Returns today's Word of the Day — deterministic by date so every device
-/// shows the same word. Uses epochDay % catalog-size.
+/// A daily word at the learner's chosen difficulty. The daily reward remains
+/// once per day even if the level changes, while beginners avoid advanced words.
 final dailyWordProvider = Provider<Word>((ref) {
-  final allWords = _allCatalogWords();
+  final level = ref.watch(selectedLevelProvider);
+  final words = kWordsCatalog[level] ?? kWordsCatalog[1]!;
   final epochDay = ref.watch(dayTickProvider);
-  return allWords[epochDay % allWords.length];
+  return words[epochDay % words.length];
 });
 
 /// Today's epoch-day integer (days since 1970-01-01).

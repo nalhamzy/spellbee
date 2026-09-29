@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
@@ -8,14 +10,29 @@ import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+enum PaywallSource {
+  general,
+  adventures,
+  customLists,
+  mathBee,
+  wordPacks,
+  studioVoice,
+}
+
 class PaywallScreen extends ConsumerStatefulWidget {
   final bool screenshotMode;
+  final PaywallSource source;
 
   /// Contextual line under the title — "Unlimited Math Bee rounds" when the
   /// kid hit that cap, the generic promise otherwise. Parents convert on
   /// the thing they were just stopped from doing, not on a feature list.
   final String? headline;
-  const PaywallScreen({super.key, this.screenshotMode = false, this.headline});
+  const PaywallScreen({
+    super.key,
+    this.screenshotMode = false,
+    this.headline,
+    this.source = PaywallSource.general,
+  });
 
   @override
   ConsumerState<PaywallScreen> createState() => _PaywallScreenState();
@@ -24,12 +41,21 @@ class PaywallScreen extends ConsumerStatefulWidget {
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   String _selected = IapProductIds.premiumYearly;
   bool _startingPurchase = false;
+  bool _openingStore = false;
   bool _restoring = false;
+  bool _showMonthly = false;
 
   Future<void> _buy(String productId) async {
-    if (_startingPurchase || widget.screenshotMode) return;
+    if (_startingPurchase || _restoring || widget.screenshotMode) return;
     setState(() => _startingPurchase = true);
     try {
+      final approved = await showDialog<bool>(
+        context: context,
+        builder: (_) => const _ParentPurchaseGate(),
+      );
+      if (approved != true || !mounted) return;
+      if (ref.read(isPremiumProvider)) return;
+      setState(() => _openingStore = true);
       await ref.read(iapServiceProvider).buy(productId);
     } catch (_) {
       if (mounted) {
@@ -40,12 +66,17 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         );
       }
     } finally {
-      if (mounted) setState(() => _startingPurchase = false);
+      if (mounted) {
+        setState(() {
+          _startingPurchase = false;
+          _openingStore = false;
+        });
+      }
     }
   }
 
   Future<void> _restore() async {
-    if (_restoring || widget.screenshotMode) return;
+    if (_restoring || _startingPurchase || widget.screenshotMode) return;
     setState(() => _restoring = true);
     try {
       await ref.read(iapServiceProvider).restore();
@@ -63,7 +94,12 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   }
 
   Future<void> _openUrl(Uri url) async {
-    final opened = await launchUrl(url, mode: LaunchMode.externalApplication);
+    var opened = false;
+    try {
+      opened = await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // A missing browser should leave the paywall usable.
+    }
     if (!opened && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not open that link.')),
@@ -98,6 +134,51 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.screenshotMode) {
+      ref.listen<bool>(isPremiumProvider, (previous, active) {
+        if (previous == false &&
+            active &&
+            mounted &&
+            ModalRoute.of(context)?.isCurrent == true) {
+          Navigator.of(context).maybePop(true);
+        }
+      });
+      if (ref.watch(isPremiumProvider)) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('SpellBee Premium')),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.verified_rounded,
+                    color: AppTheme.violet,
+                    size: 56,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Premium is ready',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Your purchase is active. Let the next adventure begin.',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton(
+                    onPressed: () => Navigator.of(context).maybePop(true),
+                    child: const Text('Back to practice'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+    }
     final productsAsync = widget.screenshotMode
         ? null
         : ref.watch(iapProductsProvider);
@@ -149,7 +230,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         SizedBox(height: context.s(14)),
                         _perks(context),
                         SizedBox(height: context.s(14)),
-                        _ValueNudge(context),
+                        _FreePracticeNote(context),
                         SizedBox(height: context.s(22)),
                         if (productsAsync == null)
                           _tiers(context, products, selected)
@@ -174,11 +255,16 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         SizedBox(height: context.s(18)),
                         SizedBox(
                           width: double.infinity,
-                          height: context.s(56),
+
                           child: FilledButton(
                             style: FilledButton.styleFrom(
                               backgroundColor: AppTheme.violet,
                               foregroundColor: Colors.white,
+                              minimumSize: Size(double.infinity, context.s(56)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                   context.s(18),
@@ -193,16 +279,26 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                                 : () => _buy(selected),
                             child: Text(
                               _startingPurchase
-                                  ? 'Opening store…'
+                                  ? (_openingStore
+                                        ? 'Opening store…'
+                                        : 'Waiting for parent…')
                                   : selected == IapProductIds.premiumLifetime
-                                  ? 'Pay Once & Unlock'
-                                  : 'Start Premium',
+                                  ? 'Unlock with one payment'
+                                  : selected == IapProductIds.premiumMonthly
+                                  ? 'Continue with monthly'
+                                  : 'Continue with yearly',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
                           ),
+                        ),
+                        SizedBox(height: context.s(8)),
+                        const Text(
+                          'For parents · Store confirmation comes next',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: AppTheme.mute, fontSize: 12),
                         ),
                         SizedBox(height: context.s(8)),
                         if (selected != null)
@@ -226,16 +322,17 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             ),
                           ],
                         ),
-                        Text(
-                          Theme.of(context).platform == TargetPlatform.android
-                              ? 'Manage or cancel subscriptions in Google Play.'
-                              : 'Manage or cancel subscriptions in your App Store account settings.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppTheme.mute,
-                            fontSize: context.s(10).clamp(10, 12),
+                        if (IapProductIds.subscriptionIds.contains(selected))
+                          Text(
+                            Theme.of(context).platform == TargetPlatform.android
+                                ? 'Manage or cancel subscriptions in Google Play.'
+                                : 'Manage or cancel subscriptions in your App Store account settings.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppTheme.mute,
+                              fontSize: context.s(10).clamp(10, 12),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -247,6 +344,20 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       ),
     );
   }
+
+  String get _contextHeadline => switch (widget.source) {
+    PaywallSource.adventures =>
+      'Keep exploring together, one little spelling victory at a time.',
+    PaywallSource.customLists =>
+      'Keep every school list ready for a little practice, any day.',
+    PaywallSource.mathBee =>
+      'Keep the number-word practice going with more Math Bee rounds.',
+    PaywallSource.wordPacks =>
+      'Make more room for the words your child wants to explore.',
+    PaywallSource.studioVoice =>
+      'More voice choices for your own practice words.',
+    PaywallSource.general => 'Turn school words into small, happy wins.',
+  };
 
   Widget _hero(BuildContext context) {
     return Container(
@@ -277,8 +388,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  widget.headline ??
-                      'A calmer, richer spelling room for daily practice.',
+                  widget.headline ?? _contextHeadline,
                   style: const TextStyle(color: AppTheme.mute, fontSize: 13),
                 ),
               ],
@@ -308,12 +418,21 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     return Column(
       children: [
         row(
-          Icons.all_inclusive_rounded,
-          'Unlimited themed word packs — no daily cap',
+          Icons.explore_rounded,
+          'All three Bee Adventures — more worlds to explore',
         ),
-        row(Icons.calculate_rounded, 'Unlimited Math Bee rounds in Number Bee'),
-        row(Icons.list_alt_rounded, 'Unlimited parent-made word lists'),
-        row(Icons.record_voice_over_rounded, 'Studio voice pronunciation'),
+        row(
+          Icons.list_alt_rounded,
+          'Unlimited school word lists — paste, save, practise',
+        ),
+        row(
+          Icons.calculate_rounded,
+          'Unlimited Math Bee rounds — keep the practice going',
+        ),
+        row(
+          Icons.record_voice_over_rounded,
+          'Online studio voices for custom practice words',
+        ),
       ],
     );
   }
@@ -333,7 +452,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             id: IapProductIds.premiumYearly,
             selected: selected == IapProductIds.premiumYearly,
             title: 'Premium Yearly',
-            subtitle: 'Best value for steady school practice',
+            subtitle: 'A full year of Premium',
             price: yearly.price,
             period: '/year',
             highlight: true,
@@ -344,17 +463,29 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             id: IapProductIds.premiumLifetime,
             selected: selected == IapProductIds.premiumLifetime,
             title: 'Premium Lifetime',
-            subtitle: 'Pay once for this family',
+            subtitle: 'One payment. No renewal.',
             price: lifetime.price,
             period: 'one-time',
           ),
         SizedBox(height: c.s(8)),
-        if (monthly != null)
+        if (monthly != null && (yearly != null || lifetime != null))
+          TextButton(
+            onPressed: _startingPurchase || _restoring
+                ? null
+                : () => setState(() => _showMonthly = !_showMonthly),
+            child: Text(
+              _showMonthly ? 'Hide monthly option' : 'Prefer monthly? See plan',
+            ),
+          ),
+        if (monthly != null &&
+            (_showMonthly ||
+                selected == monthly.id ||
+                (yearly == null && lifetime == null)))
           _tile(
             id: IapProductIds.premiumMonthly,
             selected: selected == IapProductIds.premiumMonthly,
             title: 'Premium Monthly',
-            subtitle: 'Try premium month-to-month',
+            subtitle: 'Billed each month. Cancel anytime.',
             price: monthly.price,
             period: '/month',
           ),
@@ -423,7 +554,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
-                            'POPULAR',
+                            'YEARLY',
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w900,
@@ -474,19 +605,19 @@ const _screenshotProducts = <IapProduct>[
     id: IapProductIds.premiumYearly,
     title: 'Premium Yearly',
     price: '\$29.99',
-    description: 'Best value for steady school practice',
+    description: 'A full year of Premium',
   ),
   IapProduct(
     id: IapProductIds.premiumLifetime,
     title: 'Premium Lifetime',
     price: '\$49.99',
-    description: 'Pay once for this family',
+    description: 'One payment. No renewal.',
   ),
   IapProduct(
     id: IapProductIds.premiumMonthly,
     title: 'Premium Monthly',
     price: '\$4.99',
-    description: 'Try premium month-to-month',
+    description: 'Billed each month. Cancel anytime.',
   ),
 ];
 
@@ -533,9 +664,9 @@ class _SubscriptionDisclosure extends StatelessWidget {
   }
 }
 
-class _ValueNudge extends StatelessWidget {
+class _FreePracticeNote extends StatelessWidget {
   final BuildContext pageContext;
-  const _ValueNudge(this.pageContext);
+  const _FreePracticeNote(this.pageContext);
 
   @override
   Widget build(BuildContext context) {
@@ -552,7 +683,7 @@ class _ValueNudge extends StatelessWidget {
           SizedBox(width: pageContext.s(8)),
           const Expanded(
             child: Text(
-              'Designed for daily practice: clearer pronunciation, unlimited custom lessons, and simple store checkout.',
+              'Always included free: daily review, tricky-word practice, progress and the clear Bee buddy voice.',
               style: TextStyle(
                 color: AppTheme.ink,
                 fontSize: 12,
@@ -564,4 +695,70 @@ class _ValueNudge extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Fresh approval is required for each purchase attempt and is never persisted.
+class _ParentPurchaseGate extends StatefulWidget {
+  const _ParentPurchaseGate();
+  @override
+  State<_ParentPurchaseGate> createState() => _ParentPurchaseGateState();
+}
+
+class _ParentPurchaseGateState extends State<_ParentPurchaseGate> {
+  final _answer = TextEditingController();
+  final _left = 12 + Random().nextInt(8);
+  final _right = 3 + Random().nextInt(6);
+  int _attempts = 0;
+  String? _error;
+  @override
+  void dispose() {
+    _answer.dispose();
+    super.dispose();
+  }
+
+  void _check() {
+    if (int.tryParse(_answer.text.trim()) == _left * _right) {
+      Navigator.pop(context, true);
+    } else if (++_attempts >= 3) {
+      Navigator.pop(context, false);
+    } else {
+      setState(() => _error = 'Please ask a grown-up to help.');
+      _answer.clear();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('A moment for grown-ups'),
+    content: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Please ask a parent to continue to the store.'),
+          const SizedBox(height: 16),
+          Text('What is $_left × $_right?', key: const Key('parent-challenge')),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('parent-answer'),
+            controller: _answer,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _check(),
+            decoration: InputDecoration(
+              labelText: 'Your answer',
+              errorText: _error,
+            ),
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context, false),
+        child: const Text('Not now'),
+      ),
+      FilledButton(onPressed: _check, child: const Text('Continue to store')),
+    ],
+  );
 }

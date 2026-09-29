@@ -5,8 +5,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:spellbee/core/services/bundled_tts_service.dart'
-    show waitForPlaybackEnd;
+import 'package:spellbee/core/services/speech_audio_player.dart';
 
 /// Premium voice through the SpellBee Firebase TTS gateway.
 ///
@@ -23,11 +22,20 @@ class OpenAiTtsService {
       _gatewayUrlOverride.isNotEmpty ? _gatewayUrlOverride : _defaultGatewayUrl;
   static bool get hasKey => _gatewayUrl.isNotEmpty;
 
-  static const String _model = 'gpt-4o-mini-tts';
+  static const String _model = 'gpt-4o-mini-tts-2025-12-15';
   static const String _defaultVoice = 'marin';
   static const String defaultVoice = _defaultVoice;
 
-  final _player = AudioPlayer();
+  final SpeechAudioPlayer _player;
+  final http.Client _client;
+  final Future<Directory> Function() _cacheDirectory;
+  OpenAiTtsService({
+    SpeechAudioPlayer? player,
+    http.Client? client,
+    Future<Directory> Function()? cacheDirectory,
+  }) : _player = player ?? SpeechAudioPlayer(),
+       _client = client ?? http.Client(),
+       _cacheDirectory = cacheDirectory ?? getTemporaryDirectory;
   Directory? _cacheDir;
   bool _swept = false;
 
@@ -47,7 +55,7 @@ class OpenAiTtsService {
   final _inFlight = <String, Future<void>>{};
 
   Future<Directory> _dir() async {
-    _cacheDir ??= await getTemporaryDirectory();
+    _cacheDir ??= await _cacheDirectory();
     if (!_swept) {
       _swept = true;
       _sweepOldCache(_cacheDir!); // fire-and-forget
@@ -75,7 +83,7 @@ class OpenAiTtsService {
   String _keyFor(String text, String voice) {
     final safe = text.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
     final short = safe.substring(0, safe.length.clamp(0, 40));
-    return 'sb_tts_${voice}_${short}_${text.hashCode}.mp3';
+    return 'sb_tts_buddy_v1_${voice}_${short}_${text.hashCode}.mp3';
   }
 
   /// Pronounce [text]. Returns true if the gateway + playback succeeded;
@@ -88,17 +96,21 @@ class OpenAiTtsService {
     try {
       final v = voice ?? _defaultVoice;
       final dir = await _dir();
+      if (token != _playToken) return true;
       final speedTag = (speed * 100).round();
       final file = File('${dir.path}/${_keyFor('${text}_$speedTag', v)}');
       if (!file.existsSync()) {
-        final ok = await (_inFlight[file.path] ??= _fetch(
-          file: file,
-          text: text,
-          voice: v,
-          speed: speed,
-        ).whenComplete(() => _inFlight.remove(file.path))).then(
-          (_) => file.existsSync(),
-        );
+        final ok =
+            await (_inFlight[file.path] ??=
+                    _fetch(
+                      file: file,
+                      text: text,
+                      voice: v,
+                      speed: speed,
+                    ).whenComplete(() {
+                      _inFlight.remove(file.path);
+                    }))
+                .then((_) => file.existsSync());
         if (!ok) return false;
       }
       if (token != _playToken) {
@@ -106,12 +118,7 @@ class OpenAiTtsService {
         // are cached for next time, but playing now would double-talk.
         return true;
       }
-      await _player.stop();
-      await _player.play(DeviceFileSource(file.path));
-      // Sentences (definitions, math questions) run longer than single
-      // words; the timeout only matters if the player never reports an end.
-      await waitForPlaybackEnd(_player, const Duration(seconds: 20));
-      return true;
+      return _player.play(DeviceFileSource(file.path));
     } catch (_) {
       return false;
     }
@@ -123,7 +130,7 @@ class OpenAiTtsService {
     required String voice,
     required double speed,
   }) async {
-    final resp = await http
+    final resp = await _client
         .post(
           Uri.parse(_gatewayUrl),
           headers: {
@@ -146,22 +153,29 @@ class OpenAiTtsService {
       // so a quota-exhausted day degrades to bundled/device voice silently
       // instead of hammering the function on every word.
       final retryAfter = int.tryParse(resp.headers['retry-after'] ?? '');
-      _cooldownUntil = DateTime.now().add(
-        Duration(seconds: retryAfter ?? 600),
-      );
+      _cooldownUntil = DateTime.now().add(Duration(seconds: retryAfter ?? 600));
       return;
     }
-    if (resp.statusCode != 200) return;
-    await file.writeAsBytes(resp.bodyBytes, flush: true);
+    if (resp.statusCode != 200 ||
+        !(resp.headers['content-type'] ?? '').startsWith('audio/') ||
+        resp.bodyBytes.length < 1000) {
+      return;
+    }
+    final temporary = File('${file.path}.part');
+    await temporary.writeAsBytes(resp.bodyBytes, flush: true);
+    await temporary.rename(file.path);
   }
 
   Future<void> stop() async {
+    ++_playToken;
     try {
       await _player.stop();
     } catch (_) {}
   }
 
   void dispose() {
+    ++_playToken;
+    _client.close();
     _player.dispose();
   }
 }

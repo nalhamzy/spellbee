@@ -1,0 +1,152 @@
+{
+  "method": "Unprompted gpt-4o-transcribe, 20 words spanning eight catalog levels",
+  "limitation": "Lexical regression check, not a phonetic or child-usability certification",
+  "original_matches": 16,
+  "compact_matches": 17,
+  "samples": [
+    {
+      "expected": "cat",
+      "original": "Cat",
+      "original_matches": true,
+      "compact": "Kat",
+      "compact_matches": false
+    },
+    {
+      "expected": "bag",
+      "original": "Bag.",
+      "original_matches": true,
+      "compact": "Bag.",
+      "compact_matches": true
+    },
+    {
+      "expected": "friend",
+      "original": "Friend",
+      "original_matches": true,
+      "compact": "Friend",
+      "compact_matches": true
+    },
+    {
+      "expected": "school",
+      "original": "Skool.",
+      "original_matches": false,
+      "compact": "School",
+      "compact_matches": true
+    },
+    {
+      "expected": "storm",
+      "original": "Storm",
+      "original_matches": true,
+      "compact": "Storm",
+      "compact_matches": true
+    },
+    {
+      "expected": "castle",
+      "original": "Castle",
+      "original_matches": true,
+      "compact": "Castle",
+      "compact_matches": true
+    },
+    {
+      "expected": "turtle",
+      "original": "Turtle.",
+      "original_matches": true,
+      "compact": "Turtle",
+      "compact_matches": true
+    },
+    {
+      "expected": "elephant",
+      "original": "Elefant",
+      "original_matches": false,
+      "compact": "Elefant",
+      "compact_matches": false
+    },
+    {
+      "expected": "accurate",
+      "original": "Accurate",
+      "original_matches": true,
+      "compact": "Accurate",
+      "compact_matches": true
+    },
+    {
+      "expected": "valuable",
+      "original": "Valuable.",
+      "original_matches": true,
+      "compact": "Valuable.",
+      "compact_matches": true
+    },
+    {
+      "expected": "tranquil",
+      "original": "Tranquil.",
+      "original_matches": true,
+      "compact": "Tranquil.",
+      "compact_matches": true
+    },
+    {
+      "expected": "perceive",
+      "original": "Perceive",
+      "original_matches": true,
+      "compact": "Perceive",
+      "compact_matches": true
+    },
+    {
+      "expected": "sarcastic",
+      "original": "Sarcastic",
+      "original_matches": true,
+      "compact": "Sarcastic",
+      "compact_matches": true
+    },
+    {
+      "expected": "kaleidoscope",
+      "original": "Kaleidoscope",
+      "original_matches": true,
+      "compact": "Kaleidoscope",
+      "compact_matches": true
+    },
+    {
+      "expected": "ephemeral",
+      "original": "Ephemeral",
+      "original_matches": true,
+      "compact": "Ephemeral.",
+      "compact_matches": true
+    },
+    {
+      "expected": "cynosure",
+      "original": "Senescher",
+      "original_matches": false,
+      "compact": "Sinisher",
+      "compact_matches": false
+    },
+    {
+      "expected": "logomachy",
+      "original": "Logomaki",
+      "original_matches": false,
+      "compact": "Logomachy.",
+      "compact_matches": true
+    },
+    {
+      "expected": "onomatopoeia",
+      "original": "Onomatopoeia!",
+      "original_matches": true,
+      "compact": "Onomatopoeia.",
+      "compact_matches": true
+    },
+    {
+      "expected": "zeugma",
+      "original": "Zeugma.",
+      "original_matches": true,
+      "compact": "Zeugma.",
+      "compact_matches": true
+    },
+    {
+      "expected": "floccinaucinihilipilification",
+      "original": "Floccinaucinihilipilification.",
+      "original_matches": true,
+      "compact": "Floccinaucinihilipilification.",
+      "compact_matches": true
+    }
+  ],
+  "dictionary_guidance_added": [
+    "zeugma",
+    "cynosure"
+  ]
+}
