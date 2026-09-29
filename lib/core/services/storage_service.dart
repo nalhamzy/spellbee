@@ -153,7 +153,9 @@ class StorageService {
   int getVoiceSpeedIndex() => _prefs.getInt(_kVoiceSpeed) ?? 0;
   Future<void> setVoiceSpeedIndex(int v) => _prefs.setInt(_kVoiceSpeed, v);
 
-  int getVoiceQualityIndex() => _prefs.getInt(_kVoiceQuality) ?? 0;
+  int getVoiceQualityIndex({bool premium = false}) =>
+      _prefs.getInt(_kVoiceQuality) ??
+      (premium ? VoiceQuality.studio.index : VoiceQuality.device.index);
   Future<void> setVoiceQualityIndex(int v) => _prefs.setInt(_kVoiceQuality, v);
 
   String getOpenAiVoice() =>

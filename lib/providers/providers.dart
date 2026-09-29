@@ -39,10 +39,7 @@ final ttsServiceProvider = Provider<TtsService>((ref) {
   final storage = ref.read(storageServiceProvider);
   final idx = storage.getVoiceSpeedIndex();
   s.setSpeed(VoiceSpeed.values[idx.clamp(0, VoiceSpeed.values.length - 1)]);
-  final qualityIdx = storage.getVoiceQualityIndex();
-  s.setQuality(
-    VoiceQuality.values[qualityIdx.clamp(0, VoiceQuality.values.length - 1)],
-  );
+  s.setQuality(ref.read(voiceQualityProvider));
   s.setOpenAiVoice(storage.getOpenAiVoice());
   ref.listen<VoiceSpeed>(voiceSpeedProvider, (_, next) => s.setSpeed(next));
   ref.listen<VoiceQuality>(
@@ -79,7 +76,9 @@ final voiceQualityProvider =
 class VoiceQualityNotifier extends Notifier<VoiceQuality> {
   @override
   VoiceQuality build() {
-    final idx = ref.read(storageServiceProvider).getVoiceQualityIndex();
+    final idx = ref
+        .read(storageServiceProvider)
+        .getVoiceQualityIndex(premium: ref.watch(isPremiumProvider));
     return VoiceQuality.values[idx.clamp(0, VoiceQuality.values.length - 1)];
   }
 

@@ -1,4 +1,4 @@
-# SpellBee 1.3.0 (21) — Bee Adventures and voice reliability
+# SpellBee 1.3.0 (22) — Bee Adventures and voice reliability
 
 ## Why this release
 
@@ -8,6 +8,7 @@ The audit found working, live purchase products but weak differentiation and rea
 
 - Three illustrated Bee Adventures, four short stops each. Sunny Meadow is entirely free; the two additional worlds use the existing Premium entitlement. Progress is local and independent recall remains honestly measured.
 - Bee Buddy recordings cover every built-in word and its contextual prompts, story narration and feedback. Slow repeat actually slows the recording. Stop/cancellation invalidates late playback; online custom speech uses a fixed, prompted model with bounded fallback.
+- Premium automatically enables online custom-word speech when no explicit voice preference exists. A parent's deliberate choice is preserved, including across restore, renewal and expiry. Included Bee Buddy recordings still take priority for core words.
 - Parent-oriented paywall: annual primary, lifetime alternative, monthly available, native localized prices, no invented trial or Family Sharing claim. A parent challenge precedes checkout. Verified purchase/restore returns to the invoking screen and removes duplicate purchase prompts.
 - Free offline packs remain accessible after an online credit is exhausted. Marketing distinguishes included voices and local practice from paid custom content.
 - Apple equal-service monthly/yearly subscription levels aligned; misleading Play paid ad-removal benefit removed. Prices, product IDs and access periods unchanged.
@@ -21,6 +22,7 @@ Settings → Voice explains AI-generated speech and the free included voice. Cor
 ## Validation and deployment
 
 - Flutter analyzer: no issues. Complete suite: 143 tests passed; after the final daily-level and accessibility changes, all 18 relevant learning/adventure tests passed (one newly added test, 144 total tests in the project).
+- Build 22 voice-default validation: 28 voice, preference and paywall tests passed; analyzer remained clean. The new tests cover an immediate verified upgrade, expiry and preservation of a parent's explicit choice.
 - Backend: all 10 purchase-verification tests and JavaScript syntax checks passed on Node 22.
 - Release web build succeeded. Phone-size browser smoke completed a four-word Meadow stop using tiles, showed 4/4 correct with 0/4 independent recall, returned to the story map, saved 1/4 completion and unlocked stop 2. Narration, word and feedback MP3 requests returned 200.
 - Android ARM64 release APK built successfully, approximately 95 MB. No Android phone was connected for native listening or purchase testing. CI produces the authoritative store AAB and IPA with production configuration.
@@ -48,3 +50,9 @@ Preservation checks compared the draft against version 1.2.0: keywords, marketin
 Editable fields changed are draft localization `description` and `whatsNew`, App Review `notes`, and restoration of unchanged `promotionalText`; the version was created with `releaseType: AFTER_APPROVAL`. The selected build relationship remains null. Attach only uploaded build 21 after its processing state is VALID and root confirms readiness; build 20 was never selected. No App Review submission, Google Play edit, purchase or CI trigger was performed in this preparation.
 
 Schemas were inspected from Apple's current documentation before requests: [create version](https://developer.apple.com/documentation/appstoreconnectapi/post-v1-appstoreversions), [update localization](https://developer.apple.com/documentation/appstoreconnectapi/patch-v1-appstoreversionlocalizations-_id_), and [update review detail](https://developer.apple.com/documentation/appstoreconnectapi/patch-v1-appstorereviewdetails-_id_).
+
+## Build 21 superseded before publishing
+
+Tag `v1.3.0-build21` auto-triggered Codemagic `release-both` build `6abb98c63f90aeed9672589c` from commit `7ce404c9587aef13f919c5c847f5a4fb391dd45f` at 2026-09-29 10:54:04 UTC. Setup and package resolution passed. During the Android bundle step, final review identified a Premium voice-default improvement for build 22. The build was intentionally canceled using the documented Codemagic cancel endpoint (HTTP 200); readback is `canceled`, Publishing was never started. No build 21 selection, store submission or artifact deletion occurred.
+
+Preliminary Apple readiness checks passed: existing Education category and 4+ rating metadata populated; reviewer contact fields complete; no demo account required; marketing, support and privacy pages each HTTP 200. Source Info.plist declares `ITSAppUsesNonExemptEncryption=false`. These checks do not replace verification of the final uploaded build. The next intended release artifact is build 22; the earlier build-21 preparation instructions are superseded.
