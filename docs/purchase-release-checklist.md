@@ -1,6 +1,6 @@
 # Purchase reliability release checks
 
-Updated 13 September 2026 for 1.2.0 (20). The verification backend and public support/privacy site are deployed. No real sandbox purchase lifecycle has been exercised in this session. Store build/submission status is recorded separately in the release report.
+Updated 29 September 2026 for 1.3.0 (22). The verification backend and public support/privacy site are deployed. No real sandbox purchase lifecycle has been exercised in this session; no Android phone was connected. Store build/submission status is recorded separately in [release-1.3.0.md](release-1.3.0.md).
 
 ## Implemented and regression-tested
 
@@ -14,7 +14,11 @@ Updated 13 September 2026 for 1.2.0 (20). The verification backend and public su
 - [x] Displayed localized price, selected plan, disclosure and checkout agree.
 - [x] Purchase launch and restore have busy/error handling; screenshot fixtures cannot buy or restore.
 - [x] Narrow-phone layout with enlarged text and long localized prices passes widget checks.
-- [x] All 119 Flutter unit/widget tests and 10 backend provider tests pass; static analysis is clean.
+- [x] All 146 Flutter unit/widget tests and 10 backend provider tests pass; static analysis is clean.
+- [x] A fresh grown-up challenge precedes checkout; cancellation and exhausted attempts do not launch a purchase.
+- [x] Verified purchase/restore returns to the feature that opened Premium. A late restore does not cause duplicate checkout after the grown-up challenge.
+- [x] Premium automatically enables online custom-word voices when no explicit voice preference exists. Deliberate preferences survive upgrades and expiry.
+- [x] Existing monthly/yearly plans provide the same Apple subscription service level; active products and localized prices were read from both stores without changing prices.
 
 ## Before release
 
@@ -23,7 +27,7 @@ Updated 13 September 2026 for 1.2.0 (20). The verification backend and public su
 - [ ] Confirm the durable saved entitlement survives process restart. Test store failure during acknowledgement and recovery with Restore.
 - [ ] Confirm no duplicate charges/launches under rapid taps and no duplicate access notifications during redelivery.
 - [ ] Verify accurate pricing and layout in the principal territories with native fonts and accessibility settings.
-- [ ] Recapture paywall store assets for the release; current screenshots predate these changes.
+- [ ] Recapture paywall store assets when replacing the existing listing screenshots; current screenshots predate these changes and were preserved.
 - [ ] Check restore guidance on both platforms and record the outcome of an empty restore separately from successful entitlement delivery.
 
 ## Verified access in this release

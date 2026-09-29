@@ -1,6 +1,6 @@
-# SpellBee 1.3.0 — saved Apple draft copy
+# SpellBee 1.3.0 — submitted Apple listing copy
 
-Saved to the en-US draft localization on September 29, 2026. No build is selected and no review submission has been made.
+Saved to the en-US localization and submitted with validated build 22 on September 29, 2026 at 11:15:50 UTC. Version and submission both read WAITING_FOR_REVIEW; automatic release after approval is configured. Build 22 is not yet publicly live. Exact submitted description, release notes and review instructions follow.
 
 ## Description
 
