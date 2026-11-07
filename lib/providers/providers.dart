@@ -12,6 +12,7 @@ import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/ai_word_generator.dart';
 import 'package:spellbee/core/services/iap_service.dart';
+import 'package:spellbee/core/services/review_prompt.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/core/services/stt_service.dart';
 import 'package:spellbee/core/services/tts_service.dart';
@@ -572,6 +573,18 @@ final isPremiumProvider = Provider<bool>((ref) {
   if (forcePremium) return true;
   return ref.watch(premiumProvider).isPremium;
 });
+
+/// What happened this session that rules out a rating prompt.
+final sessionSignalsProvider = Provider<SessionSignals>(
+  (ref) => SessionSignals(),
+);
+
+final reviewPromptServiceProvider = Provider<ReviewPromptService>(
+  (ref) => ReviewPromptService(
+    ref.read(storageServiceProvider).preferences,
+    signals: ref.read(sessionSignalsProvider),
+  ),
+);
 
 /// True while a store purchase is received but not yet confirmed by the
 /// verification server. main() invalidates it whenever the markers change.

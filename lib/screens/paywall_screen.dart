@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
@@ -8,6 +6,7 @@ import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/widgets/parent_gate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// The parent-facing answer to a restore.
@@ -124,6 +123,16 @@ class PaywallScreen extends ConsumerStatefulWidget {
 
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   String _selected = IapProductIds.premiumYearly;
+
+  @override
+  void initState() {
+    super.initState();
+    // No rating prompt in a session that showed the paywall.
+    if (!widget.screenshotMode) {
+      ref.read(sessionSignalsProvider).paywallSeen = true;
+    }
+  }
+
   bool _startingPurchase = false;
   bool _openingStore = false;
   bool _restoring = false;
@@ -133,11 +142,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     if (_startingPurchase || _restoring || widget.screenshotMode) return;
     setState(() => _startingPurchase = true);
     try {
-      final approved = await showDialog<bool>(
-        context: context,
-        builder: (_) => const _ParentPurchaseGate(),
-      );
-      if (approved != true || !mounted) return;
+      final approved = await showParentGate(context);
+      if (!approved || !mounted) return;
       if (ref.read(isPremiumProvider)) return;
       setState(() => _openingStore = true);
       await ref.read(iapServiceProvider).buy(productId);
@@ -777,70 +783,4 @@ class _FreePracticeNote extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Fresh approval is required for each purchase attempt and is never persisted.
-class _ParentPurchaseGate extends StatefulWidget {
-  const _ParentPurchaseGate();
-  @override
-  State<_ParentPurchaseGate> createState() => _ParentPurchaseGateState();
-}
-
-class _ParentPurchaseGateState extends State<_ParentPurchaseGate> {
-  final _answer = TextEditingController();
-  final _left = 12 + Random().nextInt(8);
-  final _right = 3 + Random().nextInt(6);
-  int _attempts = 0;
-  String? _error;
-  @override
-  void dispose() {
-    _answer.dispose();
-    super.dispose();
-  }
-
-  void _check() {
-    if (int.tryParse(_answer.text.trim()) == _left * _right) {
-      Navigator.pop(context, true);
-    } else if (++_attempts >= 3) {
-      Navigator.pop(context, false);
-    } else {
-      setState(() => _error = 'Please ask a grown-up to help.');
-      _answer.clear();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('A moment for grown-ups'),
-    content: SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Please ask a parent to continue to the store.'),
-          const SizedBox(height: 16),
-          Text('What is $_left × $_right?', key: const Key('parent-challenge')),
-          const SizedBox(height: 12),
-          TextField(
-            key: const Key('parent-answer'),
-            controller: _answer,
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _check(),
-            decoration: InputDecoration(
-              labelText: 'Your answer',
-              errorText: _error,
-            ),
-          ),
-        ],
-      ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context, false),
-        child: const Text('Not now'),
-      ),
-      FilledButton(onPressed: _check, child: const Text('Continue to store')),
-    ],
-  );
 }

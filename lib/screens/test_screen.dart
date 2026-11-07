@@ -312,6 +312,7 @@ class _TestScreenState extends ConsumerState<TestScreen>
     if (!mounted) return;
     setState(() => _micBusy = false);
     if (!started && stt.status == SttStatus.denied) {
+      ref.read(sessionSignalsProvider).errorSeen = true;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(

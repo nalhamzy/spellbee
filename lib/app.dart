@@ -45,6 +45,7 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp>
         }
       };
       ref.read(iapServiceProvider).onPurchaseError = (msg) {
+        ref.read(sessionSignalsProvider).errorSeen = true;
         final ctx = _scaffoldMessenger.currentContext;
         if (ctx != null) {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(msg)));

@@ -10,6 +10,7 @@ import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/test_screen.dart';
 import 'package:spellbee/widgets/celebration.dart';
+import 'package:spellbee/widgets/parent_gate.dart';
 
 class ResultsScreen extends ConsumerStatefulWidget {
   final TestResult result;
@@ -31,6 +32,47 @@ class ResultsScreen extends ConsumerStatefulWidget {
 }
 
 class _ResultsScreenState extends ConsumerState<ResultsScreen> {
+  /// A small "for grown-ups" rating card after a success moment.
+  bool _offerReview = false;
+
+  bool _decideReviewOffer() {
+    if (kIsWeb) return false; // web build = store screenshot mode
+    try {
+      return ref
+          .read(reviewPromptServiceProvider)
+          .recordRound(
+            perfect: widget.result.isPerfect,
+            // "Finished your first round" is a participation badge, not a
+            // success moment; the first earned badge is.
+            newBadges:
+                widget.outcome?.newBadges
+                    .where((b) => b.id != 'first_test')
+                    .length ??
+                0,
+            totalBadges: ref
+                .read(progressionProvider)
+                .badges
+                .keys
+                .where((id) => id != 'first_test')
+                .length,
+          );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _rate() async {
+    final approved = await showParentGate(
+      context,
+      message: 'Please ask a parent: would you rate SpellBee in the store?',
+      confirmLabel: 'Continue',
+    );
+    if (!mounted) return;
+    setState(() => _offerReview = false);
+    if (!approved) return;
+    await ref.read(reviewPromptServiceProvider).requestReview();
+  }
+
   bool get _celebrate {
     final o = widget.outcome;
     return widget.result.isPerfect ||
@@ -40,6 +82,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   @override
   void initState() {
     super.initState();
+    _offerReview = _decideReviewOffer();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final tts = ref.read(ttsServiceProvider);
       final premium = ref.read(isPremiumProvider);
@@ -254,6 +297,13 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                           ),
                         ),
                       ),
+                      if (_offerReview) ...[
+                        SizedBox(height: context.s(16)),
+                        _ReviewAskCard(
+                          onRate: _rate,
+                          onDismiss: () => setState(() => _offerReview = false),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -420,6 +470,59 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Parent-facing rating ask. The store sheet opens only after the parent
+/// gate; "Not now" just hides the card.
+class _ReviewAskCard extends StatelessWidget {
+  final VoidCallback onRate;
+  final VoidCallback onDismiss;
+
+  const _ReviewAskCard({required this.onRate, required this.onDismiss});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('review-ask'),
+      padding: EdgeInsets.all(context.s(14)),
+      decoration: AppTheme.card(
+        color: AppTheme.surface,
+        radius: context.s(16),
+        shadow: false,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'FOR GROWN-UPS',
+            style: TextStyle(
+              color: AppTheme.mute,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.1,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Is SpellBee helping? A quick store rating helps other families '
+            'find it.',
+            style: TextStyle(color: AppTheme.ink, fontSize: 13, height: 1.35),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            children: [
+              TextButton(onPressed: onDismiss, child: const Text('Not now')),
+              FilledButton.tonal(
+                onPressed: onRate,
+                child: const Text('Rate SpellBee'),
+              ),
+            ],
           ),
         ],
       ),

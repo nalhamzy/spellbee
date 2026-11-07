@@ -15,6 +15,10 @@ class StorageService implements PendingVerificationStore {
   final SharedPreferences _prefs;
   StorageService(this._prefs);
 
+  /// For small self-contained stores (review prompt, reminders) that keep
+  /// their own keys.
+  SharedPreferences get preferences => _prefs;
+
   static const _kAdventures = 'sb.adventures.v1';
   AdventureProgress loadAdventures() =>
       AdventureProgress(_prefs.getStringList(_kAdventures) ?? const []);
