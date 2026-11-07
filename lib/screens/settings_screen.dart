@@ -105,24 +105,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   const Divider(height: 0),
-                  ListTile(
-                    leading: const Icon(Icons.restore_rounded),
-                    title: const Text('Restore purchases'),
-                    onTap: () {
-                      // Acknowledge the tap immediately; an empty restore
-                      // emits no store events, and dead silence here is a
-                      // classic App Review flag.
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Restoring purchases… Premium unlocks in a '
-                            'moment if a purchase is found.',
-                          ),
-                        ),
-                      );
-                      ref.read(iapServiceProvider).restore();
-                    },
-                  ),
+                  const _RestorePurchasesTile(),
                 ],
               ),
               SizedBox(height: context.s(12)),
@@ -185,6 +168,47 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Awaits the restore and tells the parent the outcome (found, nothing to
+/// restore, no longer active, confirming, error). An unanswered tap here is
+/// a classic App Review flag.
+class _RestorePurchasesTile extends ConsumerStatefulWidget {
+  const _RestorePurchasesTile();
+
+  @override
+  ConsumerState<_RestorePurchasesTile> createState() =>
+      _RestorePurchasesTileState();
+}
+
+class _RestorePurchasesTileState extends ConsumerState<_RestorePurchasesTile> {
+  bool _busy = false;
+
+  Future<void> _restore() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await restoreWithFeedback(context, ref.read(iapServiceProvider));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.restore_rounded),
+      title: Text(_busy ? 'Restoring purchases…' : 'Restore purchases'),
+      trailing: _busy
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : null,
+      onTap: _busy ? null : _restore,
     );
   }
 }

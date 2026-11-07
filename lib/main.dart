@@ -57,6 +57,7 @@ Future<void> main() async {
   iap.persistEntitlement = verification.verify;
   iap.refreshEntitlement = verification.refresh;
   iap.verifyPending = verification.verifyPending;
+  iap.hasActiveEntitlement = () => storage.loadPremium().isPremium;
   iap.onPendingChanged = () => container.invalidate(pendingPurchaseProvider);
 
   if (_isMobile) {

@@ -10,6 +10,43 @@ import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// The parent-facing answer to a restore.
+String restoreOutcomeMessage(RestoreOutcome outcome) => switch (outcome) {
+  RestoreOutcome.restored => 'Premium is restored on this device.',
+  RestoreOutcome.nothingToRestore =>
+    'No purchases to restore were found for this store account.',
+  RestoreOutcome.notActive =>
+    'We found a past purchase, but it is no longer active.',
+  RestoreOutcome.confirming => kPurchaseConfirmingMessage,
+  RestoreOutcome.unavailable =>
+    'The store is not available on this device right now. Please try again later.',
+  RestoreOutcome.failed => 'Could not restore purchases. Please try again.',
+};
+
+/// Runs an explicit restore, tells the parent it is checking, then gives the
+/// outcome. Never throws.
+Future<RestoreOutcome> restoreWithFeedback(
+  BuildContext context,
+  IapService iap,
+) async {
+  final messenger = ScaffoldMessenger.of(context);
+  messenger.hideCurrentSnackBar();
+  messenger.showSnackBar(
+    const SnackBar(content: Text('Checking the store for your purchases…')),
+  );
+  RestoreOutcome outcome;
+  try {
+    outcome = await iap.restore();
+  } catch (_) {
+    outcome = RestoreOutcome.failed;
+  }
+  messenger.hideCurrentSnackBar();
+  messenger.showSnackBar(
+    SnackBar(content: Text(restoreOutcomeMessage(outcome))),
+  );
+  return outcome;
+}
+
 /// Shown while a received purchase waits for server verification.
 const kPurchaseConfirmingMessage =
     'Purchase received, confirming with the store… Premium unlocks by '
@@ -126,15 +163,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     if (_restoring || _startingPurchase || widget.screenshotMode) return;
     setState(() => _restoring = true);
     try {
-      await ref.read(iapServiceProvider).restore();
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not restore purchases. Please try again.'),
-          ),
-        );
-      }
+      await restoreWithFeedback(context, ref.read(iapServiceProvider));
     } finally {
       if (mounted) setState(() => _restoring = false);
     }

@@ -27,10 +27,12 @@ class FakeStore extends Fake implements InAppPurchase {
   List<ProductDetails> products = [];
   List<PurchaseDetails> restoredPurchases = [];
   int restoreCalls = 0;
+  bool restoreThrows = false;
 
   @override
   Future<void> restorePurchases({String? applicationUserName}) async {
     restoreCalls++;
+    if (restoreThrows) throw StateError('Store offline');
     updates.add(restoredPurchases);
     await pumpEventQueue();
   }
@@ -624,6 +626,108 @@ void main() {
       await refresher(android: false).onLaunch();
       expect(iap.calls, ['retry(force)']);
     });
+
+    final verifiedYearly = PremiumState(
+      activeProductId: IapProductIds.premiumYearly,
+      verifiedAt: DateTime.now(),
+      activatedAt: DateTime.now(),
+      expiresAt: DateTime.now().add(const Duration(days: 200)),
+      verifiedActive: true,
+      verificationSource: 'app_store',
+      verificationCredential: '2000000123',
+    );
+
+    test('iOS launch with a verified cache only refreshes the proof', () async {
+      cached = verifiedYearly;
+      await refresher(android: false).onLaunch();
+      expect(iap.calls, ['refresh', 'retry(force)']);
+    });
+
+    test('iOS launch migrates a legacy cache through one restore', () async {
+      cached = PremiumState(
+        activeProductId: IapProductIds.premiumYearly,
+        activatedAt: DateTime.now().subtract(const Duration(days: 30)),
+      );
+      await refresher(android: false).onLaunch();
+      expect(iap.calls, ['restore(silent)', 'retry(force)']);
+    });
+
+    test('iOS resume refreshes the cached expiry and never restores', () async {
+      cached = verifiedYearly;
+      final r = refresher(android: false);
+      await r.onResume();
+      await r.onResume();
+      expect(iap.calls, [
+        'foreground',
+        'refresh',
+        'retry(force)',
+        'foreground',
+        'retry(force)',
+      ], reason: 'the second resume is inside the refresh throttle');
+      expect(iap.calls.where((c) => c.startsWith('restore')), isEmpty);
+    });
+
+    test('Android resume queries purchases without a full restore', () async {
+      final r = refresher(android: true);
+      await r.onResume();
+      expect(iap.calls, ['foreground', 'redeliver', 'retry(force)']);
+    });
+
+    test('going to the background stops foreground retries', () {
+      refresher(android: true).onBackground();
+      expect(iap.calls, ['background']);
+    });
+  });
+
+  group('restore outcome', () {
+    test('an active re-verified purchase is reported as restored', () async {
+      store.restoredPurchases = [transaction(status: PurchaseStatus.restored)];
+      expect(await service.restore(), RestoreOutcome.restored);
+      expect(successes, isEmpty, reason: 'the outcome message covers it');
+    });
+
+    test('an empty store answer is nothing to restore', () async {
+      expect(await service.restore(), RestoreOutcome.nothingToRestore);
+    });
+
+    test('a cached active entitlement counts as restored', () async {
+      service.hasActiveEntitlement = () => true;
+      expect(await service.restore(), RestoreOutcome.restored);
+    });
+
+    test('an expired purchase is reported as no longer active', () async {
+      service.persistEntitlement = (_) async => false;
+      store.restoredPurchases = [transaction(status: PurchaseStatus.restored)];
+      expect(await service.restore(), RestoreOutcome.notActive);
+    });
+
+    test('a failed save is reported once, as a failure', () async {
+      service.persistEntitlement = (_) async => throw StateError('Disk full');
+      store.restoredPurchases = [transaction(status: PurchaseStatus.restored)];
+      expect(await service.restore(), RestoreOutcome.failed);
+      expect(errors, isEmpty, reason: 'no duplicate global snackbar');
+    });
+
+    test('a found purchase during an outage is confirming', () async {
+      final android = IapService(store: store, redeliverByRestore: true)
+        ..persistEntitlement = (_) async => throw StateError('503');
+      addTearDown(android.dispose);
+      store.restoredPurchases = [
+        transaction(status: PurchaseStatus.restored, token: 'tok'),
+      ];
+      expect(await android.restore(), RestoreOutcome.confirming);
+      expect(android.hasPendingVerification, isTrue);
+    });
+
+    test('an unavailable store says so', () async {
+      store.available = false;
+      expect(await service.restore(), RestoreOutcome.unavailable);
+    });
+
+    test('a throwing store restore is a failure, not an exception', () async {
+      store.restoreThrows = true;
+      expect(await service.restore(), RestoreOutcome.failed);
+    });
   });
 }
 
@@ -631,9 +735,16 @@ class _RecordingIap extends IapService {
   final calls = <String>[];
 
   @override
-  Future<void> restore({bool silent = false}) async {
+  Future<RestoreOutcome> restore({bool silent = false}) async {
     calls.add(silent ? 'restore(silent)' : 'restore');
+    return RestoreOutcome.nothingToRestore;
   }
+
+  @override
+  Future<void> refreshCachedEntitlement() async => calls.add('refresh');
+
+  @override
+  Future<void> redeliverPurchases() async => calls.add('redeliver');
 
   @override
   Future<void> retryPendingVerifications({bool force = false}) async {

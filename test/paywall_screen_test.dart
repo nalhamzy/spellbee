@@ -13,6 +13,7 @@ class RecordingIapService extends IapService {
   final bought = <String>[];
   Completer<void>? buyGate;
   bool restoreFails = false;
+  RestoreOutcome restoreOutcome = RestoreOutcome.nothingToRestore;
 
   @override
   Future<void> buy(String productId) async {
@@ -21,8 +22,9 @@ class RecordingIapService extends IapService {
   }
 
   @override
-  Future<void> restore({bool silent = false}) async {
+  Future<RestoreOutcome> restore({bool silent = false}) async {
     if (restoreFails) throw StateError('Offline');
+    return restoreOutcome;
   }
 }
 
@@ -336,6 +338,28 @@ void main() {
           .onPressed,
       isNotNull,
     );
+  });
+
+  testWidgets('restore tells the parent when nothing was found', (
+    tester,
+  ) async {
+    await mount(tester);
+    await tester.tap(find.text('Restore'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('No purchases to restore were found for this store account.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('restore of an expired purchase says it is no longer active', (
+    tester,
+  ) async {
+    service.restoreOutcome = RestoreOutcome.notActive;
+    await mount(tester);
+    await tester.tap(find.text('Restore'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('no longer active'), findsOneWidget);
   });
 
   testWidgets('available alternative selection updates checkout and terms', (

@@ -5,6 +5,44 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/services/pending_verification.dart';
 
+/// What a restore found, so the parent gets a real answer.
+enum RestoreOutcome {
+  /// Premium is active (a purchase was re-verified or the saved one is).
+  restored,
+
+  /// The store returned nothing for this account.
+  nothingToRestore,
+
+  /// Past purchases exist but none is active (expired or refunded).
+  notActive,
+
+  /// A purchase was found but the verification server is unreachable; it is
+  /// held and retried automatically.
+  confirming,
+
+  /// The store is not available on this device.
+  unavailable,
+
+  /// The store or the local save failed.
+  failed,
+}
+
+class _RestoreTally {
+  int active = 0;
+  int inactive = 0;
+  int pending = 0;
+  int failed = 0;
+
+  RestoreOutcome outcome({required bool entitledNow}) {
+    if (active > 0) return RestoreOutcome.restored;
+    if (pending > 0) return RestoreOutcome.confirming;
+    if (entitledNow) return RestoreOutcome.restored;
+    if (failed > 0) return RestoreOutcome.failed;
+    if (inactive > 0) return RestoreOutcome.notActive;
+    return RestoreOutcome.nothingToRestore;
+  }
+}
+
 class IapProduct {
   final String id;
   final String title;
@@ -67,10 +105,16 @@ class IapService {
   bool _foreground = true;
   Timer? _retryTimer;
   int _silentRestores = 0;
+  final _tallies = <_RestoreTally>[];
 
   /// Persists the entitlement. MUST be set before [initialize].
   Future<bool> Function(PurchaseDetails purchase)? persistEntitlement;
   Future<void> Function()? refreshEntitlement;
+
+  /// Whether the saved entitlement is active right now (after a restore's
+  /// proof refresh), so "nothing re-delivered" is not reported as "nothing
+  /// to restore" to a parent who already has Premium.
+  bool Function()? hasActiveEntitlement;
 
   /// Verifies a pending marker from its saved proof when the native
   /// transaction is not in memory (used where [_redeliverByRestore] is off).
@@ -178,14 +222,15 @@ class IapService {
     }
   }
 
-  Future<void> restore({bool silent = false}) async {
-    if (!await _ensureListening()) {
-      if (!silent) {
-        _reportError('Purchases are not available on this device.');
-      }
-      return;
-    }
+  /// Native store restore plus a re-check of the cached proof. The result
+  /// tells the parent what happened; it never throws. On iOS this is
+  /// restoreCompletedTransactions, so only an explicit parent tap (or a
+  /// legacy migration at launch) may call it.
+  Future<RestoreOutcome> restore({bool silent = false}) async {
+    if (!await _ensureListening()) return RestoreOutcome.unavailable;
     if (silent) _silentRestores++;
+    final tally = _RestoreTally();
+    _tallies.add(tally);
     try {
       // The saved proof can expose a refund omitted from native restore.
       // A failed refresh must not prevent native store recovery.
@@ -196,11 +241,33 @@ class IapService {
       _delivered.clear();
       _completed.clear();
       await _store.restorePurchases();
+      // StoreKit completes the restore future right after queueing the last
+      // restored batch; let it reach the purchase queue before reading.
+      await Future<void>.delayed(Duration.zero);
       await _updates;
+      return tally.outcome(entitledNow: hasActiveEntitlement?.call() ?? false);
+    } catch (_) {
+      return RestoreOutcome.failed;
     } finally {
+      _tallies.remove(tally);
       if (silent) _silentRestores--;
     }
   }
+
+  /// Re-checks the cached proof with the verification server only. No
+  /// native store call, so no Apple ID prompt. Failures keep the cache.
+  Future<void> refreshCachedEntitlement() async {
+    try {
+      await refreshEntitlement?.call();
+    } catch (_) {
+      // Offline or server down: the cached entitlement stays as it was.
+    }
+  }
+
+  /// Android only: Play's queryPurchases, without re-verifying purchases
+  /// already handled in this session. Picks up purchases that completed
+  /// while the app was away (cash / pending payments) and stranded ones.
+  Future<void> redeliverPurchases() => _redeliver();
 
   // ── Pending verification retries ────────────────────────────────────
 
@@ -436,6 +503,9 @@ class IapService {
       } catch (_) {
         // Leave unsuccessful delivery/completion pending for redelivery or
         // Restore. One failed transaction must not block the next batch.
+        for (final t in _tallies) {
+          t.failed++;
+        }
         _reportError(
           'We could not finish saving your purchase. Please try Restore.',
         );
@@ -468,6 +538,9 @@ class IapService {
         // un-completed and keep retrying instead of losing the purchase.
         if (!_holdsForRetry(p)) rethrow;
         await _holdForRetry(p);
+        for (final t in _tallies) {
+          t.pending++;
+        }
         return;
       }
       if (key != null) _delivered[key] = active;
@@ -475,13 +548,16 @@ class IapService {
     } else {
       active = _delivered[key]!;
     }
+    for (final t in _tallies) {
+      active ? t.active++ : t.inactive++;
+    }
     // Only acknowledge AFTER successful persistence. A completion failure can
     // retry without extending the entitlement or repeating delivery.
     if (p.pendingCompletePurchase) await _store.completePurchase(p);
     if (key != null) _completed.add(key);
-    // A purchase that was waiting on verification is announced even when it
-    // was recovered by a silent launch-time redelivery.
-    if (active && (_silentRestores == 0 || wasPending)) {
+    // Restores report their own outcome. A purchase that was waiting on
+    // verification is announced even when a silent redelivery recovered it.
+    if (active && ((_silentRestores == 0 && _tallies.isEmpty) || wasPending)) {
       _notifySuccess(p.productID);
     }
   }
@@ -495,7 +571,8 @@ class IapService {
   }
 
   void _reportError(String message) {
-    if (_silentRestores > 0) return;
+    // Silent restores stay silent; an explicit restore reports its outcome.
+    if (_silentRestores > 0 || _tallies.isNotEmpty) return;
     try {
       onPurchaseError?.call(message);
     } catch (_) {
