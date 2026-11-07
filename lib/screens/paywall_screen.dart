@@ -10,6 +10,53 @@ import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Shown while a received purchase waits for server verification.
+const kPurchaseConfirmingMessage =
+    'Purchase received, confirming with the store… Premium unlocks by '
+    'itself in a moment. There is no need to buy again.';
+
+/// Calm "purchase received, confirming…" card for the paywall and Settings.
+class PendingPurchaseNotice extends StatelessWidget {
+  const PendingPurchaseNotice({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('pending-purchase-notice'),
+      padding: EdgeInsets.all(context.s(14)),
+      decoration: AppTheme.card(
+        color: AppTheme.mint,
+        border: AppTheme.sage.withValues(alpha: 0.35),
+        shadow: false,
+      ),
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: AppTheme.sage,
+            ),
+          ),
+          SizedBox(width: context.s(12)),
+          const Expanded(
+            child: Text(
+              kPurchaseConfirmingMessage,
+              style: TextStyle(
+                color: AppTheme.ink,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 enum PaywallSource {
   general,
   adventures,
@@ -200,6 +247,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             IapProductIds.premiumMonthly,
           ].where(availableIds.contains).firstOrNull;
     final busy = _startingPurchase || _restoring;
+    final confirming =
+        !widget.screenshotMode && ref.watch(pendingPurchaseProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -226,6 +275,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        if (confirming) ...[
+                          const PendingPurchaseNotice(),
+                          SizedBox(height: context.s(14)),
+                        ],
                         _hero(context),
                         SizedBox(height: context.s(14)),
                         _perks(context),

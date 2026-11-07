@@ -6,10 +6,11 @@ import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/premium_state.dart';
 import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/word_list.dart';
+import 'package:spellbee/core/services/pending_verification.dart';
 import 'package:spellbee/core/services/tts_service.dart';
 
 /// SharedPreferences-backed, on-device only. No cloud, no account.
-class StorageService {
+class StorageService implements PendingVerificationStore {
   final SharedPreferences _prefs;
   StorageService(this._prefs);
 
@@ -133,6 +134,26 @@ class StorageService {
     if (!await _prefs.setString(_kPremium, s.encode())) {
       throw StateError('Could not save premium access');
     }
+  }
+
+  // ── Purchases awaiting server verification ─────────────────────────
+
+  static const _kPendingVerifications = 'sb.premium.pendingVerify.v1';
+
+  @override
+  List<PendingVerification> loadPendingVerifications() =>
+      PendingVerification.decodeAll(_prefs.getString(_kPendingVerifications));
+
+  @override
+  Future<void> savePendingVerifications(List<PendingVerification> items) async {
+    if (items.isEmpty) {
+      await _prefs.remove(_kPendingVerifications);
+      return;
+    }
+    await _prefs.setString(
+      _kPendingVerifications,
+      PendingVerification.encodeAll(items),
+    );
   }
 
   // ── Settings ────────────────────────────────────────────────────────

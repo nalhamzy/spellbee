@@ -5,7 +5,9 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/models/premium_state.dart';
+import 'package:spellbee/core/services/access_refresher.dart';
 import 'package:spellbee/core/services/iap_service.dart';
+import 'package:spellbee/core/services/pending_verification.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 
 class RejectingPreferences extends Fake implements SharedPreferences {
@@ -24,9 +26,11 @@ class FakeStore extends Fake implements InAppPurchase {
   Completer<bool>? availabilityGate;
   List<ProductDetails> products = [];
   List<PurchaseDetails> restoredPurchases = [];
+  int restoreCalls = 0;
 
   @override
   Future<void> restorePurchases({String? applicationUserName}) async {
+    restoreCalls++;
     updates.add(restoredPurchases);
     await pumpEventQueue();
   }
@@ -63,12 +67,13 @@ PurchaseDetails transaction({
   String? id = 'purchase-1',
   String productId = IapProductIds.premiumYearly,
   PurchaseStatus status = PurchaseStatus.purchased,
+  String token = '',
 }) => PurchaseDetails(
   purchaseID: id,
   productID: productId,
   verificationData: PurchaseVerificationData(
     localVerificationData: '',
-    serverVerificationData: '',
+    serverVerificationData: token,
     source: 'test',
   ),
   transactionDate: '1000',
@@ -350,4 +355,292 @@ void main() {
     await service.buy(IapProductIds.premiumYearly);
     expect(errors.single, contains('could not start'));
   });
+
+  group('pending verification (verification outage)', () {
+    late InMemoryPendingVerificationStore markers;
+    late DateTime now;
+    late List<String> pendings;
+    late bool serverUp;
+    late int verifyCalls;
+
+    IapService build({required bool android, FakeStore? onStore}) {
+      final s =
+          IapService(
+              store: onStore ?? store,
+              pendingStore: markers,
+              redeliverByRestore: android,
+              clock: () => now,
+            )
+            ..persistEntitlement = (p) async {
+              verifyCalls++;
+              if (!serverUp) {
+                throw StateError('Store verification is unavailable');
+              }
+              saved.add(p.productID);
+              return true;
+            }
+            ..onPurchaseError = errors.add
+            ..onPurchaseSuccess = successes.add
+            ..onPurchasePending = pendings.add;
+      addTearDown(s.dispose);
+      return s;
+    }
+
+    setUp(() {
+      markers = InMemoryPendingVerificationStore();
+      now = DateTime.utc(2026, 11, 7, 12);
+      pendings = [];
+      serverUp = false;
+      verifyCalls = 0;
+    });
+
+    PurchaseDetails fresh() => transaction(token: 'play-token-1');
+
+    test(
+      'a purchase whose verification fails is held and announced calmly',
+      () async {
+        service = build(android: true);
+        await service.initialize();
+        await emit(fresh());
+        expect(store.completed, isEmpty, reason: 'never acknowledged');
+        expect(errors, isEmpty, reason: 'no error for a received purchase');
+        expect(pendings, [IapProductIds.premiumYearly]);
+        expect(service.hasPendingVerification, isTrue);
+        final marker = markers.loadPendingVerifications().single;
+        expect(marker.credential, 'play-token-1');
+        expect(marker.attempts, 1);
+      },
+    );
+
+    test('a due retry verifies, acknowledges and clears the marker', () async {
+      service = build(android: true);
+      await service.initialize();
+      await emit(fresh());
+      serverUp = true;
+      now = now.add(const Duration(seconds: 31));
+      await service.retryPendingVerifications();
+      expect(saved, [IapProductIds.premiumYearly]);
+      expect(store.completed, ['purchase-1']);
+      expect(successes, [IapProductIds.premiumYearly]);
+      expect(service.hasPendingVerification, isFalse);
+    });
+
+    test('retries back off while the server stays down', () async {
+      service = build(android: true);
+      await service.initialize();
+      await emit(fresh());
+      expect(verifyCalls, 1);
+
+      // Not due yet: the first retry waits 30 s.
+      now = now.add(const Duration(seconds: 10));
+      await service.retryPendingVerifications();
+      expect(verifyCalls, 1);
+
+      now = now.add(const Duration(seconds: 21));
+      await service.retryPendingVerifications();
+      expect(verifyCalls, 2);
+      expect(markers.loadPendingVerifications().single.attempts, 2);
+
+      // Second gap is a minute.
+      now = now.add(const Duration(seconds: 40));
+      await service.retryPendingVerifications();
+      expect(verifyCalls, 2);
+      now = now.add(const Duration(seconds: 21));
+      await service.retryPendingVerifications();
+      expect(verifyCalls, 3);
+      expect(store.completed, isEmpty);
+      expect(errors, isEmpty);
+      expect(pendings, hasLength(1), reason: 'announced once, not per retry');
+    });
+
+    test(
+      'launch/resume retries skip the backoff but keep a minimum gap',
+      () async {
+        service = build(android: true);
+        await service.initialize();
+        await emit(fresh());
+        now = now.add(const Duration(seconds: 3));
+        await service.retryPendingVerifications(force: true);
+        expect(verifyCalls, 1, reason: 'inside the 10 s minimum gap');
+        now = now.add(const Duration(seconds: 8));
+        await service.retryPendingVerifications(force: true);
+        expect(verifyCalls, 2);
+      },
+    );
+
+    test(
+      'Android relaunch re-delivers the unacknowledged purchase via queryPurchases',
+      () async {
+        // Session 1: purchase arrives during an outage, app is killed.
+        service = build(android: true);
+        await service.initialize();
+        await emit(fresh());
+        service.dispose();
+
+        // Session 2: a new process with only the persisted marker.
+        final relaunched = FakeStore()
+          ..restoredPurchases = [
+            transaction(status: PurchaseStatus.restored, token: 'play-token-1'),
+          ];
+        addTearDown(relaunched.updates.close);
+        serverUp = true;
+        now = now.add(const Duration(hours: 5));
+        final next = build(android: true, onStore: relaunched);
+        await next.initialize();
+        await next.retryPendingVerifications(force: true);
+        expect(relaunched.restoreCalls, 1);
+        expect(relaunched.completed, ['purchase-1']);
+        expect(next.hasPendingVerification, isFalse);
+        expect(
+          successes,
+          [IapProductIds.premiumYearly],
+          reason: 'a recovered purchase is announced even though silent',
+        );
+      },
+    );
+
+    test(
+      'Android relaunch while the server is still down keeps the marker',
+      () async {
+        service = build(android: true);
+        await service.initialize();
+        await emit(fresh());
+        service.dispose();
+
+        final relaunched = FakeStore()
+          ..restoredPurchases = [
+            transaction(status: PurchaseStatus.restored, token: 'play-token-1'),
+          ];
+        addTearDown(relaunched.updates.close);
+        now = now.add(const Duration(minutes: 3));
+        final next = build(android: true, onStore: relaunched);
+        await next.initialize();
+        await next.retryPendingVerifications(force: true);
+        expect(relaunched.completed, isEmpty);
+        expect(errors, isEmpty);
+        expect(markers.loadPendingVerifications().single.attempts, 2);
+      },
+    );
+
+    test('iOS relaunch verifies the saved proof without a restore', () async {
+      service = build(android: false);
+      await service.initialize();
+      await emit(fresh());
+      service.dispose();
+
+      final relaunched = FakeStore();
+      addTearDown(relaunched.updates.close);
+      final checked = <String>[];
+      now = now.add(const Duration(minutes: 3));
+      final next = build(android: false, onStore: relaunched)
+        ..verifyPending = (marker) async {
+          checked.add(marker.credential);
+          return true;
+        };
+      await next.initialize();
+      await next.retryPendingVerifications(force: true);
+      expect(relaunched.restoreCalls, 0, reason: 'no Apple ID prompt');
+      expect(checked, ['play-token-1']);
+      expect(next.hasPendingVerification, isFalse);
+      expect(successes, [IapProductIds.premiumYearly]);
+    });
+
+    test('markers older than the retry window are dropped', () async {
+      service = build(android: true);
+      await service.initialize();
+      await emit(fresh());
+      now = now.add(VerificationBackoff.maxAge + const Duration(minutes: 1));
+      await service.retryPendingVerifications(force: true);
+      expect(service.hasPendingVerification, isFalse);
+    });
+
+    test('markers survive a restart through SharedPreferences', () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = StorageService(await SharedPreferences.getInstance());
+      final marker = PendingVerification(
+        productId: IapProductIds.premiumMonthly,
+        source: 'google_play',
+        credential: 'token',
+        purchaseId: 'GPA.1',
+        firstSeen: now,
+        attempts: 2,
+        lastAttempt: now,
+      );
+      await storage.savePendingVerifications([marker]);
+      final reread = StorageService(
+        await SharedPreferences.getInstance(),
+      ).loadPendingVerifications().single;
+      expect(reread.key, marker.key);
+      expect(reread.attempts, 2);
+      expect(reread.firstSeen, now);
+      await storage.savePendingVerifications([]);
+      expect(storage.loadPendingVerifications(), isEmpty);
+    });
+
+    test('backoff grows to a 30 minute ceiling', () {
+      expect(VerificationBackoff.delayAfter(0), Duration.zero);
+      expect(VerificationBackoff.delayAfter(1), const Duration(seconds: 30));
+      expect(VerificationBackoff.delayAfter(2), const Duration(minutes: 1));
+      expect(VerificationBackoff.delayAfter(7), const Duration(minutes: 30));
+      expect(VerificationBackoff.delayAfter(40), const Duration(minutes: 30));
+    });
+
+    test('corrupt marker storage reads as empty, bad rows are skipped', () {
+      expect(PendingVerification.decodeAll('not json'), isEmpty);
+      expect(
+        PendingVerification.decodeAll(
+          '[{"productId":"x"},{"productId":"a","source":"s","credential":"c",'
+          '"firstSeen":"2026-11-07T00:00:00Z"}]',
+        ).single.credential,
+        'c',
+      );
+    });
+  });
+
+  group('access refresh at launch and resume', () {
+    late _RecordingIap iap;
+    PremiumState cached = const PremiumState();
+
+    setUp(() {
+      iap = _RecordingIap();
+      cached = const PremiumState();
+    });
+
+    AccessRefresher refresher({required bool android}) => AccessRefresher(
+      iap: iap,
+      cachedPremium: () => cached,
+      isAndroid: android,
+    );
+
+    test(
+      'Android launch runs one silent restore even with nothing cached',
+      () async {
+        await refresher(android: true).onLaunch();
+        expect(iap.calls, ['restore(silent)', 'retry(force)']);
+      },
+    );
+
+    test('iOS launch with nothing cached never restores', () async {
+      await refresher(android: false).onLaunch();
+      expect(iap.calls, ['retry(force)']);
+    });
+  });
+}
+
+class _RecordingIap extends IapService {
+  final calls = <String>[];
+
+  @override
+  Future<void> restore({bool silent = false}) async {
+    calls.add(silent ? 'restore(silent)' : 'restore');
+  }
+
+  @override
+  Future<void> retryPendingVerifications({bool force = false}) async {
+    calls.add(force ? 'retry(force)' : 'retry');
+  }
+
+  @override
+  void setForeground(bool foreground) =>
+      calls.add(foreground ? 'foreground' : 'background');
 }

@@ -50,6 +50,19 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp>
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(msg)));
         }
       };
+      // Verification outage: the purchase is safe and retried, so the
+      // parent hears "received, confirming" rather than an error.
+      ref.read(iapServiceProvider).onPurchasePending = (_) {
+        final ctx = _scaffoldMessenger.currentContext;
+        if (ctx != null) {
+          ScaffoldMessenger.of(ctx).showSnackBar(
+            const SnackBar(
+              duration: Duration(seconds: 6),
+              content: Text(kPurchaseConfirmingMessage),
+            ),
+          );
+        }
+      };
     });
   }
 
@@ -151,14 +164,38 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp>
           title: 'Level 3 trial',
           result: TestResult(
             items: const [
-              AskedItem(target: 'rainbow', submitted: 'rainbow', isCorrect: true),
+              AskedItem(
+                target: 'rainbow',
+                submitted: 'rainbow',
+                isCorrect: true,
+              ),
               AskedItem(target: 'castle', submitted: 'castle', isCorrect: true),
               AskedItem(target: 'bridge', submitted: 'bridge', isCorrect: true),
-              AskedItem(target: 'thunder', submitted: 'thunder', isCorrect: true),
-              AskedItem(target: 'giraffe', submitted: 'giraffe', isCorrect: true),
-              AskedItem(target: 'library', submitted: 'library', isCorrect: true),
-              AskedItem(target: 'penguin', submitted: 'penguin', isCorrect: true),
-              AskedItem(target: 'volcano', submitted: 'volcano', isCorrect: true),
+              AskedItem(
+                target: 'thunder',
+                submitted: 'thunder',
+                isCorrect: true,
+              ),
+              AskedItem(
+                target: 'giraffe',
+                submitted: 'giraffe',
+                isCorrect: true,
+              ),
+              AskedItem(
+                target: 'library',
+                submitted: 'library',
+                isCorrect: true,
+              ),
+              AskedItem(
+                target: 'penguin',
+                submitted: 'penguin',
+                isCorrect: true,
+              ),
+              AskedItem(
+                target: 'volcano',
+                submitted: 'volcano',
+                isCorrect: true,
+              ),
             ],
             elapsed: const Duration(seconds: 74),
             endedAt: DateTime.now(),

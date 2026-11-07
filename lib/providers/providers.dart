@@ -569,6 +569,16 @@ final isPremiumProvider = Provider<bool>((ref) {
   return ref.watch(premiumProvider).isPremium;
 });
 
+/// True while a store purchase is received but not yet confirmed by the
+/// verification server. main() invalidates it whenever the markers change.
+final pendingPurchaseProvider = Provider<bool>((ref) {
+  try {
+    return ref.read(iapServiceProvider).hasPendingVerification;
+  } catch (_) {
+    return false;
+  }
+});
+
 final iapProductsProvider = FutureProvider<List<IapProduct>>((ref) async {
   try {
     return await ref.read(iapServiceProvider).loadProducts();

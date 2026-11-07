@@ -13,6 +13,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremium = ref.watch(isPremiumProvider);
+    final confirmingPurchase = ref.watch(pendingPurchaseProvider);
     final quality = ref.watch(voiceQualityProvider);
     final ttsService = ref.read(ttsServiceProvider);
     final hasStudioVoice = ttsService.hasPremiumVoice;
@@ -94,6 +95,8 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: Text(
                       isPremium
                           ? 'All adventures, unlimited lists and Math Bee.'
+                          : confirmingPurchase
+                          ? 'Purchase received, confirming with the store…'
                           : 'More adventures, school lists and Math Bee.',
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),

@@ -9,6 +9,7 @@ import 'package:spellbee/core/data/words_catalog.dart';
 import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/word_list.dart';
+import 'package:spellbee/core/services/access_refresher.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/purchase_verification_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
@@ -35,7 +36,7 @@ Future<void> main() async {
   final storage = StorageService(prefs);
   await _seedScreenshotDataIfNeeded(storage);
 
-  final iap = IapService();
+  final iap = IapService(pendingStore: storage);
 
   final container = ProviderContainer(
     // Riverpod 3's default auto-retry turns a throwing provider into a
@@ -55,20 +56,28 @@ Future<void> main() async {
     ..onChanged = () => container.invalidate(premiumProvider);
   iap.persistEntitlement = verification.verify;
   iap.refreshEntitlement = verification.refresh;
+  iap.verifyPending = verification.verifyPending;
+  iap.onPendingChanged = () => container.invalidate(pendingPurchaseProvider);
 
   if (_isMobile) {
     await iap.initialize().catchError((_) {});
-    Future<void> refreshAccess() async {
-      container.invalidate(premiumProvider);
-      if (storage.loadPremium().activeProductId != null) {
-        await iap.restore(silent: true).catchError((_) {});
-      }
-    }
-
-    refreshAccess();
+    final access = AccessRefresher(
+      iap: iap,
+      cachedPremium: storage.loadPremium,
+      isAndroid: defaultTargetPlatform == TargetPlatform.android,
+    );
+    container.invalidate(premiumProvider);
+    access.onLaunch();
     // Lifetime refunds are checked too; legacy paid users migrate through the
     // native store restore without losing their original cache on an outage.
-    AppLifecycleListener(onResume: refreshAccess);
+    // Pending verifications retry on every return to the foreground.
+    AppLifecycleListener(
+      onResume: () {
+        container.invalidate(premiumProvider);
+        access.onResume();
+      },
+      onPause: access.onBackground,
+    );
   }
 
   runApp(

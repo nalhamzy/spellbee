@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/models/premium_state.dart';
+import 'package:spellbee/core/services/pending_verification.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 
 /// Server-owned store verification. No signing keys or service account secrets
@@ -26,10 +27,15 @@ class PurchaseVerificationService {
     () => _verify(
       purchase.productID,
       purchase.verificationData.source,
-      purchase.verificationData.source == 'app_store'
-          ? purchase.purchaseID ?? ''
-          : purchase.verificationData.serverVerificationData,
+      purchaseCredential(purchase),
     ),
+  );
+
+  /// Verifies a purchase from its saved proof alone, for a pending marker
+  /// whose native transaction is not in memory (iOS after a relaunch, before
+  /// StoreKit re-delivers it). Throws when the server is still unreachable.
+  Future<bool> verifyPending(PendingVerification pending) => _enqueue(
+    () => _verify(pending.productId, pending.source, pending.credential),
   );
 
   /// Recheck the cached proof even when store restore omits a refunded item.
