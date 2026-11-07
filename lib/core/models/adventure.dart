@@ -1,4 +1,5 @@
 import 'package:spellbee/core/data/words_catalog.dart';
+import 'package:spellbee/core/utils/day_key.dart';
 import 'package:spellbee/core/models/word.dart';
 
 /// Authored stories; no generated story content or child data leaves the device.
@@ -113,9 +114,7 @@ List<Word> adventureWords(
   DateTime day,
 ) {
   final pool = kWordsCatalog[level] ?? kWordsCatalog[1]!;
-  final dayNumber =
-      DateTime.utc(day.year, day.month, day.day).millisecondsSinceEpoch ~/
-      Duration.millisecondsPerDay;
+  final dayNumber = dayKeyOf(day);
   final worldIndex = adventureWorlds.indexWhere((w) => w.id == world.id);
   final offset = dayNumber + worldIndex * 16 + stop * 4;
   return List.generate(4, (i) => pool[(offset + i) % pool.length]);

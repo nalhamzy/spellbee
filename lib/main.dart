@@ -13,6 +13,7 @@ import 'package:spellbee/core/services/access_refresher.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/purchase_verification_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
+import 'package:spellbee/core/utils/day_key.dart';
 import 'package:spellbee/providers/providers.dart';
 
 /// True only on phones because in_app_purchase has no desktop/web
@@ -34,6 +35,8 @@ Future<void> main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final storage = StorageService(prefs);
+  // One local day boundary since 1.4.0: convert stored UTC day numbers once.
+  await storage.migrateToLocalDayKeys().catchError((_) => false);
   await _seedScreenshotDataIfNeeded(storage);
 
   final iap = IapService(pendingStore: storage);
@@ -123,9 +126,7 @@ Future<void> _seedScreenshotDataIfNeeded(StorageService storage) async {
       lastPlayedEpochMs: DateTime.now().millisecondsSinceEpoch,
       // Yesterday, so the store shot shows the "Spell it now" call to action
       // instead of a finished card.
-      lastDailyEpochDay:
-          DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay -
-          1,
+      lastDailyEpochDay: localDayKey() - 1,
     ),
   );
   await storage.saveProgression(
@@ -138,8 +139,7 @@ Future<void> _seedScreenshotDataIfNeeded(StorageService storage) async {
         'tiles_first': 4,
         'daily_3': 5,
       },
-      questDay:
-          DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay,
+      questDay: localDayKey(),
       questProgress: const {
         'correctWords': 14,
         'finishTests': 1,

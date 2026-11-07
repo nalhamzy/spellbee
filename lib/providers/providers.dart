@@ -14,6 +14,7 @@ import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/core/services/stt_service.dart';
 import 'package:spellbee/core/services/tts_service.dart';
+import 'package:spellbee/core/utils/day_key.dart';
 export 'package:spellbee/core/services/openai_tts_service.dart'
     show OpenAiTtsService;
 export 'package:spellbee/core/services/tts_service.dart'
@@ -126,23 +127,24 @@ class TabNotifier extends Notifier<AppTab> {
 
 // ─── Daily word ─────────────────────────────────────────────────────────
 
-/// The current epoch day, refreshed when the app returns to the foreground
-/// (see the lifecycle observer in app.dart). Kids' tablets keep apps
-/// resident for days; without this tick the daily word, its "done" flag,
-/// and the AI credit were all frozen at whatever day the process started.
+/// Today's local day key (see core/utils/day_key.dart), refreshed when the
+/// app returns to the foreground (see the lifecycle observer in app.dart).
+/// Kids' tablets keep apps resident for days; without this tick the daily
+/// word, its "done" flag, and the AI credit were all frozen at whatever day
+/// the process started. Every daily roll-over uses this one local key.
 final dayTickProvider = NotifierProvider<DayTickNotifier, int>(
   DayTickNotifier.new,
 );
 
 class DayTickNotifier extends Notifier<int> {
   @override
-  int build() => _todayEpochDay();
+  int build() => _todayDayKey();
 
   /// Re-reads the clock; only changes state (and thus dependents) when the
   /// date actually rolled over.
   void refresh() {
     ref.invalidate(learningDayProvider);
-    final today = _todayEpochDay();
+    final today = _todayDayKey();
     if (today != state) state = today;
   }
 }
@@ -156,9 +158,10 @@ final dailyWordProvider = Provider<Word>((ref) {
   return words[epochDay % words.length];
 });
 
-/// Today's epoch-day integer (days since 1970-01-01).
-int _todayEpochDay() =>
-    DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
+/// Today's local calendar day key. Replaces the old UTC epoch day, which
+/// rolled the daily word, streak and quests over mid-afternoon in the US and
+/// mid-morning in Jakarta and Manila.
+int _todayDayKey() => localDayKey();
 
 /// True when the user has already completed today's daily word.
 final dailyWordDoneProvider = Provider<bool>((ref) {
@@ -523,7 +526,7 @@ class PlayerStatsNotifier extends Notifier<PlayerStats> {
 
   /// Call when the user correctly spells today's daily word.
   Future<void> recordDailyWordComplete() async {
-    final today = _todayEpochDay();
+    final today = _todayDayKey();
     if (state.lastDailyEpochDay == today) return; // already counted
 
     final yesterday = today - 1;

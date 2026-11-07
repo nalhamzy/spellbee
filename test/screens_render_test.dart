@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spellbee/core/utils/day_key.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -70,9 +71,7 @@ void main() {
       Progression(
         honey: 215,
         badges: const {'first_test': 1, 'perfect_test': 2, 'mic_first': 3},
-        questDay:
-            DateTime.now().millisecondsSinceEpoch ~/
-            Duration.millisecondsPerDay,
+        questDay: localDayKey(),
         questProgress: const {'correctWords': 6, 'finishTests': 1},
         totalMicWords: 4,
         totalTilesWords: 2,

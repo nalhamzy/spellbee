@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
+import 'package:spellbee/core/utils/day_key.dart';
 
 /// Calendar dates, rather than elapsed 24-hour periods, define a review day.
-int learningDay(DateTime date) =>
-    DateTime.utc(date.year, date.month, date.day).millisecondsSinceEpoch ~/
-    Duration.millisecondsPerDay;
+/// Same key as the daily word, streak and quests (see day_key.dart).
+int learningDay(DateTime date) => dayKeyOf(date);
 
 String reviewKey(String text, String? listId) =>
     jsonEncode([listId, text.trim().toLowerCase()]);

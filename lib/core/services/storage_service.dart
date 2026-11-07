@@ -8,6 +8,7 @@ import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/pending_verification.dart';
 import 'package:spellbee/core/services/tts_service.dart';
+import 'package:spellbee/core/utils/day_key.dart';
 
 /// SharedPreferences-backed, on-device only. No cloud, no account.
 class StorageService implements PendingVerificationStore {
@@ -198,9 +199,46 @@ class StorageService implements PendingVerificationStore {
     }
   }
 
+  // ── One local day boundary (1.4.0 migration) ───────────────────────
+
+  static const _kDayKeyVersion = 'sb.daykey.version';
+
+  /// Before 1.4.0 the daily word streak and the quest day were stored as UTC
+  /// day numbers. Converts them once to local day keys, keeping their
+  /// distance from today, so an existing streak survives the upgrade.
+  /// Returns true when it migrated something.
+  Future<bool> migrateToLocalDayKeys({
+    DateTime? now,
+    int Function(DateTime instant)? localDayOf,
+  }) async {
+    if ((_prefs.getInt(_kDayKeyVersion) ?? 1) >= 2) return false;
+    final at = now ?? DateTime.now();
+    int convert(int legacy) =>
+        migrateLegacyDay(legacy, now: at, localDayOf: localDayOf);
+    var migrated = false;
+    final stats = loadStats();
+    final lastDaily = stats.lastDailyEpochDay;
+    if (lastDaily != null) {
+      await saveStats(stats.copyWith(lastDailyEpochDay: convert(lastDaily)));
+      migrated = true;
+    }
+    final progress = loadProgression();
+    if (progress.questDay != 0) {
+      await saveProgression(
+        progress.copyWith(questDay: convert(progress.questDay)),
+      );
+      migrated = true;
+    }
+    await _prefs.setInt(_kDayKeyVersion, 2);
+    return migrated;
+  }
+
   // ── Daily AI credit tracking (free-tier AI limits) ────────────────
 
   static const _kAiCreditsPrefix = 'sb.ai.credits.';
+
+  /// Local calendar date, the same boundary as [localDayKey]. The string
+  /// format is unchanged so today's credits and counters survive upgrades.
   String _todayKey() {
     final d = DateTime.now();
     return '${d.year}-${d.month}-${d.day}';

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:spellbee/core/utils/day_key.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,7 +26,11 @@ TestResult _round({
   return TestResult(
     items: [
       for (var i = 0; i < total; i++)
-        AskedItem(target: 'word$i', submitted: 'word$i', isCorrect: i < correct),
+        AskedItem(
+          target: 'word$i',
+          submitted: 'word$i',
+          isCorrect: i < correct,
+        ),
     ],
     elapsed: const Duration(seconds: 30),
     endedAt: DateTime.now(),
@@ -218,66 +223,76 @@ void main() {
   });
 
   group('progression notifier', () {
-    test('a round earns honey, advances quests and awards first badges', () async {
-      final c = await _container();
-      await c
-          .read(playerStatsProvider.notifier)
-          .recordTestComplete(asked: 10, correct: 10, longestStreak: 10);
-      final outcome = await c
-          .read(progressionProvider.notifier)
-          .recordRound(_round(longestStreak: 10, micCorrect: 2, tilesCorrect: 1));
+    test(
+      'a round earns honey, advances quests and awards first badges',
+      () async {
+        final c = await _container();
+        await c
+            .read(playerStatsProvider.notifier)
+            .recordTestComplete(asked: 10, correct: 10, longestStreak: 10);
+        final outcome = await c
+            .read(progressionProvider.notifier)
+            .recordRound(
+              _round(longestStreak: 10, micCorrect: 2, tilesCorrect: 1),
+            );
 
-      // 10 correct × 2 + perfect 5, plus the "spell N words" quest reward
-      // that 10 correct words completes on even days (target 10).
-      expect(outcome.honeyEarned, greaterThanOrEqualTo(25));
-      expect(outcome.newBadges.map((b) => b.id), contains('first_test'));
-      expect(outcome.newBadges.map((b) => b.id), contains('perfect_test'));
-      expect(outcome.newBadges.map((b) => b.id), contains('streak_10'));
-      expect(outcome.newBadges.map((b) => b.id), contains('mic_first'));
-      expect(outcome.newBadges.map((b) => b.id), contains('tiles_first'));
+        // 10 correct × 2 + perfect 5, plus the "spell N words" quest reward
+        // that 10 correct words completes on even days (target 10).
+        expect(outcome.honeyEarned, greaterThanOrEqualTo(25));
+        expect(outcome.newBadges.map((b) => b.id), contains('first_test'));
+        expect(outcome.newBadges.map((b) => b.id), contains('perfect_test'));
+        expect(outcome.newBadges.map((b) => b.id), contains('streak_10'));
+        expect(outcome.newBadges.map((b) => b.id), contains('mic_first'));
+        expect(outcome.newBadges.map((b) => b.id), contains('tiles_first'));
 
-      final p = c.read(progressionProvider);
-      expect(p.honey, outcome.honeyEarned);
-      expect(p.progressFor(kQuestPool[0]), 10);
-      expect(p.totalMicWords, 2);
-      expect(p.totalTilesWords, 1);
-      expect(p.questDay, c.read(dayTickProvider));
+        final p = c.read(progressionProvider);
+        expect(p.honey, outcome.honeyEarned);
+        expect(p.progressFor(kQuestPool[0]), 10);
+        expect(p.totalMicWords, 2);
+        expect(p.totalTilesWords, 1);
+        expect(p.questDay, c.read(dayTickProvider));
 
-      // Persisted: a fresh read from storage matches.
-      final stored = c.read(storageServiceProvider).loadProgression();
-      expect(stored, p);
-    });
+        // Persisted: a fresh read from storage matches.
+        final stored = c.read(storageServiceProvider).loadProgression();
+        expect(stored, p);
+      },
+    );
 
-    test('quest rewards are granted once and can hand out a pack credit', () async {
-      final c = await _container();
-      final quests = c.read(dailyQuestsProvider);
-      final core = quests.first;
-      final creditsBefore = c.read(aiCreditsProvider);
+    test(
+      'quest rewards are granted once and can hand out a pack credit',
+      () async {
+        final c = await _container();
+        final quests = c.read(dailyQuestsProvider);
+        final core = quests.first;
+        final creditsBefore = c.read(aiCreditsProvider);
 
-      final first = await c
-          .read(progressionProvider.notifier)
-          .recordRound(_round(correct: core.target, total: core.target));
-      expect(first.questsCompleted.map((q) => q.id), contains(core.id));
-      // One credit per completed bonus quest. Some days pair two of them
-      // (a 20-word round is also a perfect round), so count rather than
-      // assume one — this assertion used to fail roughly one day in 14.
-      final bonusQuests =
-          first.questsCompleted.where((q) => q.bonusCredit).length;
-      expect(c.read(aiCreditsProvider), creditsBefore + bonusQuests);
+        final first = await c
+            .read(progressionProvider.notifier)
+            .recordRound(_round(correct: core.target, total: core.target));
+        expect(first.questsCompleted.map((q) => q.id), contains(core.id));
+        // One credit per completed bonus quest. Some days pair two of them
+        // (a 20-word round is also a perfect round), so count rather than
+        // assume one — this assertion used to fail roughly one day in 14.
+        final bonusQuests = first.questsCompleted
+            .where((q) => q.bonusCredit)
+            .length;
+        expect(c.read(aiCreditsProvider), creditsBefore + bonusQuests);
 
-      final second = await c
-          .read(progressionProvider.notifier)
-          .recordRound(_round(correct: core.target, total: core.target));
-      expect(second.questsCompleted.map((q) => q.id), isNot(contains(core.id)));
-    });
+        final second = await c
+            .read(progressionProvider.notifier)
+            .recordRound(_round(correct: core.target, total: core.target));
+        expect(
+          second.questsCompleted.map((q) => q.id),
+          isNot(contains(core.id)),
+        );
+      },
+    );
 
     test('quest counters reset when the day rolls over', () async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final storage = StorageService(prefs);
-      final yesterday =
-          DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerDay -
-          1;
+      final yesterday = localDayKey() - 1;
       await storage.saveProgression(
         Progression(
           honey: 50,
