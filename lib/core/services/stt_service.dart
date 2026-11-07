@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/foundation.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -27,6 +29,66 @@ class SttService extends ChangeNotifier {
   bool get listening => _status == SttStatus.listening;
   bool get available => _available;
   SttStatus get status => _status;
+
+  /// The English recognizer locale, resolved once per session.
+  String? _localeId;
+
+  Future<String> _englishLocale() async {
+    final cached = _localeId;
+    if (cached != null) return cached;
+    var available = const <String>[];
+    try {
+      available = (await _stt.locales()).map((l) => l.localeId).toList();
+    } catch (_) {
+      // Some recognizers cannot list locales; fall back to en_US.
+    }
+    return _localeId = pickEnglishLocale(
+      deviceRegion: deviceRegion(ui.PlatformDispatcher.instance.locales),
+      available: available,
+    );
+  }
+
+  /// English variant per device region. A phone set to Hindi in India
+  /// (hi_IN) gets Indian English, Filipino in the Philippines gets en_PH;
+  /// regions without an English variant here (e.g. Indonesia) get en_US.
+  static const englishLocaleByRegion = {
+    'US': 'en_US',
+    'GB': 'en_GB',
+    'UK': 'en_GB',
+    'IN': 'en_IN',
+    'PH': 'en_PH',
+    'AU': 'en_AU',
+  };
+
+  /// The first region among the device's preferred locales, if any.
+  static String? deviceRegion(Iterable<ui.Locale> preferred) {
+    for (final locale in preferred) {
+      final region = locale.countryCode;
+      if (region != null && region.isNotEmpty) return region.toUpperCase();
+    }
+    return null;
+  }
+
+  /// Picks the recognizer locale id to pass to listen(): the device region's
+  /// English variant when the recognizer offers it, else en_US. Matching
+  /// ignores `_` vs `-` and case, and returns the recognizer's own spelling
+  /// of the id.
+  static String pickEnglishLocale({
+    required String? deviceRegion,
+    required Iterable<String> available,
+  }) {
+    String norm(String id) => id.replaceAll('-', '_').toLowerCase();
+    final byNorm = <String, String>{};
+    for (final id in available) {
+      byNorm.putIfAbsent(norm(id), () => id);
+    }
+    final preferred = englishLocaleByRegion[deviceRegion?.toUpperCase()];
+    if (preferred != null) {
+      final hit = byNorm[norm(preferred)];
+      if (hit != null) return hit;
+    }
+    return byNorm['en_us'] ?? 'en_US';
+  }
 
   Future<bool> initialize() {
     return _initFuture ??= _initOnce();
@@ -74,8 +136,12 @@ class SttService extends ChangeNotifier {
       if (!ok) return false;
     }
     try {
+      final localeId = await _englishLocale();
       await _stt.listen(
         onResult: (r) => onResult(r.recognizedWords, r.finalResult),
+        // Always English: letter names ("see", "tee") are only recognised by
+        // an English model, whatever language the phone is set to.
+        localeId: localeId,
         listenOptions: stt.SpeechListenOptions(
           partialResults: true,
           cancelOnError: true,
@@ -214,7 +280,9 @@ class SttService extends ChangeNotifier {
 
     // The word itself, spoken rather than spelled — including digits, since
     // the recognizer returns "38" when a child reads a number aloud.
-    final saidWord = tokens.map((t) => t.replaceAll(RegExp(r'[^a-z]'), '')).join();
+    final saidWord = tokens
+        .map((t) => t.replaceAll(RegExp(r'[^a-z]'), ''))
+        .join();
     final digits = tokens.join();
     final asNumber = RegExp(r'^\d{1,3}$').hasMatch(digits)
         ? spokenNumber?.call(digits)
@@ -235,7 +303,6 @@ class SttService extends ChangeNotifier {
       isSpellingShape: spellingShape,
     );
   }
-
 }
 
 /// How a transcript reads once classified.
