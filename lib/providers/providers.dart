@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/data/word_facts.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
@@ -582,12 +583,32 @@ final pendingPurchaseProvider = Provider<bool>((ref) {
   }
 });
 
-final iapProductsProvider = FutureProvider<List<IapProduct>>((ref) async {
-  try {
-    return await ref.read(iapServiceProvider).loadProducts();
-  } catch (_) {
-    return const [];
+/// Pause before the one automatic retry of an empty or failed product query.
+@visibleForTesting
+Duration iapProductsRetryDelay = const Duration(seconds: 2);
+
+/// Store products for the paywall. Auto-disposed, so a transient store
+/// failure is never cached for the process lifetime: closing and reopening
+/// the paywall asks the store again. An empty or failed answer gets one
+/// quiet retry (billing service still binding, network blip) before the
+/// paywall shows "couldn't reach the store" with its manual Try again.
+final iapProductsProvider = FutureProvider.autoDispose<List<IapProduct>>((
+  ref,
+) async {
+  final iap = ref.read(iapServiceProvider);
+  Future<List<IapProduct>> attempt() async {
+    try {
+      return await iap.loadProducts();
+    } catch (_) {
+      return const [];
+    }
   }
+
+  final products = await attempt();
+  if (products.isNotEmpty || !ref.mounted) return products;
+  await Future<void>.delayed(iapProductsRetryDelay);
+  if (!ref.mounted) return const [];
+  return attempt();
 });
 
 // ─── Custom word lists ──────────────────────────────────────────────────
