@@ -4,7 +4,9 @@ import 'package:spellbee/core/constants/legal_urls.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/core/services/daily_reminder.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
+import 'package:spellbee/widgets/parent_gate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -81,6 +83,10 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              SizedBox(height: context.s(16)),
+              const _SectionLabel('Practice reminder'),
+              SizedBox(height: context.s(7)),
+              const _SettingsCard(children: [_ReminderTile()]),
               SizedBox(height: context.s(16)),
               _SettingsCard(
                 children: [
@@ -168,6 +174,122 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Opt-in daily reminder. Every change goes through the parent gate, and the
+/// OS permission is asked only when a grown-up turns it on.
+class _ReminderTile extends ConsumerStatefulWidget {
+  const _ReminderTile();
+
+  @override
+  ConsumerState<_ReminderTile> createState() => _ReminderTileState();
+}
+
+class _ReminderTileState extends ConsumerState<_ReminderTile> {
+  bool _busy = false;
+
+  String _time(int hour) => MaterialLocalizations.of(
+    context,
+  ).formatTimeOfDay(TimeOfDay(hour: hour, minute: 0));
+
+  Future<int?> _pickHour(int current) => showDialog<int>(
+    context: context,
+    builder: (dialogContext) => SimpleDialog(
+      title: const Text('Remind every day at'),
+      children: [
+        for (final hour in ReminderSettings.hours)
+          SimpleDialogOption(
+            key: Key('reminder-hour-$hour'),
+            onPressed: () => Navigator.pop(dialogContext, hour),
+            child: Text(
+              _time(hour),
+              style: TextStyle(
+                fontWeight: hour == current ? FontWeight.w900 : FontWeight.w500,
+              ),
+            ),
+          ),
+      ],
+    ),
+  );
+
+  Future<void> _change({required bool turnOn}) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final approved = await showParentGate(
+        context,
+        message: 'Please ask a parent to set the practice reminder.',
+        confirmLabel: 'Continue',
+      );
+      if (!approved || !mounted) return;
+      final notifier = ref.read(reminderSettingsProvider.notifier);
+      if (!turnOn) {
+        await notifier.disable();
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Daily reminder turned off.')),
+        );
+        return;
+      }
+      final hour = await _pickHour(ref.read(reminderSettingsProvider).hour);
+      if (hour == null || !mounted) return;
+      final result = await notifier.enable(hour);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(switch (result) {
+            ReminderChange.enabled =>
+              'Reminder set for ${_time(hour)} every day.',
+            ReminderChange.permissionDenied =>
+              'Notifications are off for SpellBee. Allow them in the phone '
+                  'settings to get the reminder.',
+            _ => 'Could not set the reminder. Please try again.',
+          }),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = ref.watch(reminderSettingsProvider);
+    return Column(
+      children: [
+        SwitchListTile(
+          key: const Key('reminder-switch'),
+          value: settings.enabled,
+          onChanged: _busy ? null : (on) => _change(turnOn: on),
+          activeThumbColor: AppTheme.ink,
+          activeTrackColor: AppTheme.honey,
+          secondary: const Icon(
+            Icons.notifications_active_rounded,
+            color: AppTheme.honeyDark,
+          ),
+          title: const Text(
+            'Daily practice reminder',
+            style: TextStyle(fontWeight: FontWeight.w900),
+          ),
+          subtitle: Text(
+            settings.enabled
+                ? "Every day at ${_time(settings.hour)}: “Today's word is ready”."
+                : 'Off. A grown-up can turn on one gentle reminder a day.',
+          ),
+        ),
+        if (settings.enabled)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8, bottom: 6),
+              child: TextButton(
+                onPressed: _busy ? null : () => _change(turnOn: true),
+                child: const Text('Change time'),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

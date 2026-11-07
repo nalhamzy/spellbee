@@ -11,6 +11,7 @@ import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/ai_word_generator.dart';
+import 'package:spellbee/core/services/daily_reminder.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/review_prompt.dart';
 import 'package:spellbee/core/services/storage_service.dart';
@@ -573,6 +574,43 @@ final isPremiumProvider = Provider<bool>((ref) {
   if (forcePremium) return true;
   return ref.watch(premiumProvider).isPremium;
 });
+
+// ─── Daily practice reminder (parent opt-in) ────────────────────────────
+
+final reminderSchedulerProvider = Provider<ReminderScheduler>(
+  (ref) => LocalNotificationScheduler(),
+);
+
+final dailyReminderServiceProvider = Provider<DailyReminderService>(
+  (ref) => DailyReminderService(
+    ref.read(storageServiceProvider).preferences,
+    ref.read(reminderSchedulerProvider),
+  ),
+);
+
+final reminderSettingsProvider =
+    NotifierProvider<ReminderSettingsNotifier, ReminderSettings>(
+      ReminderSettingsNotifier.new,
+    );
+
+class ReminderSettingsNotifier extends Notifier<ReminderSettings> {
+  DailyReminderService get _service => ref.read(dailyReminderServiceProvider);
+
+  @override
+  ReminderSettings build() => _service.settings;
+
+  Future<ReminderChange> enable(int hour) async {
+    final result = await _service.enable(hour);
+    state = _service.settings;
+    return result;
+  }
+
+  Future<ReminderChange> disable() async {
+    final result = await _service.disable();
+    state = _service.settings;
+    return result;
+  }
+}
 
 /// What happened this session that rules out a rating prompt.
 final sessionSignalsProvider = Provider<SessionSignals>(

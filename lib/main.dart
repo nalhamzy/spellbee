@@ -72,6 +72,8 @@ Future<void> main() async {
     );
     container.invalidate(premiumProvider);
     access.onLaunch();
+    // Opted-in reminders are re-armed in the device's current time zone.
+    container.read(dailyReminderServiceProvider).rescheduleIfEnabled();
     // Lifetime refunds are checked too; legacy paid users migrate through the
     // native store restore without losing their original cache on an outage.
     // Pending verifications retry on every return to the foreground.
