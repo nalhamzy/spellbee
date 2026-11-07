@@ -9,6 +9,53 @@ import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/widgets/parent_gate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Paywall copy for a store free trial. Null when the store returned no
+/// trial for this customer, and then the paywall is exactly as before.
+class PaywallTrialCopy {
+  /// Tile line, e.g. "7 days free, then AED 109.99/year".
+  final String tileLine;
+
+  /// Purchase button, e.g. "Start 7-day free trial".
+  final String cta;
+
+  /// Apple 3.1.2(c) disclosure: trial length, the price after it, when the
+  /// charge happens, auto-renewal and how to cancel.
+  final String disclosure;
+
+  const PaywallTrialCopy({
+    required this.tileLine,
+    required this.cta,
+    required this.disclosure,
+  });
+}
+
+PaywallTrialCopy? paywallTrialCopy(
+  IapProduct product, {
+  required bool android,
+}) {
+  final trial = product.freeTrial;
+  if (trial == null) return null;
+  final (title, per, every) = switch (product.id) {
+    IapProductIds.premiumYearly => ('Premium Yearly', 'year', 'yearly'),
+    IapProductIds.premiumMonthly => ('Premium Monthly', 'month', 'monthly'),
+    _ => ('', '', ''),
+  };
+  if (per.isEmpty) return null; // Lifetime is a one-time purchase.
+  final account = android ? 'Google Play account' : 'Apple ID account';
+  final manage = android
+      ? 'Manage or cancel anytime in Google Play.'
+      : 'Manage or cancel anytime in your App Store account settings.';
+  return PaywallTrialCopy(
+    tileLine: '${trial.label} free, then ${product.price}/$per',
+    cta: 'Start ${trial.adjective} free trial',
+    disclosure:
+        'SpellBee $title: ${trial.label} free, then ${product.price} per '
+        '$per. Your $account is charged ${product.price} when the free trial '
+        'ends unless you cancel at least 24 hours before it ends. The '
+        'subscription then renews $every until cancelled. $manage',
+  );
+}
+
 /// The parent-facing answer to a restore.
 String restoreOutcomeMessage(RestoreOutcome outcome) => switch (outcome) {
   RestoreOutcome.restored => 'Premium is restored on this device.',
@@ -370,11 +417,15 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                                   ? (_openingStore
                                         ? 'Opening store…'
                                         : 'Waiting for parent…')
-                                  : selected == IapProductIds.premiumLifetime
-                                  ? 'Unlock with one payment'
-                                  : selected == IapProductIds.premiumMonthly
-                                  ? 'Continue with monthly'
-                                  : 'Continue with yearly',
+                                  : _trialFor(products, selected)?.cta ??
+                                        (selected ==
+                                                IapProductIds.premiumLifetime
+                                            ? 'Unlock with one payment'
+                                            : selected ==
+                                                  IapProductIds.premiumMonthly
+                                            ? 'Continue with monthly'
+                                            : 'Continue with yearly'),
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w900,
@@ -525,6 +576,15 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
   }
 
+  bool get _android => Theme.of(context).platform == TargetPlatform.android;
+
+  PaywallTrialCopy? _trialFor(List<IapProduct> products, String? id) {
+    final product = products.where((p) => p.id == id).firstOrNull;
+    return product == null
+        ? null
+        : paywallTrialCopy(product, android: _android);
+  }
+
   Widget _tiers(BuildContext c, List<IapProduct> products, String? selected) {
     IapProduct? find(String id) =>
         products.where((p) => p.id == id).cast<IapProduct?>().firstOrNull;
@@ -540,7 +600,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             id: IapProductIds.premiumYearly,
             selected: selected == IapProductIds.premiumYearly,
             title: 'Premium Yearly',
-            subtitle: 'A full year of Premium',
+            subtitle:
+                _trialFor(products, yearly.id)?.tileLine ??
+                'A full year of Premium',
             price: yearly.price,
             period: '/year',
             highlight: true,
@@ -728,21 +790,30 @@ class _SubscriptionDisclosure extends StatelessWidget {
     // amount in this legally load-bearing disclosure is wrong on every
     // non-US storefront.
     final price = product?.price;
-    final text = switch (selectedProductId) {
-      IapProductIds.premiumMonthly when price != null =>
-        'SpellBee Premium Monthly: $price per month. Auto-renews monthly until cancelled.',
-      IapProductIds.premiumMonthly =>
-        'SpellBee Premium Monthly auto-renews monthly until cancelled. The price is shown at checkout.',
-      IapProductIds.premiumYearly when price != null =>
-        'SpellBee Premium Yearly: $price per year. Auto-renews yearly until cancelled.',
-      IapProductIds.premiumYearly =>
-        'SpellBee Premium Yearly auto-renews yearly until cancelled. The price is shown at checkout.',
-      IapProductIds.premiumLifetime when price != null =>
-        'SpellBee Premium Lifetime: $price one-time purchase. No subscription renewal.',
-      IapProductIds.premiumLifetime =>
-        'SpellBee Premium Lifetime is a one-time purchase. No subscription renewal.',
-      _ => 'Review the selected purchase before confirming in the App Store.',
-    };
+    final trial = product == null
+        ? null
+        : paywallTrialCopy(
+            product,
+            android: Theme.of(context).platform == TargetPlatform.android,
+          );
+    final text =
+        trial?.disclosure ??
+        switch (selectedProductId) {
+          IapProductIds.premiumMonthly when price != null =>
+            'SpellBee Premium Monthly: $price per month. Auto-renews monthly until cancelled.',
+          IapProductIds.premiumMonthly =>
+            'SpellBee Premium Monthly auto-renews monthly until cancelled. The price is shown at checkout.',
+          IapProductIds.premiumYearly when price != null =>
+            'SpellBee Premium Yearly: $price per year. Auto-renews yearly until cancelled.',
+          IapProductIds.premiumYearly =>
+            'SpellBee Premium Yearly auto-renews yearly until cancelled. The price is shown at checkout.',
+          IapProductIds.premiumLifetime when price != null =>
+            'SpellBee Premium Lifetime: $price one-time purchase. No subscription renewal.',
+          IapProductIds.premiumLifetime =>
+            'SpellBee Premium Lifetime is a one-time purchase. No subscription renewal.',
+          _ =>
+            'Review the selected purchase before confirming in the App Store.',
+        };
 
     return Text(
       text,

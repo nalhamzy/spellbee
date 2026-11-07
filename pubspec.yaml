@@ -20,6 +20,9 @@ dependencies:
   # 0.5.0+1 and later need Flutter >= 3.44, above the pinned 3.41.1.
   in_app_purchase: ^3.3.0
   in_app_purchase_android: 0.5.0
+  # Direct for intro-offer reading (SKProduct.introductoryPrice) and the
+  # StoreKit 2 trial-eligibility check; same version the lock already uses.
+  in_app_purchase_storekit: ^0.4.8
 
   # Voice + speech
   flutter_tts: ^4.2.0
