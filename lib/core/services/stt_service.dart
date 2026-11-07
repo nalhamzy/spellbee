@@ -33,14 +33,23 @@ class SttService extends ChangeNotifier {
   /// The English recognizer locale, resolved once per session.
   String? _localeId;
 
+  /// How long to wait for the recognizer's locale list before using en_US.
+  static const localesTimeout = Duration(seconds: 2);
+
   Future<String> _englishLocale() async {
     final cached = _localeId;
     if (cached != null) return cached;
     var available = const <String>[];
     try {
-      available = (await _stt.locales()).map((l) => l.localeId).toList();
+      // speech_to_text 7.3.0 on Android 13+ never answers locales() when the
+      // phone has no on-device recognizer or checkRecognitionSupport errors,
+      // so an unbounded await would leave the mic dead for the session.
+      available = (await _stt.locales().timeout(localesTimeout))
+          .map((l) => l.localeId)
+          .toList();
     } catch (_) {
-      // Some recognizers cannot list locales; fall back to en_US.
+      // Some recognizers cannot list locales (or never answer); fall back to
+      // en_US.
     }
     return _localeId = pickEnglishLocale(
       deviceRegion: deviceRegion(ui.PlatformDispatcher.instance.locales),

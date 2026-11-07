@@ -204,7 +204,7 @@ rendered set before upload.
 
 ---
 
-## Release notes 1.4.0 (build 23, en)
+## Release notes 1.4.0 (build 24, en)
 
 Store text, identical for the iOS What's New and the Play release notes (en-US):
 ```
