@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/data/word_facts.dart';
 import 'package:spellbee/core/data/words_catalog.dart';
@@ -571,10 +571,15 @@ class PremiumNotifier extends Notifier<PremiumState> {
 }
 
 final isPremiumProvider = Provider<bool>((ref) {
-  const forcePremium = bool.fromEnvironment('FORCE_PREMIUM_UNLOCK');
-  if (forcePremium) return true;
+  if (kForcePremiumUnlock) return true;
   return ref.watch(premiumProvider).isPremium;
 });
+
+/// Developer-only shortcut for testing Premium screens. kDebugMode is a
+/// compile-time false in release and profile builds, so a stray
+/// `--dart-define=FORCE_PREMIUM_UNLOCK=true` can never unlock a store build.
+const kForcePremiumUnlock =
+    kDebugMode && bool.fromEnvironment('FORCE_PREMIUM_UNLOCK');
 
 /// Privacy-safe funnel counters; a no-op unless the build sets EVENTS_URL.
 final eventLoggerProvider = Provider<EventLogger>(
