@@ -163,6 +163,19 @@ function Invoke-ChromeScreenshot($Chrome, $Url, $Output, $CaptureWidth, $Capture
     }
 }
 
+# Store captions per frame (en). Overlay text, if a caption pass is added,
+# must use exactly these strings; all passed store_price_audit.py.
+$ShotCaptions = @{
+    '01_practice' = 'Spelling bee practice, word by word'
+    '02_lists' = "Paste this week's school spelling list"
+    '03_hear' = 'Hear every word, meaning and sentence'
+    '04_tiles' = 'Type it, tap the tiles or spell it aloud'
+    '05_review' = 'Review the words that need another go'
+    '06_adventures' = 'Explore Bee Adventures with Bee Buddy'
+    '07_math' = 'Spell numbers and sums in Math Bee'
+    '08_parent' = 'Parent view: see first-try progress'
+}
+
 function Write-Manifest($Root, $CaptureUrl) {
     $manifest = Join-Path $Root 'README.md'
     $files = Get-ChildItem -LiteralPath $Root -Recurse -Filter '*.png' | Sort-Object FullName
@@ -179,8 +192,8 @@ function Write-Manifest($Root, $CaptureUrl) {
         '',
         '## Upload Sets',
         '',
-        '| File | Dimensions | Platform target | Scene | Upload readiness |',
-        '|---|---:|---|---|---|'
+        '| File | Dimensions | Platform target | Scene | Caption | Upload readiness |',
+        '|---|---:|---|---|---|---|'
     )
 
     foreach ($file in $files) {
@@ -203,7 +216,8 @@ function Write-Manifest($Root, $CaptureUrl) {
         }
         $scene = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
         $displayPath = '``' + $relative + '``'
-        $lines += "| $displayPath | $($size.Width)x$($size.Height) | $target | $scene | Ready after visual review |"
+        $caption = if ($ShotCaptions.ContainsKey($scene)) { $ShotCaptions[$scene] } else { '' }
+        $lines += "| $displayPath | $($size.Width)x$($size.Height) | $target | $scene | $caption | Ready after visual review |"
     }
 
     $lines += @(
@@ -364,18 +378,19 @@ try {
         @{ Name = 'android_phone'; Width = 1080; Height = 1920; CaptureWidth = 500; CaptureHeight = 889; LayoutWidth = 428; Scale = 1; GamesScroll = 960 },
         @{ Name = 'android_tablet'; Width = 1600; Height = 2560; CaptureWidth = 860; CaptureHeight = 1376; LayoutWidth = 800; Scale = 1; GamesScroll = 1050 }
         )
-        # Scene order = store order. The first three carry the v1.1.0
-        # story (quests + honey, the game grid, Number Bee); the rest show
-        # the mechanics a parent is buying. GamesScroll is per layout width.
+        # Scene order = store order (1.4.0 ASO pass, docs/listing-1.4.0.md).
+        # No paywall frame and no price / "free" / "Premium" in any frame;
+        # 06_adventures replaces the old "Unlimited word packs ... Go Premium"
+        # frame. Captions live in $ShotCaptions and land in the manifest.
         $shotList = { param($set) @(
-            @{ Name = '01_home'; Shot = 'home' },
-            @{ Name = '02_games'; Shot = ('home&scroll=' + $set.GamesScroll) },
-            @{ Name = '03_numbers'; Shot = 'numbers' },
+            @{ Name = '01_practice'; Shot = 'home' },
+            @{ Name = '02_lists'; Shot = 'lists' },
+            @{ Name = '03_hear'; Shot = 'test' },
             @{ Name = '04_tiles'; Shot = 'tiles&fill=4' },
-            @{ Name = '05_aloud'; Shot = 'test&mode=mic' },
-            @{ Name = '06_math'; Shot = 'math' },
-            @{ Name = '07_results'; Shot = 'results' },
-            @{ Name = '08_paywall'; Shot = 'paywall' }
+            @{ Name = '05_review'; Shot = 'results' },
+            @{ Name = '06_adventures'; Shot = 'adventures' },
+            @{ Name = '07_math'; Shot = 'math' },
+            @{ Name = '08_parent'; Shot = 'stats' }
         ) }
 
         foreach ($set in $sets) {

@@ -10,6 +10,7 @@ import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/utils/number_words.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/adventures_screen.dart';
 import 'package:spellbee/screens/custom_lists_screen.dart';
 import 'package:spellbee/screens/dashboard_screen.dart';
 import 'package:spellbee/screens/number_bee_screen.dart';
@@ -212,7 +213,10 @@ class _SpellBeeAppState extends ConsumerState<SpellBeeApp>
             bonusCredits: 1,
           ),
         );
+      case 'adventures':
+        return const AdventuresScreen();
       case 'paywall':
+        // Kept for App Review IAP screenshots; not a store listing frame.
         return const PaywallScreen(screenshotMode: true);
       case 'home':
       default:

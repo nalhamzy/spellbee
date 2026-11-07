@@ -1,12 +1,15 @@
 # SpellBee — Store listing copy
 
-## Release 1.2.0
+## Release 1.4.0
 
-School-list paste, today's practice, first-attempt reporting, and store-verified Premium.
-Prices and product IDs are unchanged. See `docs/purchase-release-checklist.md` for validation.
+English-pinned spell-aloud, local-midnight day boundary, purchase recovery after a
+verification outage, restore outcomes, a parent-set daily reminder and a trial-ready
+paywall. Prices and product IDs are unchanged.
 
-SEO-tuned for the spelling-bee / student-education niche. Every field under its
-platform limit.
+**Source of truth for 1.4.0 copy: [docs/listing-1.4.0.md](../docs/listing-1.4.0.md)**
+(from the 2026-11-07 studio ASO pass). This file mirrors it. No price, "free" or
+"ad-free" in name, subtitle, keywords, promotional text, Play title, Play short
+description or screenshot captions (Apple 2.3.7).
 
 ---
 
@@ -20,82 +23,85 @@ SpellBee: Spelling Bee Tutor
 
 ### Subtitle (30 char)
 ```
-School lists. Daily practice.
+Word Test Practice & Dictation
 ```
-**29 chars.** Leads with school-list relevance and a daily practice habit.
+**30 chars.** Combines with the name into "spelling test", "spelling practice",
+"spelling bee practice" and "spelling dictation".
 
 ### Keywords (100 char — comma-separated, no spaces, singular)
 ```
-spelling,word,dictation,phonics,vocabulary,bee,test,practice,tutor,homework,student,school,parent
+spell,list,school,weekly,quiz,vocabulary,homework,grade,prep,english,esl,homeschool,aloud,math
 ```
-**97 chars.** Avoids title/subtitle words ("spellbee", "voice", "AI") —
-Apple auto-indexes those.
+**94 chars.** No name or subtitle words (Apple indexes those already); "phonics"
+dropped because the app does not teach phonics.
 
 ### Promotional Text (170 chars)
 ```
-Bee-ready spelling practice. Clear voice prompts read every word, with type-or-speak practice, parent-curated lists, and themed packs by grade level.
+Paste this week's school words, hear each one read aloud and review the misses in short daily rounds. Built-in words, definitions and sentences play offline.
 ```
-**163 chars.**
+**157 chars.** Bee-season variant (2027-01-04 to 2027-06-06) is in docs/listing-1.4.0.md.
 
 ### Description (4000 chars)
 ```
-SpellBee is the fastest way to get spelling-bee ready. Pick a grade level, hit start, and the pronouncer does the rest — reading each word aloud, offering the definition, and using it in a sentence on request, just like a real bee.
+Help your child walk into this week's spelling test ready. Paste the school word list, let Bee Buddy read each word aloud, and practice the ones that slipped in short daily rounds.
+Built for spelling bee practice too: eight levels from first words to championship-level challenges, each with a definition and an example sentence.
+No account. No ads. Built-in words and clues play offline.
 
-Built by a spelling-bee parent who was tired of drill apps that feel like worksheets.
+YOUR SCHOOL SPELLING LIST, READY IN SECONDS
+Paste words from a worksheet, email or message, one per line or separated by commas. Review and edit them, add your own definitions if you like, then tap practice. Duplicates are removed, and your lists stay on your device.
 
-THREE WAYS TO PRACTICE
+HEAR EVERY WORD
+Bee Buddy recordings cover all 360 built-in words, their definitions and example sentences, and they work offline. Hear a word again or use slow repeat whenever you need more time. Words from your own lists are read by your device's voice, or by an online Studio voice with Premium.
 
-• TYPE — See the prompt, type the word, check instantly. Misses trigger a clear spell-out so you hear every letter.
-• LETTER TILES — Tap letters into place. Early readers build words without a keyboard.
-• SPELL ALOUD — Say each letter, hands-free. SpellBee understands letter names ("see a tee" → CAT), opens the mic by itself after each word, and checks when your child stops talking. Say "repeat" to hear a word again.
+THREE WAYS TO ANSWER
+• Type the word and check it instantly
+• Tap letter tiles, great for early readers
+• Spell it aloud: say the letters and SpellBee checks them, listening for English letter names whatever language the phone is set to. Say "repeat" to hear the word again. Hands-free mode opens the mic after each word.
+
+TODAY'S PRACTICE AND FIRST-TRY PROGRESS
+Each day mixes words at your level with words due for review. Results separate words spelled right on the first try from words finished after another go, so you can see which spellings have really stuck. Coach focus gathers the most-missed words into a focus round. A grown-up can turn on one gentle daily reminder in Settings.
+
+PARENT VIEW
+Words asked and spelled correctly, best run, perfect streaks, progress on each of your lists and the words that need attention, all on one screen.
+
+SPELLING BEE PRACTICE
+Eight difficulty levels, from first words to championship-level stumpers. Built-in themed word packs work offline. About 100 words come with a fun fact that is read aloud after a correct answer.
+
+BEE ADVENTURES
+Explore three illustrated worlds with Bee Buddy, four short stops in each. All of Sunny Meadow is included for everyone; Moonlight Garden and Rainbow Falls come with Premium.
+
+NUMBER BEE AND MATH BEE
+Spell numbers as words ("38" becomes thirty-eight), or hear a sum and spell the answer, in three number ranges.
 
 QUESTS, HONEY AND BADGES
-Three daily quests, honey for every correct word, Bee ranks from Egg to Queen Bee, and badges for milestones. Perfect rounds get confetti.
-
-NUMBER BEE
-Spell numbers as words ("38" → thirty-eight) or play Math Bee: hear a sum, work it out, spell the answer. Three sizes from 0–20 up to 0–999.
-
-DID YOU KNOW?
-Over 100 words come with a fun fact the pronouncer reads aloud — the reward for getting a word right.
-
-EIGHT DIFFICULTY LEVELS
-From K-1 starter words to championship-tier stumpers like "pneumonoultramicroscopicsilicovolcanoconiosis". Every word ships with a definition and an example sentence so the context lands.
-
-THEMED WORD PACKS
-Choose a built-in theme for a practice pack at your level. Built-in packs work offline.
-
-PARENT-MADE LISTS
-Paste this week's school words, separated by lines or commas. Review and edit the words before adding them; duplicates are removed. Tap "practice" and the same words read aloud with optional definitions you wrote yourself. Great for weekly spelling tests, pre-bee warm-ups, and ESL families who want their own word set.
-
-INSTANT FEEDBACK + STREAKS
-Today’s practice brings back words due for review and mixes in words at your chosen level. Results separate words spelled correctly on the first try from words completed after a retry. Progress shows independent recall across practice days, so parents can see what is sticking.
-
-WHO IT'S FOR
-• Elementary students prepping for weekly spelling tests
-• Learners training for school or regional spelling bees
-• Homeschool families
-• ESL learners building vocabulary
-• Anyone rebuilding a reading habit
-
-PRIVACY
-Lists and practice history stay on your device. No account and no ads. Optional speech recognition may use your device provider’s servers. Enhanced pronunciation sends text to our voice service. Purchases are verified securely with Apple or Google. See our privacy policy for details.
+Three daily quests, honey for correct words, Bee ranks from Egg to Queen Bee, badges, and a daily word with a streak.
 
 PREMIUM
-Unlock everything for less than one coffee a month:
-• Unlimited themed word packs — no daily cap
-• Unlimited Math Bee rounds (free tier: 1 a day)
-• Unlimited parent-made word lists (free tier: 3)
-• Enhanced voice pronunciation
+SpellBee is free to download, and every practice mode is included. Premium adds:
+• Moonlight Garden and Rainbow Falls
+• Unlimited parent-made word lists (3 included)
+• Unlimited Math Bee rounds (1 a day included)
+• Online Studio voices for words from your own lists
+Built-in words always use the included Bee Buddy recordings.
+Choose a monthly or yearly subscription or a one-time lifetime purchase. Prices are shown in your local currency before checkout, and a grown-up question comes before any purchase. Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period; manage or cancel them in your Apple ID account settings. Restore Purchases is in Settings and on the Premium screen.
 
-Monthly or yearly subscriptions, or a one-time lifetime purchase. Manage subscription renewals in your store account.
+PRIVACY
+No account and no ads. Lists, Adventure progress and practice history stay on your device. Optional speech recognition may use your device provider's servers. Online voices for your own words send the word text to our voice service. Purchases are verified with Apple. See the privacy policy for details.
 
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
-
-Free to start. Premium when your practice routine is ready.
 ```
 
-### What's New in This Version (v1.2.0)
+### What's New in This Version (v1.4.0)
+```
+• Spell-aloud now listens for English letter names on every phone, whatever its language
+• The daily word, streak and quests now change over at your local midnight
+• New: an optional daily practice reminder that a grown-up can set in Settings
+• Purchases and restores recover more reliably after a connection problem, and Restore tells you what it found
+• Small fixes and polish
+```
+
+### What's New archive (v1.2.0)
 ```
 Build a stronger spelling habit:
 
@@ -181,7 +187,7 @@ SpellBee is a local-first spelling-bee practice app for students and families. L
 | Duration | 1 Month |
 | Price | $4.99 |
 | Display Name | `Premium Monthly` |
-| Description | `Unlimited themed word packs, unlimited custom lists, and studio voice. Renews monthly.` |
+| Description | `More worlds, unlimited lists and Math Bee` |
 
 ### Product 2 — Premium Yearly
 | Field | Value |
@@ -193,7 +199,8 @@ SpellBee is a local-first spelling-bee practice app for students and families. L
 | Duration | 1 Year |
 | Price | $29.99 (save 50% vs monthly) |
 | Display Name | `Premium Yearly` |
-| Description | `Save 50% vs monthly. Everything in Premium, billed yearly.` |
+| Description | `More worlds, unlimited lists and Math Bee` |
+| Introductory offer | 7-day free trial, new subscribers (operator: create in ASC; the 1.4.0 paywall shows it automatically) |
 
 ### Product 3 — Premium Lifetime
 | Field | Value |
@@ -203,7 +210,7 @@ SpellBee is a local-first spelling-bee practice app for students and families. L
 | Type | Non-Consumable |
 | Price | $49.99 one-time |
 | Display Name | `Premium Lifetime` |
-| Description | `Pay once. Keep forever. Everything in Premium with no subscription.` |
+| Description | `More worlds, unlimited lists and Math Bee` |
 
 **IAP review notes (same for all three):**
 ```
@@ -218,17 +225,59 @@ Review screenshot: `store_assets/ios/05_premium.png` (1290×2796).
 
 ### App Name (30 char)
 ```
-SpellBee: Spelling Bee for Kids
+SpellBee: Spelling Bee Kids
 ```
+**27 chars.** The live title. Keep it: it carries the Play Explore traffic.
 
 ### Short Description (80 char)
 ```
-Paste school words, practice daily and build spelling confidence. Ad-free.
+Spelling bee practice & weekly spelling tests: hear each word, spell, review.
 ```
-**72 chars.**
+**77 chars.** Localized short descriptions (en-GB, en-IN, id-ID, hi-IN, fil-PH) are in the
+2026-11-07 listing proposal; hi/id/fil need a native speaker first.
 
 ### Full Description (4000 char)
-*Reuse the Apple description above.*
+```
+SpellBee is spelling bee practice and weekly spelling test prep for kids. Paste this week's school spelling list, let Bee Buddy read each word aloud, and practice the words that slipped in short daily rounds.
+Eight levels take spellers from first words to championship-level challenges, each with a definition and an example sentence. No account. No ads. Built-in words and clues play offline.
+
+YOUR SCHOOL SPELLING LIST, READY IN SECONDS
+Paste spelling words from a worksheet, email or message, one per line or separated by commas. Review and edit them, add your own definitions if you like, then tap practice. Duplicates are removed, and your lists stay on your device.
+
+HEAR EVERY SPELLING WORD
+Bee Buddy recordings cover all 360 built-in words, their definitions and example sentences, and they work offline. Hear a word again or use slow repeat. Words from your own lists are read by your device's voice, or by an online Studio voice with Premium.
+
+THREE WAYS TO SPELL
+• Type the word and check it instantly
+• Tap letter tiles, great for early readers
+• Spell it aloud: say the letters and SpellBee checks them, listening for English letter names whatever language the phone is set to. Say "repeat" to hear the word again. Hands-free mode opens the mic after each word.
+
+TODAY'S PRACTICE AND FIRST-TRY PROGRESS
+Each day mixes spelling words at your level with words due for review. Results separate words spelled right on the first try from words finished after another go, so you can see which spellings have stuck before the spelling test. Coach focus gathers the most-missed words into a focus round. A grown-up can turn on one gentle daily reminder in Settings.
+
+PARENT VIEW
+Words asked and spelled correctly, best run, perfect streaks, progress on each list and the words that need attention.
+
+SPELLING BEE PRACTICE FOR KIDS
+Eight difficulty levels and built-in themed word packs that work offline. About 100 words come with a fun fact read aloud after a correct answer. Three daily quests, honey, Bee ranks from Egg to Queen Bee, badges and a daily word with a streak keep practice going.
+
+BEE ADVENTURES
+Explore three illustrated worlds with Bee Buddy, four short stops each. All of Sunny Meadow is included for everyone; Moonlight Garden and Rainbow Falls come with Premium.
+
+NUMBER BEE AND MATH BEE
+Spell numbers as words ("38" becomes thirty-eight), or hear a sum and spell the answer, in three number ranges.
+
+PREMIUM
+Every practice mode is included. Premium adds Moonlight Garden and Rainbow Falls, unlimited parent-made word lists (3 included), unlimited Math Bee rounds (1 a day included) and online Studio voices for words from your own lists. Built-in words always use the included Bee Buddy recordings. Choose a monthly or yearly subscription or a one-time lifetime purchase; prices appear in your local currency before checkout, and a grown-up question comes before any purchase. Manage subscriptions in your Google Play account. Restore Purchases is in Settings and on the Premium screen.
+
+PRIVACY
+No account and no ads. Lists, Adventure progress and practice history stay on your device. Optional speech recognition may use your device provider's servers. Online voices for your own words send the word text to our voice service. Purchases are verified with Google Play.
+
+Privacy Policy: https://nalhamzy.github.io/spellbee/privacy.html
+```
+
+### Release notes (v1.4.0)
+Same lines as the iOS What's New above.
 
 ### Tags (pick up to 5)
 ```
@@ -269,7 +318,7 @@ records this commitment. SpellBee has no ads; do not add ad-inventory guidance.
 | Product ID | `spellbee_premium_monthly` |
 |---|---|
 | Name | `Premium Monthly` |
-| Description | `Unlimited themed word packs, unlimited custom lists, and studio voice.` |
+| Description | `More worlds, unlimited lists and Math Bee` |
 | Base plan | 1 month auto-renewing, $4.99 USD |
 | Free trial | Not configured |
 
@@ -277,8 +326,9 @@ records this commitment. SpellBee has no ads; do not add ad-inventory guidance.
 | Product ID | `spellbee_premium_yearly` |
 |---|---|
 | Name | `Premium Yearly` |
-| Description | `Save 50%. Everything in Premium, billed yearly.` |
+| Description | `More worlds, unlimited lists and Math Bee` |
 | Base plan | 1 year auto-renewing, $29.99 USD |
+| Free trial | Offer `trial-7d` on the yearly base plan: 7-day free phase, new customers only (operator: create in Play Console; the 1.4.0 paywall picks it up and buys its offer token) |
 
 ### In-App Product — Lifetime
 | Product ID | `spellbee_premium_lifetime` |
@@ -292,13 +342,20 @@ records this commitment. SpellBee has no ads; do not add ad-inventory guidance.
 
 ## Screenshot captions (for overlay text, if used)
 
-| # | Caption |
-|---|---|
-| 01_home | `Pick your level — K-1 to championship-tier.` |
-| 02_listen | `Hear every word in a clear voice.` |
-| 03_typing | `Type the word or spell it aloud.` |
-| 04_correct | `Build streaks. Master the tricky ones.` |
-| 05_premium | `Unlimited word packs. Studio voice. Go Premium.` |
+No price, "free" or "Premium" in any frame, and no paywall frame. The old 05_premium
+caption ("Unlimited word packs. Studio voice. Go Premium.") sold themed packs as
+Premium although they have been free since 1.3.0; frame 06 replaces it.
+
+| # | Caption | Scene |
+|---|---|---|
+| 01_practice | `Spelling bee practice, word by word` | home |
+| 02_lists | `Paste this week's school spelling list` | lists |
+| 03_hear | `Hear every word, meaning and sentence` | test |
+| 04_tiles | `Type it, tap the tiles or spell it aloud` | tiles |
+| 05_review | `Review the words that need another go` | results |
+| 06_adventures | `Explore Bee Adventures with Bee Buddy` | adventures |
+| 07_math | `Spell numbers and sums in Math Bee` | math |
+| 08_parent | `Parent view: see first-try progress` | stats |
 
 ---
 
