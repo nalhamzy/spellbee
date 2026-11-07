@@ -5,6 +5,7 @@ import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/core/services/daily_reminder.dart';
+import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/widgets/parent_gate.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -225,6 +226,8 @@ class _ReminderTileState extends ConsumerState<_ReminderTile> {
         confirmLabel: 'Continue',
       );
       if (!approved || !mounted) return;
+      final events = ref.read(eventLoggerProvider)
+        ..log(FunnelEvent.parentGatePass, {'source': 'reminder'});
       final notifier = ref.read(reminderSettingsProvider.notifier);
       if (!turnOn) {
         await notifier.disable();
@@ -236,6 +239,9 @@ class _ReminderTileState extends ConsumerState<_ReminderTile> {
       final hour = await _pickHour(ref.read(reminderSettingsProvider).hour);
       if (hour == null || !mounted) return;
       final result = await notifier.enable(hour);
+      if (result == ReminderChange.enabled) {
+        events.log(FunnelEvent.reminderEnabled);
+      }
       messenger.showSnackBar(
         SnackBar(
           content: Text(switch (result) {
@@ -312,7 +318,11 @@ class _RestorePurchasesTileState extends ConsumerState<_RestorePurchasesTile> {
     if (_busy) return;
     setState(() => _busy = true);
     try {
-      await restoreWithFeedback(context, ref.read(iapServiceProvider));
+      await restoreWithFeedback(
+        context,
+        ref.read(iapServiceProvider),
+        events: ref.read(eventLoggerProvider),
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }

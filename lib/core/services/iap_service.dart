@@ -140,6 +140,12 @@ class IapService {
   /// trial when the answer is no or unknown. Tests inject their own.
   Future<bool> Function(String productId)? introOfferEligibility;
 
+  /// A new purchase (or a held one) passed server verification as active.
+  void Function(String productId)? onPurchaseVerified;
+
+  /// A new purchase could not be verified and is now held for retry.
+  void Function(String productId)? onVerificationHeld;
+
   /// A purchase was received but is still being confirmed. Not an error.
   void Function(String productId)? onPurchasePending;
 
@@ -514,6 +520,7 @@ class IapService {
     }
     _awaiting[key] = p;
     await _savePending(items, notify: isNew);
+    if (isNew) _safely(() => onVerificationHeld?.call(p.productID));
     if (isNew && _silentRestores == 0) {
       try {
         onPurchasePending?.call(p.productID);
@@ -609,6 +616,9 @@ class IapService {
     for (final t in _tallies) {
       active ? t.active++ : t.inactive++;
     }
+    if (active && (p.status == PurchaseStatus.purchased || wasPending)) {
+      _safely(() => onPurchaseVerified?.call(p.productID));
+    }
     // Only acknowledge AFTER successful persistence. A completion failure can
     // retry without extending the entitlement or repeating delivery.
     if (p.pendingCompletePurchase) await _store.completePurchase(p);
@@ -617,6 +627,14 @@ class IapService {
     // verification is announced even when a silent redelivery recovered it.
     if (active && ((_silentRestores == 0 && _tallies.isEmpty) || wasPending)) {
       _notifySuccess(p.productID);
+    }
+  }
+
+  void _safely(void Function() callback) {
+    try {
+      callback();
+    } catch (_) {
+      // Telemetry and UI hooks must not change a transaction's outcome.
     }
   }
 

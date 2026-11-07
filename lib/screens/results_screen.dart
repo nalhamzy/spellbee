@@ -6,6 +6,7 @@ import 'package:spellbee/core/data/voice_phrase_bank.dart';
 import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/test_result.dart';
 import 'package:spellbee/core/models/word.dart';
+import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/test_screen.dart';
@@ -70,7 +71,11 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
     if (!mounted) return;
     setState(() => _offerReview = false);
     if (!approved) return;
-    await ref.read(reviewPromptServiceProvider).requestReview();
+    final events = ref.read(eventLoggerProvider)
+      ..log(FunnelEvent.parentGatePass, {'source': 'review'});
+    if (await ref.read(reviewPromptServiceProvider).requestReview()) {
+      events.log(FunnelEvent.reviewPromptShown);
+    }
   }
 
   bool get _celebrate {

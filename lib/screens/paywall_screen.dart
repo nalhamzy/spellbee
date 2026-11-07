@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/constants/legal_urls.dart';
 import 'package:spellbee/core/constants/theme.dart';
+import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
@@ -73,8 +74,9 @@ String restoreOutcomeMessage(RestoreOutcome outcome) => switch (outcome) {
 /// outcome. Never throws.
 Future<RestoreOutcome> restoreWithFeedback(
   BuildContext context,
-  IapService iap,
-) async {
+  IapService iap, {
+  EventLogger? events,
+}) async {
   final messenger = ScaffoldMessenger.of(context);
   messenger.hideCurrentSnackBar();
   messenger.showSnackBar(
@@ -90,6 +92,7 @@ Future<RestoreOutcome> restoreWithFeedback(
   messenger.showSnackBar(
     SnackBar(content: Text(restoreOutcomeMessage(outcome))),
   );
+  events?.log(FunnelEvent.restoreResult, {'outcome': outcome.name});
   return outcome;
 }
 
@@ -177,6 +180,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     // No rating prompt in a session that showed the paywall.
     if (!widget.screenshotMode) {
       ref.read(sessionSignalsProvider).paywallSeen = true;
+      ref.read(eventLoggerProvider).log(FunnelEvent.paywallView, {
+        'source': widget.source.name,
+      });
     }
   }
 
@@ -191,8 +197,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     try {
       final approved = await showParentGate(context);
       if (!approved || !mounted) return;
+      final events = ref.read(eventLoggerProvider)
+        ..log(FunnelEvent.parentGatePass, {'source': 'purchase'});
       if (ref.read(isPremiumProvider)) return;
       setState(() => _openingStore = true);
+      events.log(FunnelEvent.checkoutStart, {'product': productId});
       await ref.read(iapServiceProvider).buy(productId);
     } catch (_) {
       if (mounted) {
@@ -216,7 +225,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     if (_restoring || _startingPurchase || widget.screenshotMode) return;
     setState(() => _restoring = true);
     try {
-      await restoreWithFeedback(context, ref.read(iapServiceProvider));
+      await restoreWithFeedback(
+        context,
+        ref.read(iapServiceProvider),
+        events: ref.read(eventLoggerProvider),
+      );
     } finally {
       if (mounted) setState(() => _restoring = false);
     }

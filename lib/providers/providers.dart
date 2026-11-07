@@ -12,6 +12,7 @@ import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/ai_word_generator.dart';
 import 'package:spellbee/core/services/daily_reminder.dart';
+import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/review_prompt.dart';
 import 'package:spellbee/core/services/storage_service.dart';
@@ -574,6 +575,11 @@ final isPremiumProvider = Provider<bool>((ref) {
   if (forcePremium) return true;
   return ref.watch(premiumProvider).isPremium;
 });
+
+/// Privacy-safe funnel counters; a no-op unless the build sets EVENTS_URL.
+final eventLoggerProvider = Provider<EventLogger>(
+  (ref) => EventLogger.fromEnvironment(),
+);
 
 // ─── Daily practice reminder (parent opt-in) ────────────────────────────
 

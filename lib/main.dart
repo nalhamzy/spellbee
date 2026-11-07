@@ -10,6 +10,7 @@ import 'package:spellbee/core/models/player_stats.dart';
 import 'package:spellbee/core/models/progression.dart';
 import 'package:spellbee/core/models/word_list.dart';
 import 'package:spellbee/core/services/access_refresher.dart';
+import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/purchase_verification_service.dart';
 import 'package:spellbee/core/services/storage_service.dart';
@@ -40,6 +41,7 @@ Future<void> main() async {
   await _seedScreenshotDataIfNeeded(storage);
 
   final iap = IapService(pendingStore: storage);
+  final events = EventLogger.fromEnvironment();
 
   final container = ProviderContainer(
     // Riverpod 3's default auto-retry turns a throwing provider into a
@@ -49,6 +51,7 @@ Future<void> main() async {
     overrides: [
       storageServiceProvider.overrideWithValue(storage),
       iapServiceProvider.overrideWithValue(iap),
+      eventLoggerProvider.overrideWithValue(events),
     ],
   );
 
@@ -61,6 +64,10 @@ Future<void> main() async {
   iap.refreshEntitlement = verification.refresh;
   iap.verifyPending = verification.verifyPending;
   iap.hasActiveEntitlement = () => storage.loadPremium().isPremium;
+  iap.onPurchaseVerified = (id) =>
+      events.log(FunnelEvent.purchaseVerified, {'product': id});
+  iap.onVerificationHeld = (id) =>
+      events.log(FunnelEvent.purchaseVerifyFailed, {'product': id});
   iap.onPendingChanged = () => container.invalidate(pendingPurchaseProvider);
 
   if (_isMobile) {

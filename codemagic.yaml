@@ -63,7 +63,8 @@ workflows:
             --dart-define=TTS_GATEWAY_URL=$TTS_GATEWAY_URL \
             --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
             --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
-            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN
+            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN \
+            --dart-define=EVENTS_URL=${EVENTS_URL:-}
       - name: Install CocoaPods dependencies
         script: |
           cd ios
@@ -96,6 +97,7 @@ workflows:
             --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
             --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
             --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN \
+            --dart-define=EVENTS_URL=${EVENTS_URL:-} \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -178,6 +180,7 @@ workflows:
             --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
             --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
             --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN \
+            --dart-define=EVENTS_URL=${EVENTS_URL:-} \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -229,7 +232,8 @@ workflows:
             --dart-define=TTS_GATEWAY_URL=$TTS_GATEWAY_URL \
             --dart-define=TTS_GATEWAY_TOKEN=$TTS_GATEWAY_TOKEN \
             --dart-define=WORD_GENERATOR_GATEWAY_URL=$WORD_GENERATOR_GATEWAY_URL \
-            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN
+            --dart-define=WORD_GENERATOR_GATEWAY_TOKEN=$WORD_GENERATOR_GATEWAY_TOKEN \
+            --dart-define=EVENTS_URL=${EVENTS_URL:-}
     artifacts:
       - build/app/outputs/bundle/release/*.aab
       - build/app/outputs/mapping/release/mapping.txt

@@ -579,6 +579,28 @@ void main() {
       expect(storage.loadPendingVerifications(), isEmpty);
     });
 
+    test(
+      'funnel hooks: held once on failure, verified once on recovery',
+      () async {
+        final held = <String>[];
+        final verified = <String>[];
+        service = build(android: true)
+          ..onVerificationHeld = held.add
+          ..onPurchaseVerified = verified.add;
+        await service.initialize();
+        await emit(fresh());
+        now = now.add(const Duration(seconds: 31));
+        await service.retryPendingVerifications();
+        expect(held, [IapProductIds.premiumYearly]);
+        expect(verified, isEmpty);
+        serverUp = true;
+        now = now.add(const Duration(minutes: 2));
+        await service.retryPendingVerifications();
+        expect(verified, [IapProductIds.premiumYearly]);
+        expect(held, hasLength(1));
+      },
+    );
+
     test('backoff grows to a 30 minute ceiling', () {
       expect(VerificationBackoff.delayAfter(0), Duration.zero);
       expect(VerificationBackoff.delayAfter(1), const Duration(seconds: 30));
