@@ -201,3 +201,45 @@ which sold themed packs as Premium although they have been free since 1.3.0. The
 longer captured as a store frame. `tools/build_store_assets.ps1` captures this order and writes the
 captions into `store_assets/upload_ready/README.md`. Re-run `store_price_audit.py --images` on the
 rendered set before upload.
+
+---
+
+## Release notes 1.4.0 (build 23, en)
+
+Store text, identical for the iOS What's New and the Play release notes (en-US):
+```
+• Spell-aloud now listens for English letter names on every phone, whatever its language
+• The daily word, streak and quests now change over at your local midnight
+• New: an optional daily practice reminder that a grown-up can set in Settings
+• Purchases and restores recover more reliably after a connection problem, and Restore tells you what it found
+• Small fixes and polish
+```
+
+What changed (for the team):
+- **Purchases (Android, high):** a purchase whose server verification fails is kept un-acknowledged
+  with a persisted "pending verification" marker and retried with backoff (30 s to 30 min) on
+  launch, on resume and on a timer while the app is open. Every Android launch runs one silent
+  `queryPurchases`, so an unacknowledged purchase is verified and acknowledged before Play's
+  3-day auto-refund. The parent sees "Purchase received, confirming…" instead of an error.
+- **Restore (iOS):** no more silent `restoreCompletedTransactions` on every resume; resume only
+  re-checks the saved proof with the server (15-minute throttle). Restore in Settings and on the
+  Premium screen now says what it found (restored / nothing to restore / no longer active /
+  confirming / store unavailable / error).
+- **Spell-aloud:** the recognizer is pinned to English (en_US, en_GB, en_IN, en_PH or en_AU by
+  device region when the recognizer offers it, else en_US).
+- **Days:** one local-midnight day key for the daily word, streak, quests, review history and
+  adventure rounds; existing streaks are migrated so none breaks on upgrade.
+- **Paywall:** product loading no longer caches a store failure for the session (auto-dispose
+  plus one quiet retry). The paywall shows a store free trial ("7 days free, then <price>/year"
+  with the full Apple 3.1.2(c) disclosure) only when the store returns one; no offer exists
+  today, so it looks as before.
+- **Rating prompt:** in_app_review offered to a grown-up after the 3rd perfect round or the first
+  earned badge, at most once per 120 days, never after an error or the paywall, behind the
+  multiplication parent gate.
+- **Daily reminder:** opt-in local notification at a parent-chosen hour, behind the parent gate;
+  OS permission asked only when turned on; time-zone and DST safe.
+- **Funnel events:** privacy-safe counters to the shared studio events endpoint, off unless the
+  build sets `EVENTS_URL`.
+- **Security:** `FORCE_PREMIUM_UNLOCK` works only in debug builds.
+- **Listing:** new subtitle, keywords, promotional text, descriptions and screenshot captions
+  (see above); the screenshot pipeline no longer captures a paywall frame.
