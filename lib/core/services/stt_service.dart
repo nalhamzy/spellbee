@@ -44,9 +44,9 @@ class SttService extends ChangeNotifier {
       // speech_to_text 7.3.0 on Android 13+ never answers locales() when the
       // phone has no on-device recognizer or checkRecognitionSupport errors,
       // so an unbounded await would leave the mic dead for the session.
-      available = (await _stt.locales().timeout(localesTimeout))
-          .map((l) => l.localeId)
-          .toList();
+      available = (await _stt.locales().timeout(
+        localesTimeout,
+      )).map((l) => l.localeId).toList();
     } catch (_) {
       // Some recognizers cannot list locales (or never answer); fall back to
       // en_US.

@@ -21,37 +21,32 @@ class WordList extends Equatable {
 
   int get size => words.length;
 
-  WordList copyWith({
-    String? name,
-    List<Word>? words,
-    int? level,
-  }) =>
-      WordList(
-        id: id,
-        name: name ?? this.name,
-        words: words ?? this.words,
-        createdAt: createdAt,
-        level: level ?? this.level,
-      );
+  WordList copyWith({String? name, List<Word>? words, int? level}) => WordList(
+    id: id,
+    name: name ?? this.name,
+    words: words ?? this.words,
+    createdAt: createdAt,
+    level: level ?? this.level,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'level': level,
-        'createdAt': createdAt.toIso8601String(),
-        'words': words.map((w) => w.toJson()).toList(),
-      };
+    'id': id,
+    'name': name,
+    'level': level,
+    'createdAt': createdAt.toIso8601String(),
+    'words': words.map((w) => w.toJson()).toList(),
+  };
 
   factory WordList.fromJson(Map<String, dynamic> j) => WordList(
-        id: j['id'] as String,
-        name: j['name'] as String? ?? 'Untitled',
-        level: j['level'] as int?,
-        createdAt: DateTime.tryParse(j['createdAt'] as String? ?? '') ??
-            DateTime.now(),
-        words: ((j['words'] as List?) ?? [])
-            .map((e) => Word.fromJson(e as Map<String, dynamic>))
-            .toList(),
-      );
+    id: j['id'] as String,
+    name: j['name'] as String? ?? 'Untitled',
+    level: j['level'] as int?,
+    createdAt:
+        DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
+    words: ((j['words'] as List?) ?? [])
+        .map((e) => Word.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
 
   String encode() => jsonEncode(toJson());
   factory WordList.decode(String raw) =>

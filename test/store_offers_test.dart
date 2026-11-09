@@ -7,6 +7,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
+import 'package:in_app_purchase_storekit/store_kit_2_wrappers.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/constants/theme.dart';
@@ -81,6 +82,19 @@ AppStoreProductDetails appStore(String id, {SKProductDiscountWrapper? intro}) =>
           unit: SKSubscriptionPeriodUnit.year,
         ),
         introductoryPrice: intro,
+      ),
+    );
+
+AppStoreProduct2Details appStore2(String id) =>
+    AppStoreProduct2Details.fromSK2Product(
+      SK2Product(
+        id: id,
+        displayName: id,
+        displayPrice: r'$29.99',
+        description: '',
+        price: 29.99,
+        type: SK2ProductType.autoRenewable,
+        priceLocale: SK2PriceLocale(currencyCode: 'USD', currencySymbol: r'$'),
       ),
     );
 
@@ -213,6 +227,48 @@ void main() {
         isNull,
       );
     });
+    test('App Store via StoreKit 2: the trial comes from the intro lookup', () {
+      final product = appStore2(IapProductIds.premiumYearly);
+      expect(freeTrialOf(product), isNull, reason: 'SK2 carries no intro');
+      final trials = {
+        IapProductIds.premiumYearly: freeTrialFromAppleIntro(
+          appleIntro(SKProductDiscountPaymentMode.freeTrail),
+        )!,
+      };
+      final yearly = collapseStorePlans([
+        product,
+      ], appStoreTrials: trials).single;
+      expect(yearly.freeTrial!.label, '7 days');
+      expect(yearly.price, r'$29.99');
+      expect(yearly.purchaseDetails, same(product));
+      expect(
+        collapseStorePlans(
+          [product],
+          appStoreTrials: trials,
+          trialEligible: (_) => false,
+        ).single.freeTrial,
+        isNull,
+      );
+    });
+
+    test('Apple intro offers: only free trials count', () {
+      expect(freeTrialFromAppleIntro(null), isNull);
+      expect(
+        freeTrialFromAppleIntro(
+          appleIntro(SKProductDiscountPaymentMode.payUpFront),
+        ),
+        isNull,
+      );
+      expect(
+        freeTrialFromAppleIntro(
+          appleIntro(
+            SKProductDiscountPaymentMode.freeTrail,
+            unit: SKSubscriptionPeriodUnit.month,
+          ),
+        )!.label,
+        '1 month',
+      );
+    });
   });
 
   group('IapService with offers', () {
@@ -237,6 +293,78 @@ void main() {
         expect(
           (store.bought as GooglePlayProductDetails).offerToken,
           'trial-token',
+        );
+      },
+    );
+
+    test('StoreKit 2 (iOS 15+): an eligible Apple ID sees the trial', () async {
+      final store = _OfferStore([appStore2(IapProductIds.premiumYearly)]);
+      addTearDown(store.updates.close);
+      Set<String>? asked;
+      final iap = IapService(store: store, redeliverByRestore: false)
+        ..appStoreTrialLookup = (ids) async {
+          asked = ids;
+          return {
+            IapProductIds.premiumYearly: const FreeTrial(1, TrialUnit.week),
+          };
+        }
+        ..introOfferEligibility = (_) async => true;
+      addTearDown(iap.dispose);
+      final yearly = (await iap.loadProducts()).single;
+      expect(asked, {IapProductIds.premiumYearly});
+      expect(yearly.freeTrial!.label, '7 days');
+      expect(yearly.price, r'$29.99');
+      await iap.buy(IapProductIds.premiumYearly);
+      expect(store.bought!.id, IapProductIds.premiumYearly);
+    });
+
+    test(
+      'StoreKit 2: used trial, failed lookup or failed check hide it',
+      () async {
+        Future<FreeTrial?> trialWith({
+          required Future<Map<String, FreeTrial>> Function(Set<String>) lookup,
+          required Future<bool> Function(String) eligible,
+        }) async {
+          final store = _OfferStore([appStore2(IapProductIds.premiumYearly)]);
+          addTearDown(store.updates.close);
+          final iap = IapService(store: store, redeliverByRestore: false)
+            ..appStoreTrialLookup = lookup
+            ..introOfferEligibility = eligible;
+          addTearDown(iap.dispose);
+          return (await iap.loadProducts()).single.freeTrial;
+        }
+
+        final week = {
+          IapProductIds.premiumYearly: const FreeTrial(1, TrialUnit.week),
+        };
+        expect(
+          await trialWith(
+            lookup: (_) async => week,
+            eligible: (_) async => false,
+          ),
+          isNull,
+        );
+        expect(
+          await trialWith(
+            lookup: (_) async => throw StateError('no SK1'),
+            eligible: (_) async => true,
+          ),
+          isNull,
+        );
+        expect(
+          await trialWith(
+            lookup: (_) async => week,
+            eligible: (_) async => throw StateError('iOS 14'),
+          ),
+          isNull,
+        );
+        expect(
+          await trialWith(
+            lookup: (_) async => const {},
+            eligible: (_) async => true,
+          ),
+          isNull,
+          reason: 'no intro offer configured',
         );
       },
     );

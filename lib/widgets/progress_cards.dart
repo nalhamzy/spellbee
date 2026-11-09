@@ -149,7 +149,10 @@ class QuestsCard extends StatelessWidget {
                       done == quests.length
                           ? 'All done — Quest Master!'
                           : '$done of ${quests.length} done · new quests every day',
-                      style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                      style: const TextStyle(
+                        color: AppTheme.mute,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -312,7 +315,10 @@ class BadgesGrid extends StatelessWidget {
                     ),
                     Text(
                       '${earned.length} of ${kBadges.length} earned',
-                      style: const TextStyle(color: AppTheme.mute, fontSize: 12),
+                      style: const TextStyle(
+                        color: AppTheme.mute,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),

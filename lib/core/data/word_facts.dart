@@ -9,24 +9,34 @@ const kWordFacts = <String, String>{
   'cat': 'Cats spend up to sixteen hours a day sleeping.',
   'dog': 'A dog\'s nose print is unique, like a human fingerprint.',
   'sun': 'The Sun is so big that a million Earths could fit inside it.',
-  'moon': 'The Moon is slowly drifting away from Earth, about four centimetres every year.',
-  'tree': 'The oldest known tree is a bristlecone pine that is almost five thousand years old.',
+  'moon':
+      'The Moon is slowly drifting away from Earth, about four centimetres every year.',
+  'tree':
+      'The oldest known tree is a bristlecone pine that is almost five thousand years old.',
   'fish': 'Some fish can sleep with their eyes open — most have no eyelids.',
-  'ball': 'The first rubber balls were made by people in Central America over three thousand years ago.',
+  'ball':
+      'The first rubber balls were made by people in Central America over three thousand years ago.',
   'milk': 'A cow can give around thirty litres of milk in a single day.',
-  'book': 'The word "book" comes from an old word for beech trees, whose bark was used for writing.',
-  'home': 'The word "home" is one of the oldest words in English, going back over a thousand years.',
+  'book':
+      'The word "book" comes from an old word for beech trees, whose bark was used for writing.',
+  'home':
+      'The word "home" is one of the oldest words in English, going back over a thousand years.',
   'bird': 'Birds are the only animals alive today that have feathers.',
   'cake': 'The word "cake" came from the Vikings — it was "kaka" in Old Norse.',
-  'rain': 'Raindrops are not tear-shaped — they look more like tiny hamburger buns as they fall.',
+  'rain':
+      'Raindrops are not tear-shaped — they look more like tiny hamburger buns as they fall.',
   'hat': 'Top hats were once banned in London because they scared horses.',
   'bug': 'There are more insects on Earth than all other animals combined.',
-  'map': 'The oldest known map was carved onto a clay tablet about 2,700 years ago.',
+  'map':
+      'The oldest known map was carved onto a clay tablet about 2,700 years ago.',
   'red': 'Red is the first colour babies can see after black and white.',
-  'big': 'The blue whale is the biggest animal that has ever lived — bigger than any dinosaur.',
+  'big':
+      'The blue whale is the biggest animal that has ever lived — bigger than any dinosaur.',
   'frog': 'Frogs drink water through their skin instead of their mouths.',
-  'star': 'On a clear night you can see about two thousand stars with just your eyes.',
-  'duck': 'A duck\'s quack has no echo — actually it does, it is just very quiet.',
+  'star':
+      'On a clear night you can see about two thousand stars with just your eyes.',
+  'duck':
+      'A duck\'s quack has no echo — actually it does, it is just very quiet.',
   'snow': 'No two snowflakes are exactly the same shape.',
   'hand': 'Your hand has twenty-seven bones in it.',
   'apple': 'Apples float because a quarter of an apple is air.',
@@ -35,147 +45,242 @@ const kWordFacts = <String, String>{
   'green': 'Green is the easiest colour for human eyes to see.',
   'house': 'The word "house" is related to the word "hut" from long ago.',
   'horse': 'Horses can sleep standing up.',
-  'bread': 'Bread is one of the oldest foods people have made — over ten thousand years old.',
+  'bread':
+      'Bread is one of the oldest foods people have made — over ten thousand years old.',
   'candy': 'The word "candy" comes from an Arabic word for sugar, "qandi".',
   'clock': 'The word "clock" comes from a word meaning "bell".',
   'tiger': 'Every tiger\'s stripes are different, like fingerprints.',
   'zebra': 'Zebra stripes may help keep biting flies away.',
   'ocean': 'We have explored less of the ocean floor than the surface of Mars.',
   'robot': 'The word "robot" comes from a Czech word for "work".',
-  'rocket': 'The word "rocket" comes from an Italian word for a spinning bobbin.',
+  'rocket':
+      'The word "rocket" comes from an Italian word for a spinning bobbin.',
   'planet': '"Planet" comes from a Greek word meaning "wanderer".',
   // Level 3-4
-  'thunder': 'Thunder is the sound of air heating up so fast it explodes outward.',
-  'bridge': 'The Golden Gate Bridge in San Francisco is painted with a colour called "international orange".',
-  'castle': 'Spiral staircases in castles usually turn clockwise to make attacking swordsmen awkward.',
-  'giraffe': 'A giraffe\'s tongue is about fifty centimetres long and dark blue.',
+  'thunder':
+      'Thunder is the sound of air heating up so fast it explodes outward.',
+  'bridge':
+      'The Golden Gate Bridge in San Francisco is painted with a colour called "international orange".',
+  'castle':
+      'Spiral staircases in castles usually turn clockwise to make attacking swordsmen awkward.',
+  'giraffe':
+      'A giraffe\'s tongue is about fifty centimetres long and dark blue.',
   'dolphin': 'Dolphins sleep with one half of their brain at a time.',
   'elephant': 'Elephants can recognise themselves in a mirror.',
   'volcano': 'The word "volcano" comes from Vulcan, the Roman god of fire.',
   'library': 'The word "library" comes from the Latin word for "book", liber.',
-  'penguin': 'Penguins propose with a pebble — they give one to the penguin they like.',
+  'penguin':
+      'Penguins propose with a pebble — they give one to the penguin they like.',
   'science': '"Science" comes from a Latin word that simply means "knowledge".',
-  'balloon': 'The first passengers in a hot-air balloon were a sheep, a duck and a rooster.',
+  'balloon':
+      'The first passengers in a hot-air balloon were a sheep, a duck and a rooster.',
   'dinosaur': '"Dinosaur" means "terrible lizard" in Greek.',
   'kangaroo': 'Kangaroos cannot walk backwards.',
-  'chocolate': 'The word "chocolate" comes from an Aztec word, "xocolatl", meaning "bitter water".',
+  'chocolate':
+      'The word "chocolate" comes from an Aztec word, "xocolatl", meaning "bitter water".',
   'butterfly': 'Butterflies taste with their feet.',
-  'squirrel': 'Squirrels forget where they hide about a quarter of their nuts — and grow new trees by accident.',
-  'rainbow': 'A rainbow is really a full circle — you only see half of it from the ground.',
-  'whisper': 'A whisper is about thirty decibels, quieter than a fridge humming.',
+  'squirrel':
+      'Squirrels forget where they hide about a quarter of their nuts — and grow new trees by accident.',
+  'rainbow':
+      'A rainbow is really a full circle — you only see half of it from the ground.',
+  'whisper':
+      'A whisper is about thirty decibels, quieter than a fridge humming.',
   'mystery': '"Mystery" comes from a Greek word meaning "secret rite".',
   'octopus': 'An octopus has three hearts and blue blood.',
-  'calendar': '"Calendar" comes from the Latin word for the first day of the month, when debts were due.',
+  'calendar':
+      '"Calendar" comes from the Latin word for the first day of the month, when debts were due.',
   // Level 5+
-  'necessary': 'A trick for spelling "necessary": one collar, two sleeves — one c, two s.',
-  'rhythm': '"Rhythm" is one of the longest common English words with no vowel letters a, e, i, o or u.',
-  'island': 'The "s" in "island" was added by mistake — people thought it came from the French "isle".',
-  'knight': 'The "k" in "knight" used to be pronounced. It went silent about five hundred years ago.',
-  'February': 'The "r" in February is skipped by most speakers, which is why it is so often misspelled.',
+  'necessary':
+      'A trick for spelling "necessary": one collar, two sleeves — one c, two s.',
+  'rhythm':
+      '"Rhythm" is one of the longest common English words with no vowel letters a, e, i, o or u.',
+  'island':
+      'The "s" in "island" was added by mistake — people thought it came from the French "isle".',
+  'knight':
+      'The "k" in "knight" used to be pronounced. It went silent about five hundred years ago.',
+  'February':
+      'The "r" in February is skipped by most speakers, which is why it is so often misspelled.',
   'vacuum': '"Vacuum" is one of the few English words with a double "u".',
-  'queue': 'In "queue", the last four letters are silent — you say only the "q".',
-  'colonel': '"Colonel" is pronounced "kernel" because English borrowed the spelling from Italian and the sound from French.',
-  'bouquet': '"Bouquet" came into English from French, where it first meant "little wood".',
-  'silhouette': 'A silhouette is named after a French finance minister who was famous for being stingy.',
-  'onomatopoeia': 'Onomatopoeia means a word that sounds like what it names — like "buzz" or "splash".',
-  'pneumonia': 'The silent "p" in "pneumonia" comes from Greek, where it was pronounced.',
-  'mnemonic': 'A mnemonic is a memory trick — and its own silent "m" is famously hard to remember.',
-  'entrepreneur': '"Entrepreneur" is French for "someone who undertakes" a task.',
-  'conscience': '"Conscience" hides the word "science" inside it — both come from Latin "to know".',
-  'mischievous': '"Mischievous" has only three syllables — "mis-chie-vous", not "mis-chee-vee-ous".',
+  'queue':
+      'In "queue", the last four letters are silent — you say only the "q".',
+  'colonel':
+      '"Colonel" is pronounced "kernel" because English borrowed the spelling from Italian and the sound from French.',
+  'bouquet':
+      '"Bouquet" came into English from French, where it first meant "little wood".',
+  'silhouette':
+      'A silhouette is named after a French finance minister who was famous for being stingy.',
+  'onomatopoeia':
+      'Onomatopoeia means a word that sounds like what it names — like "buzz" or "splash".',
+  'pneumonia':
+      'The silent "p" in "pneumonia" comes from Greek, where it was pronounced.',
+  'mnemonic':
+      'A mnemonic is a memory trick — and its own silent "m" is famously hard to remember.',
+  'entrepreneur':
+      '"Entrepreneur" is French for "someone who undertakes" a task.',
+  'conscience':
+      '"Conscience" hides the word "science" inside it — both come from Latin "to know".',
+  'mischievous':
+      '"Mischievous" has only three syllables — "mis-chie-vous", not "mis-chee-vee-ous".',
   'chameleon': '"Chameleon" comes from Greek words meaning "ground lion".',
   'hippopotamus': '"Hippopotamus" means "river horse" in Greek.',
   'archipelago': '"Archipelago" originally meant just one sea — the Aegean.',
-  'kaleidoscope': 'The kaleidoscope was invented in 1816 and its name means "beautiful shape watcher".',
+  'kaleidoscope':
+      'The kaleidoscope was invented in 1816 and its name means "beautiful shape watcher".',
   // More catalog coverage
-  'play': 'Playing is how young animals learn — lion cubs, puppies and kids all practise by playing.',
-  'cloud': 'A fluffy white cloud can weigh as much as a hundred elephants — the water is just spread out very thin.',
-  'train': 'The fastest trains in the world run at over four hundred kilometres per hour.',
+  'play':
+      'Playing is how young animals learn — lion cubs, puppies and kids all practise by playing.',
+  'cloud':
+      'A fluffy white cloud can weigh as much as a hundred elephants — the water is just spread out very thin.',
+  'train':
+      'The fastest trains in the world run at over four hundred kilometres per hour.',
   'sheep': 'Sheep can remember the faces of about fifty other sheep for years.',
-  'river': 'The Amazon River carries more water than the next seven biggest rivers put together.',
-  'night': 'The "gh" in "night" used to be a real sound, like the "ch" in Scottish "loch".',
-  'smile': 'Smiling is contagious — seeing one makes your own face want to copy it.',
-  'money': 'The first coins were made about 2,600 years ago in a kingdom called Lydia.',
-  'dream': 'Most people have four to six dreams every night and forget nearly all of them.',
-  'sugar': 'The word "sugar" travelled from Sanskrit through Persian and Arabic before reaching English.',
+  'river':
+      'The Amazon River carries more water than the next seven biggest rivers put together.',
+  'night':
+      'The "gh" in "night" used to be a real sound, like the "ch" in Scottish "loch".',
+  'smile':
+      'Smiling is contagious — seeing one makes your own face want to copy it.',
+  'money':
+      'The first coins were made about 2,600 years ago in a kingdom called Lydia.',
+  'dream':
+      'Most people have four to six dreams every night and forget nearly all of them.',
+  'sugar':
+      'The word "sugar" travelled from Sanskrit through Persian and Arabic before reaching English.',
   'plant': 'Plants make their own food out of sunlight, water and air.',
   'storm': 'Lightning is about five times hotter than the surface of the Sun.',
-  'grass': 'Grass is the most common plant on Earth — bamboo, wheat and rice are all types of grass.',
-  'chair': 'For most of history only kings and important people sat in chairs. Everyone else used benches and stools.',
-  'clown': 'The word "clown" may come from an old word meaning "clod" — a lump of earth.',
-  'frost': 'Frost forms when water in the air turns straight into ice crystals, skipping being a liquid.',
-  'spoon': '"Spoon" comes from an old word for a chip of wood — the first spoons were carved.',
-  'brush': 'The first toothbrushes with bristles were made in China over five hundred years ago.',
-  'stone': 'The biggest stones at Stonehenge weigh as much as four elephants each.',
-  'school': '"School" comes from a Greek word meaning "free time" — learning was what people did when they were not working.',
+  'grass':
+      'Grass is the most common plant on Earth — bamboo, wheat and rice are all types of grass.',
+  'chair':
+      'For most of history only kings and important people sat in chairs. Everyone else used benches and stools.',
+  'clown':
+      'The word "clown" may come from an old word meaning "clod" — a lump of earth.',
+  'frost':
+      'Frost forms when water in the air turns straight into ice crystals, skipping being a liquid.',
+  'spoon':
+      '"Spoon" comes from an old word for a chip of wood — the first spoons were carved.',
+  'brush':
+      'The first toothbrushes with bristles were made in China over five hundred years ago.',
+  'stone':
+      'The biggest stones at Stonehenge weigh as much as four elephants each.',
+  'school':
+      '"School" comes from a Greek word meaning "free time" — learning was what people did when they were not working.',
   'friend': '"Friend" comes from an old English word meaning "to love".',
-  'family': 'The word "family" once meant everyone living in a house, including the servants.',
-  'pencil': 'Pencils do not contain lead — the grey part is a mineral called graphite.',
+  'family':
+      'The word "family" once meant everyone living in a house, including the servants.',
+  'pencil':
+      'Pencils do not contain lead — the grey part is a mineral called graphite.',
   'orange': 'The fruit was named first. The colour orange was named after it.',
-  'guitar': 'The word "guitar" goes back to an ancient Greek instrument called the kithara.',
+  'guitar':
+      'The word "guitar" goes back to an ancient Greek instrument called the kithara.',
   'window': '"Window" comes from an Old Norse word meaning "wind eye".',
-  'circle': 'A circle is the shape that holds the most space inside the shortest edge.',
-  'desert': 'Antarctica is the biggest desert on Earth — a desert is a place with very little rain, not just sand.',
-  'finger': 'Fingers have no muscles inside them. They are pulled by muscles in your palm and forearm.',
-  'garden': '"Garden" and "yard" both come from an old word meaning "enclosure".',
-  'insect': 'The word "insect" means "cut into sections" — an insect\'s body has three parts.',
-  'jungle': '"Jungle" comes from a Hindi word, "jangal", that first meant a dry, wild place.',
-  'kitten': 'Kittens are born with their eyes closed and open them after about a week.',
+  'circle':
+      'A circle is the shape that holds the most space inside the shortest edge.',
+  'desert':
+      'Antarctica is the biggest desert on Earth — a desert is a place with very little rain, not just sand.',
+  'finger':
+      'Fingers have no muscles inside them. They are pulled by muscles in your palm and forearm.',
+  'garden':
+      '"Garden" and "yard" both come from an old word meaning "enclosure".',
+  'insect':
+      'The word "insect" means "cut into sections" — an insect\'s body has three parts.',
+  'jungle':
+      '"Jungle" comes from a Hindi word, "jangal", that first meant a dry, wild place.',
+  'kitten':
+      'Kittens are born with their eyes closed and open them after about a week.',
   'lemon': 'Lemon trees can produce fruit all year round.',
-  'magnet': '"Magnet" comes from Magnesia, a place in ancient Greece where magnetic rocks were found.',
+  'magnet':
+      '"Magnet" comes from Magnesia, a place in ancient Greece where magnetic rocks were found.',
   'parrot': 'Some parrots live longer than people — over eighty years.',
-  'rabbit': 'A rabbit\'s teeth never stop growing, so it chews all day to keep them short.',
-  'shadow': 'Your shadow is shortest at midday, when the Sun is highest in the sky.',
-  'spider': 'Spider silk is stronger than a steel thread of the same thickness.',
-  'turtle': 'Some turtles can breathe through their bottoms when they sleep underwater all winter.',
+  'rabbit':
+      'A rabbit\'s teeth never stop growing, so it chews all day to keep them short.',
+  'shadow':
+      'Your shadow is shortest at midday, when the Sun is highest in the sky.',
+  'spider':
+      'Spider silk is stronger than a steel thread of the same thickness.',
+  'turtle':
+      'Some turtles can breathe through their bottoms when they sleep underwater all winter.',
   'village': '"Village" comes from the Latin word "villa", a country house.',
-  'walrus': 'A walrus can sleep floating in the sea, using air pouches in its neck like a life jacket.',
-  'yellow': 'Yellow is the easiest colour to spot from far away — that is why school buses are yellow.',
+  'walrus':
+      'A walrus can sleep floating in the sea, using air pouches in its neck like a life jacket.',
+  'yellow':
+      'Yellow is the easiest colour to spot from far away — that is why school buses are yellow.',
   'zipper': 'The zipper was named after the "zip" sound it makes.',
-  'cactus': 'A big saguaro cactus can store thousands of cups of water inside it.',
-  'candle': 'Before clocks, some candles were marked with lines so people could tell the time as they burned.',
+  'cactus':
+      'A big saguaro cactus can store thousands of cups of water inside it.',
+  'candle':
+      'Before clocks, some candles were marked with lines so people could tell the time as they burned.',
   'cherry': 'Cherry trees are part of the rose family.',
   'donkey': 'A donkey\'s big ears help it stay cool in hot, dry places.',
-  'elbow': 'The funny bone is not a bone — it is a nerve that runs past your elbow.',
+  'elbow':
+      'The funny bone is not a bone — it is a nerve that runs past your elbow.',
   'feather': 'A single swan can have more than twenty-five thousand feathers.',
-  'gravel': 'Gravel is rock that water, ice and time have broken into small pieces.',
+  'gravel':
+      'Gravel is rock that water, ice and time have broken into small pieces.',
   'festival': '"Festival" comes from a Latin word meaning "joyful".',
-  'harvest': '"Harvest" once meant the whole season of autumn, not just picking crops.',
-  'journey': '"Journey" comes from the French word for "day" — it first meant one day\'s travel.',
+  'harvest':
+      '"Harvest" once meant the whole season of autumn, not just picking crops.',
+  'journey':
+      '"Journey" comes from the French word for "day" — it first meant one day\'s travel.',
   'patience': '"Patience" comes from a Latin word meaning "to put up with".',
-  'academy': 'The first Academy was a garden in Athens where the philosopher Plato taught.',
-  'chapter': '"Chapter" comes from the Latin for "little head" — each one is a small heading.',
-  'explore': '"Explore" comes from Latin words meaning "to cry out" — hunters shouted when they found something.',
+  'academy':
+      'The first Academy was a garden in Athens where the philosopher Plato taught.',
+  'chapter':
+      '"Chapter" comes from the Latin for "little head" — each one is a small heading.',
+  'explore':
+      '"Explore" comes from Latin words meaning "to cry out" — hunters shouted when they found something.',
   'horizon': '"Horizon" comes from a Greek word meaning "limiting circle".',
-  'lantern': 'The first jack-o\'-lanterns were carved from turnips, not pumpkins.',
+  'lantern':
+      'The first jack-o\'-lanterns were carved from turnips, not pumpkins.',
   'railway': 'The first public steam railway opened in England in 1825.',
-  'weather': 'All our weather happens in the bottom layer of the sky, about ten kilometres thick.',
-  'emerald': 'Emeralds are green because of tiny traces of a metal called chromium.',
-  'jewelry': '"Jewelry" is the American spelling. In Britain it is "jewellery", with two l\'s.',
-  'kingdom': '"Kingdom" is "king" plus "-dom", the same ending you find in "freedom".',
+  'weather':
+      'All our weather happens in the bottom layer of the sky, about ten kilometres thick.',
+  'emerald':
+      'Emeralds are green because of tiny traces of a metal called chromium.',
+  'jewelry':
+      '"Jewelry" is the American spelling. In Britain it is "jewellery", with two l\'s.',
+  'kingdom':
+      '"Kingdom" is "king" plus "-dom", the same ending you find in "freedom".',
   'universe': '"Universe" comes from Latin words meaning "turned into one".',
-  'zeppelin': 'Zeppelins were giant airships named after Count Ferdinand von Zeppelin, who flew the first one in 1900.',
+  'zeppelin':
+      'Zeppelins were giant airships named after Count Ferdinand von Zeppelin, who flew the first one in 1900.',
   'camouflage': '"Camouflage" comes from a French word meaning "to disguise".',
-  'labyrinth': 'In Greek myth, the Labyrinth was a maze built to hold a creature called the Minotaur.',
-  'hypothesis': 'A hypothesis is a careful guess that scientists then test. The word means "a putting under" in Greek.',
-  'catastrophe': '"Catastrophe" first meant the final turn of events in a play.',
+  'labyrinth':
+      'In Greek myth, the Labyrinth was a maze built to hold a creature called the Minotaur.',
+  'hypothesis':
+      'A hypothesis is a careful guess that scientists then test. The word means "a putting under" in Greek.',
+  'catastrophe':
+      '"Catastrophe" first meant the final turn of events in a play.',
   'rhinoceros': '"Rhinoceros" means "nose horn" in Greek.',
-  'hieroglyphic': 'Hieroglyphics were Egyptian picture-writing. The word means "sacred carving".',
-  'quokka': 'The quokka is a small Australian animal called the happiest animal on Earth because it looks like it is smiling.',
-  'xylography': '"Xylography" means carving pictures into wood to print them — "xylo" is Greek for wood.',
-  'ophthalmology': 'An ophthalmologist is an eye doctor. The tricky "phth" comes straight from Greek.',
+  'hieroglyphic':
+      'Hieroglyphics were Egyptian picture-writing. The word means "sacred carving".',
+  'quokka':
+      'The quokka is a small Australian animal called the happiest animal on Earth because it looks like it is smiling.',
+  'xylography':
+      '"Xylography" means carving pictures into wood to print them — "xylo" is Greek for wood.',
+  'ophthalmology':
+      'An ophthalmologist is an eye doctor. The tricky "phth" comes straight from Greek.',
   'borborygmus': '"Borborygmus" is the science word for a rumbling tummy.',
-  'crepuscular': 'Crepuscular animals, like rabbits and deer, are most active at dawn and dusk.',
-  'pneumonoultramicroscopicsilicovolcanoconiosis': 'At forty-five letters, this word was invented on purpose to be the longest in the dictionary.',
-  'tintinnabulation': '"Tintinnabulation" is the ringing of bells. The poet Edgar Allan Poe made the word famous.',
-  'sesquipedalian': '"Sesquipedalian" means "a foot and a half long" — a Roman poet\'s joke about very long words.',
-  'juggernaut': '"Juggernaut" comes from Jagannath, a Hindu god whose giant temple cart is pulled through the streets each year.',
-  'Byzantine': 'Byzantine comes from Byzantium, the old name of the city now called Istanbul.',
+  'crepuscular':
+      'Crepuscular animals, like rabbits and deer, are most active at dawn and dusk.',
+  'pneumonoultramicroscopicsilicovolcanoconiosis':
+      'At forty-five letters, this word was invented on purpose to be the longest in the dictionary.',
+  'tintinnabulation':
+      '"Tintinnabulation" is the ringing of bells. The poet Edgar Allan Poe made the word famous.',
+  'sesquipedalian':
+      '"Sesquipedalian" means "a foot and a half long" — a Roman poet\'s joke about very long words.',
+  'juggernaut':
+      '"Juggernaut" comes from Jagannath, a Hindu god whose giant temple cart is pulled through the streets each year.',
+  'Byzantine':
+      'Byzantine comes from Byzantium, the old name of the city now called Istanbul.',
   'zeitgeist': '"Zeitgeist" is German for "spirit of the time".',
-  'ichthyology': '"Ichthyology" is the study of fish — "ichthys" is Greek for fish.',
-  'melancholy': '"Melancholy" means "black bile" in Greek — doctors once thought sadness came from it.',
-  'ephemeral': 'Mayflies are the classic ephemeral creature — some adults live for less than a day.',
-  'halcyon': 'A halcyon was a legendary bird said to calm the sea while it nested, so "halcyon days" are peaceful ones.',
+  'ichthyology':
+      '"Ichthyology" is the study of fish — "ichthys" is Greek for fish.',
+  'melancholy':
+      '"Melancholy" means "black bile" in Greek — doctors once thought sadness came from it.',
+  'ephemeral':
+      'Mayflies are the classic ephemeral creature — some adults live for less than a day.',
+  'halcyon':
+      'A halcyon was a legendary bird said to calm the sea while it nested, so "halcyon days" are peaceful ones.',
 };
 
 /// Facts about spelling, letters, and bees for the dashboard's daily card.

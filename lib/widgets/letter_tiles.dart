@@ -238,7 +238,9 @@ class _Tile extends StatelessWidget {
               border: Border.all(
                 color: AppTheme.honeyDark.withValues(alpha: used ? 0.2 : 0.5),
               ),
-              boxShadow: used ? null : AppTheme.tintedShadow(AppTheme.honeyDark),
+              boxShadow: used
+                  ? null
+                  : AppTheme.tintedShadow(AppTheme.honeyDark),
             ),
             child: Center(
               child: Text(

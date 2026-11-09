@@ -19,12 +19,30 @@ class BeeRank {
   static const all = <BeeRank>[
     BeeRank(0, 'Egg', 0, Icons.egg_rounded, Color(0xFFE59D15)),
     BeeRank(1, 'Larva', 60, Icons.bug_report_rounded, Color(0xFF42B883)),
-    BeeRank(2, 'Worker Bee', 180, Icons.emoji_nature_rounded, Color(0xFFFFC83D)),
+    BeeRank(
+      2,
+      'Worker Bee',
+      180,
+      Icons.emoji_nature_rounded,
+      Color(0xFFFFC83D),
+    ),
     BeeRank(3, 'Scout Bee', 400, Icons.explore_rounded, Color(0xFF58A6FF)),
     BeeRank(4, 'Forager', 800, Icons.local_florist_rounded, Color(0xFFFF6B74)),
     BeeRank(5, 'Guard Bee', 1400, Icons.shield_rounded, Color(0xFF8D72FF)),
-    BeeRank(6, 'Royal Bee', 2400, Icons.auto_awesome_rounded, Color(0xFFE59D15)),
-    BeeRank(7, 'Queen Bee', 4000, Icons.workspace_premium_rounded, Color(0xFF8D72FF)),
+    BeeRank(
+      6,
+      'Royal Bee',
+      2400,
+      Icons.auto_awesome_rounded,
+      Color(0xFFE59D15),
+    ),
+    BeeRank(
+      7,
+      'Queen Bee',
+      4000,
+      Icons.workspace_premium_rounded,
+      Color(0xFF8D72FF),
+    ),
   ];
 
   static BeeRank forHoney(int honey) {
@@ -164,7 +182,9 @@ const kQuestPool = <QuestDef>[
 /// quest so the core loop is always rewarded; the other two rotate.
 List<QuestDef> dailyQuestsFor(int epochDay) {
   final core = epochDay.isEven ? kQuestPool[0] : kQuestPool[1];
-  final rest = kQuestPool.where((q) => q.type != QuestType.correctWords).toList();
+  final rest = kQuestPool
+      .where((q) => q.type != QuestType.correctWords)
+      .toList();
   final a = rest[epochDay % rest.length];
   final b = rest[(epochDay * 7 + 3) % rest.length];
   final second = a;

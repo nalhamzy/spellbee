@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart'
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_2_wrappers.dart';
+import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:spellbee/core/constants/iap_ids.dart';
 import 'package:spellbee/core/services/pending_verification.dart';
 import 'package:spellbee/core/services/store_offers.dart';
@@ -57,7 +58,7 @@ class IapProduct {
   final String description;
 
   /// The store's free trial for this customer, when one is configured and
-  /// the customer can use it. Null today: no intro offer exists yet.
+  /// the customer can use it.
   final FreeTrial? freeTrial;
   const IapProduct({
     required this.id,
@@ -140,6 +141,12 @@ class IapService {
   /// trial when the answer is no or unknown. Tests inject their own.
   Future<bool> Function(String productId)? introOfferEligibility;
 
+  /// App Store intro offers by product id. The plugin returns StoreKit 2
+  /// products, which do not carry the intro offer, so iOS reads the offer
+  /// terms with a StoreKit 1 product request. Tests inject their own.
+  Future<Map<String, FreeTrial>> Function(Set<String> productIds)?
+  appStoreTrialLookup;
+
   /// A new purchase (or a held one) passed server verification as active.
   void Function(String productId)? onPurchaseVerified;
 
@@ -201,9 +208,11 @@ class IapService {
     final details = resp.productDetails
         .where((p) => IapProductIds.all.contains(p.id))
         .toList();
+    final appStoreTrials = await _appStoreTrials(details);
     final plans = collapseStorePlans(
       details,
-      trialEligible: await _trialEligibility(details),
+      trialEligible: await _trialEligibility(details, appStoreTrials),
+      appStoreTrials: appStoreTrials,
     );
     return plans
         .map(
@@ -222,10 +231,13 @@ class IapService {
   /// the customer is eligible for, so Play entries are always eligible.
   Future<bool Function(String productId)> _trialEligibility(
     Iterable<ProductDetails> details,
+    Map<String, FreeTrial> appStoreTrials,
   ) async {
     final withTrial = details
-        .whereType<AppStoreProductDetails>()
-        .where((d) => freeTrialOf(d) != null)
+        .where(
+          (d) => d is AppStoreProductDetails || d is AppStoreProduct2Details,
+        )
+        .where((d) => freeTrialOf(d, appStoreTrials: appStoreTrials) != null)
         .map((d) => d.id)
         .toSet();
     if (withTrial.isEmpty) return (_) => true;
@@ -243,6 +255,34 @@ class IapService {
 
   static Future<bool> _storeKitIntroEligible(String productId) =>
       SK2Product.isIntroductoryOfferEligible(productId);
+
+  /// Intro offers for the StoreKit 2 entries in [details]; empty when there
+  /// are none or the lookup fails (then no App Store trial is shown).
+  Future<Map<String, FreeTrial>> _appStoreTrials(
+    Iterable<ProductDetails> details,
+  ) async {
+    final ids = details.whereType<AppStoreProduct2Details>().map((d) => d.id);
+    if (ids.isEmpty) return const {};
+    try {
+      return await (appStoreTrialLookup ?? _storeKitIntroOffers)(ids.toSet());
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  static Future<Map<String, FreeTrial>> _storeKitIntroOffers(
+    Set<String> productIds,
+  ) async {
+    final response = await SKRequestMaker()
+        .startProductRequest(productIds.toList())
+        .timeout(const Duration(seconds: 10));
+    return {
+      for (final product in response.products)
+        product.productIdentifier: ?freeTrialFromAppleIntro(
+          product.introductoryPrice,
+        ),
+    };
+  }
 
   Future<void> buy(String productId) async {
     if (_startingPurchase) return;
@@ -269,12 +309,7 @@ class IapService {
         .toList();
     // Buy the same entry the paywall showed: on Play, the free-trial offer
     // when one exists for this customer, otherwise the base plan.
-    final product = matching.isEmpty
-        ? null
-        : collapseStorePlans(
-            matching,
-            trialEligible: await _trialEligibility(matching),
-          ).first.purchaseDetails;
+    final product = matching.isEmpty ? null : await _purchaseEntry(matching);
     if (product == null) {
       _reportError('The store could not load this plan. Please try again.');
       return;
@@ -284,6 +319,15 @@ class IapService {
     if (!await _store.buyNonConsumable(purchaseParam: p)) {
       _reportError('The store could not start the purchase. Please try again.');
     }
+  }
+
+  Future<ProductDetails> _purchaseEntry(List<ProductDetails> matching) async {
+    final appStoreTrials = await _appStoreTrials(matching);
+    return collapseStorePlans(
+      matching,
+      trialEligible: await _trialEligibility(matching, appStoreTrials),
+      appStoreTrials: appStoreTrials,
+    ).first.purchaseDetails;
   }
 
   /// Native store restore plus a re-check of the cached proof. The result

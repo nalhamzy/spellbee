@@ -11,9 +11,12 @@ import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 /// and only offers the customer is eligible for. An offer whose first
 /// pricing phase costs 0 is a free trial; its own `price` is that free phase,
 /// so the recurring price must come from the base plan (or the offer's last
-/// phase). On the App Store the intro offer is `skProduct.introductoryPrice`;
-/// StoreKit 1 cannot tell whether this Apple ID already used it, so callers
-/// pass an eligibility check (StoreKit 2) and hide the trial when unsure.
+/// phase). On the App Store the plugin hands over StoreKit 2 products
+/// ([AppStoreProduct2Details]), which carry no intro offer at all, so the
+/// offer terms are read with a StoreKit 1 product request and passed in as
+/// `appStoreTrials`. Neither StoreKit 1 nor the terms say whether this Apple
+/// ID already used the trial, so callers also pass an eligibility check
+/// (StoreKit 2) and hide the trial when unsure.
 enum TrialUnit { day, week, month, year }
 
 class FreeTrial {
@@ -77,8 +80,33 @@ SubscriptionOfferDetailsWrapper? _playOffer(GooglePlayProductDetails p) {
   return offers[index];
 }
 
+/// The free trial an App Store (StoreKit 1) intro offer describes, or null
+/// when there is none or it is not a free trial (pay-as-you-go, pay-up-front).
+FreeTrial? freeTrialFromAppleIntro(SKProductDiscountWrapper? intro) {
+  if (intro == null ||
+      intro.paymentMode != SKProductDiscountPaymentMode.freeTrail) {
+    return null;
+  }
+  final period = intro.subscriptionPeriod;
+  final unit = switch (period.unit) {
+    SKSubscriptionPeriodUnit.day => TrialUnit.day,
+    SKSubscriptionPeriodUnit.week => TrialUnit.week,
+    SKSubscriptionPeriodUnit.month => TrialUnit.month,
+    SKSubscriptionPeriodUnit.year => TrialUnit.year,
+  };
+  final periods = intro.numberOfPeriods < 1 ? 1 : intro.numberOfPeriods;
+  final count = period.numberOfUnits * periods;
+  return count > 0 ? FreeTrial(count, unit) : null;
+}
+
 /// The free trial this store entry starts with, or null.
-FreeTrial? freeTrialOf(ProductDetails p) {
+///
+/// [appStoreTrials] holds the App Store intro offers by product id, read with
+/// a StoreKit 1 request; StoreKit 2 entries have no other source for them.
+FreeTrial? freeTrialOf(
+  ProductDetails p, {
+  Map<String, FreeTrial> appStoreTrials = const {},
+}) {
   if (p is GooglePlayProductDetails) {
     final offer = _playOffer(p);
     if (offer == null || offer.offerId == null) return null;
@@ -89,22 +117,9 @@ FreeTrial? freeTrialOf(ProductDetails p) {
     return parseIsoPeriod(first.billingPeriod, times: first.billingCycleCount);
   }
   if (p is AppStoreProductDetails) {
-    final intro = p.skProduct.introductoryPrice;
-    if (intro == null ||
-        intro.paymentMode != SKProductDiscountPaymentMode.freeTrail) {
-      return null;
-    }
-    final period = intro.subscriptionPeriod;
-    final unit = switch (period.unit) {
-      SKSubscriptionPeriodUnit.day => TrialUnit.day,
-      SKSubscriptionPeriodUnit.week => TrialUnit.week,
-      SKSubscriptionPeriodUnit.month => TrialUnit.month,
-      SKSubscriptionPeriodUnit.year => TrialUnit.year,
-    };
-    final periods = intro.numberOfPeriods < 1 ? 1 : intro.numberOfPeriods;
-    final count = period.numberOfUnits * periods;
-    return count > 0 ? FreeTrial(count, unit) : null;
+    return freeTrialFromAppleIntro(p.skProduct.introductoryPrice);
   }
+  if (p is AppStoreProduct2Details) return appStoreTrials[p.id];
   return null;
 }
 
@@ -143,9 +158,11 @@ class StorePlan {
 
 /// Collapses the store's per-offer entries into one plan per product id.
 /// [trialEligible] filters App Store trials (Play already filters offers).
+/// [appStoreTrials] are the App Store intro offers (see [freeTrialOf]).
 List<StorePlan> collapseStorePlans(
   Iterable<ProductDetails> details, {
   bool Function(String productId) trialEligible = _always,
+  Map<String, FreeTrial> appStoreTrials = const {},
 }) {
   final byId = <String, List<ProductDetails>>{};
   for (final d in details) {
@@ -153,16 +170,23 @@ List<StorePlan> collapseStorePlans(
   }
   return [
     for (final entry in byId.entries)
-      _plan(entry.key, entry.value, trialEligible(entry.key)),
+      _plan(entry.key, entry.value, trialEligible(entry.key), appStoreTrials),
   ];
 }
 
 bool _always(String _) => true;
 
-StorePlan _plan(String id, List<ProductDetails> entries, bool eligible) {
+StorePlan _plan(
+  String id,
+  List<ProductDetails> entries,
+  bool eligible,
+  Map<String, FreeTrial> appStoreTrials,
+) {
+  FreeTrial? trialOf(ProductDetails e) =>
+      freeTrialOf(e, appStoreTrials: appStoreTrials);
   final base = entries.where(isBasePlan).firstOrNull ?? entries.first;
   final withTrial = eligible
-      ? entries.where((e) => freeTrialOf(e) != null).firstOrNull
+      ? entries.where((e) => trialOf(e) != null).firstOrNull
       : null;
   final buyWith = withTrial ?? base;
   return StorePlan(
@@ -170,7 +194,7 @@ StorePlan _plan(String id, List<ProductDetails> entries, bool eligible) {
     title: base.title,
     description: base.description,
     price: regularPriceOf(base),
-    freeTrial: withTrial == null ? null : freeTrialOf(withTrial),
+    freeTrial: withTrial == null ? null : trialOf(withTrial),
     purchaseDetails: buyWith,
   );
 }
