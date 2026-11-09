@@ -1,7 +1,7 @@
 name: spellbee
 description: "SpellBee — Spelling-bee practice with themed word packs and voice feedback."
 publish_to: 'none'
-version: 1.4.0+24
+version: 1.4.1+25
 environment:
   sdk: ^3.11.0
 
