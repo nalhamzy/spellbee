@@ -136,6 +136,28 @@ String regularPriceOf(ProductDetails p) {
   return p.price;
 }
 
+/// The regular price as a number, for arithmetic only (never for display).
+double regularRawPriceOf(ProductDetails p) {
+  if (p is GooglePlayProductDetails) {
+    final phases = _playOffer(p)?.pricingPhases;
+    if (phases != null && phases.isNotEmpty) {
+      return phases.last.priceAmountMicros / 1000000;
+    }
+  }
+  return p.rawPrice;
+}
+
+/// ISO currency code of [regularRawPriceOf].
+String regularCurrencyOf(ProductDetails p) {
+  if (p is GooglePlayProductDetails) {
+    final phases = _playOffer(p)?.pricingPhases;
+    if (phases != null && phases.isNotEmpty) {
+      return phases.last.priceCurrencyCode;
+    }
+  }
+  return p.currencyCode;
+}
+
 /// One store's view of one product id: its regular price and, when the
 /// customer can use it, its free trial and the entry to buy it with.
 class StorePlan {
@@ -143,6 +165,8 @@ class StorePlan {
   final String title;
   final String description;
   final String price;
+  final double rawPrice;
+  final String currencyCode;
   final FreeTrial? freeTrial;
   final ProductDetails purchaseDetails;
 
@@ -151,6 +175,8 @@ class StorePlan {
     required this.title,
     required this.description,
     required this.price,
+    required this.rawPrice,
+    required this.currencyCode,
     required this.freeTrial,
     required this.purchaseDetails,
   });
@@ -194,6 +220,8 @@ StorePlan _plan(
     title: base.title,
     description: base.description,
     price: regularPriceOf(base),
+    rawPrice: regularRawPriceOf(base),
+    currencyCode: regularCurrencyOf(base),
     freeTrial: withTrial == null ? null : trialOf(withTrial),
     purchaseDetails: buyWith,
   );

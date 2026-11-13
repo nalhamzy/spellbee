@@ -55,6 +55,11 @@ class IapProduct {
 
   /// The regular (recurring or one-time) store price, never an intro price.
   final String price;
+
+  /// The regular price as a number and its ISO currency code, as the store
+  /// reported them. Used only to compare plans, never to show a price.
+  final double? rawPrice;
+  final String? currencyCode;
   final String description;
 
   /// The store's free trial for this customer, when one is configured and
@@ -65,6 +70,8 @@ class IapProduct {
     required this.title,
     required this.price,
     required this.description,
+    this.rawPrice,
+    this.currencyCode,
     this.freeTrial,
   });
 }
@@ -220,6 +227,8 @@ class IapService {
             id: p.id,
             title: p.title,
             price: p.price,
+            rawPrice: p.rawPrice,
+            currencyCode: p.currencyCode,
             description: p.description,
             freeTrial: p.freeTrial,
           ),

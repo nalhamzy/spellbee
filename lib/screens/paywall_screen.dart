@@ -5,6 +5,7 @@ import 'package:spellbee/core/constants/legal_urls.dart';
 import 'package:spellbee/core/constants/theme.dart';
 import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/services/iap_service.dart';
+import 'package:spellbee/core/services/plan_savings.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/widgets/parent_gate.dart';
@@ -360,137 +361,177 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           alignment: Alignment.topCenter,
           child: SizedBox(
             width: responsiveViewportWidth(context),
-            child: SingleChildScrollView(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: responsiveMaxContentWidth(context),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(context.s(20)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (confirming) ...[
-                          const PendingPurchaseNotice(),
-                          SizedBox(height: context.s(14)),
-                        ],
-                        _hero(context),
-                        SizedBox(height: context.s(14)),
-                        _perks(context),
-                        SizedBox(height: context.s(14)),
-                        _FreePracticeNote(context),
-                        SizedBox(height: context.s(22)),
-                        if (productsAsync == null)
-                          _tiers(context, products, selected)
-                        else
-                          productsAsync.when(
-                            // Never invent prices: a tier list built from
-                            // hardcoded USD fallbacks shows the wrong amount
-                            // on every non-US storefront and contradicts the
-                            // store's own payment sheet. If the store gave us
-                            // nothing, say so and offer a retry.
-                            data: (_) => products.isEmpty
-                                ? _storeUnavailable(context)
-                                : _tiers(context, products, selected),
-                            error: (_, _) => _storeUnavailable(context),
-                            loading: () => Padding(
-                              padding: EdgeInsets.all(context.s(24)),
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ),
-                          ),
-                        SizedBox(height: context.s(18)),
-                        SizedBox(
-                          width: double.infinity,
-
-                          child: FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppTheme.violet,
-                              foregroundColor: Colors.white,
-                              minimumSize: Size(double.infinity, context.s(56)),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 16,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  context.s(18),
+            height: double.infinity,
+            // Plans and perks scroll; the buy button, the terms and the
+            // Privacy / Terms links stay pinned so a small phone never has
+            // to scroll to find them.
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: responsiveMaxContentWidth(context),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(context.s(20)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (confirming) ...[
+                                const PendingPurchaseNotice(),
+                                SizedBox(height: context.s(14)),
+                              ],
+                              _hero(context),
+                              SizedBox(height: context.s(14)),
+                              if (productsAsync == null)
+                                _tiers(context, products, selected)
+                              else
+                                productsAsync.when(
+                                  // Never invent prices: a tier list built from
+                                  // hardcoded USD fallbacks shows the wrong amount
+                                  // on every non-US storefront and contradicts the
+                                  // store's own payment sheet. If the store gave us
+                                  // nothing, say so and offer a retry.
+                                  data: (_) => products.isEmpty
+                                      ? _storeUnavailable(context)
+                                      : _tiers(context, products, selected),
+                                  error: (_, _) => _storeUnavailable(context),
+                                  loading: () => Padding(
+                                    padding: EdgeInsets.all(context.s(24)),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            onPressed:
-                                selected == null ||
-                                    busy ||
-                                    widget.screenshotMode
-                                ? null
-                                : () => _buy(selected),
-                            child: Text(
-                              _startingPurchase
-                                  ? (_openingStore
-                                        ? 'Opening store…'
-                                        : 'Waiting for parent…')
-                                  : _trialFor(products, selected)?.cta ??
-                                        (selected ==
-                                                IapProductIds.premiumLifetime
-                                            ? 'Unlock with one payment'
-                                            : selected ==
-                                                  IapProductIds.premiumMonthly
-                                            ? 'Continue with monthly'
-                                            : 'Continue with yearly'),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
+                              SizedBox(height: context.s(14)),
+                              _perks(context),
+                              SizedBox(height: context.s(14)),
+                              _FreePracticeNote(context),
+                            ],
                           ),
                         ),
-                        SizedBox(height: context.s(8)),
-                        const Text(
-                          'For parents · Store confirmation comes next',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: AppTheme.mute, fontSize: 12),
-                        ),
-                        SizedBox(height: context.s(8)),
-                        if (selected != null)
-                          _SubscriptionDisclosure(
-                            selectedProductId: selected,
-                            products: products,
-                          ),
-                        SizedBox(height: context.s(8)),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 4,
-                          runSpacing: 0,
-                          children: [
-                            TextButton(
-                              onPressed: () => _openUrl(LegalUrls.privacy),
-                              child: const Text('Privacy Policy'),
-                            ),
-                            TextButton(
-                              onPressed: () => _openUrl(LegalUrls.terms),
-                              child: const Text('Terms of Use (EULA)'),
-                            ),
-                          ],
-                        ),
-                        if (IapProductIds.subscriptionIds.contains(selected))
-                          Text(
-                            Theme.of(context).platform == TargetPlatform.android
-                                ? 'Manage or cancel subscriptions in Google Play.'
-                                : 'Manage or cancel subscriptions in your App Store account settings.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppTheme.mute,
-                              fontSize: context.s(10).clamp(10, 12),
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+                Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: responsiveMaxContentWidth(context),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        context.s(20),
+                        context.s(8),
+                        context.s(20),
+                        context.s(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+
+                            child: FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppTheme.violet,
+                                foregroundColor: Colors.white,
+                                minimumSize: Size(
+                                  double.infinity,
+                                  context.s(56),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    context.s(18),
+                                  ),
+                                ),
+                              ),
+                              onPressed:
+                                  selected == null ||
+                                      busy ||
+                                      widget.screenshotMode
+                                  ? null
+                                  : () => _buy(selected),
+                              child: Text(
+                                _startingPurchase
+                                    ? (_openingStore
+                                          ? 'Opening store…'
+                                          : 'Waiting for parent…')
+                                    : _trialFor(products, selected)?.cta ??
+                                          (selected ==
+                                                  IapProductIds.premiumLifetime
+                                              ? 'Unlock with one payment'
+                                              : selected ==
+                                                    IapProductIds.premiumMonthly
+                                              ? 'Continue with monthly'
+                                              : 'Continue with yearly'),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: context.s(8)),
+                          const Text(
+                            'For parents · Store confirmation comes next',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppTheme.mute,
+                              fontSize: 12,
+                            ),
+                          ),
+                          SizedBox(height: context.s(8)),
+                          if (selected != null)
+                            _SubscriptionDisclosure(
+                              selectedProductId: selected,
+                              products: products,
+                            ),
+                          SizedBox(height: context.s(8)),
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 4,
+                            runSpacing: 0,
+                            children: [
+                              TextButton(
+                                onPressed: () => _openUrl(LegalUrls.privacy),
+                                child: const Text('Privacy Policy'),
+                              ),
+                              TextButton(
+                                onPressed: () => _openUrl(LegalUrls.terms),
+                                child: const Text('Terms of Use (EULA)'),
+                              ),
+                            ],
+                          ),
+                          if (IapProductIds.subscriptionIds.contains(
+                                selected,
+                              ) &&
+                              _trialFor(products, selected) == null)
+                            Text(
+                              Theme.of(context).platform ==
+                                      TargetPlatform.android
+                                  ? 'Manage or cancel subscriptions in Google Play.'
+                                  : 'Manage or cancel subscriptions in your App Store account settings.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppTheme.mute,
+                                fontSize: context.s(10).clamp(10, 12),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -608,6 +649,15 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     final monthly = find(IapProductIds.premiumMonthly);
     final yearly = find(IapProductIds.premiumYearly);
     final lifetime = find(IapProductIds.premiumLifetime);
+    final saving = yearly == null || monthly == null
+        ? null
+        : yearlySaving(
+            monthlyRaw: monthly.rawPrice,
+            yearlyRaw: yearly.rawPrice,
+            yearlyPrice: yearly.price,
+            monthlyCurrency: monthly.currencyCode,
+            yearlyCurrency: yearly.currencyCode,
+          );
 
     return Column(
       children: [
@@ -622,6 +672,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             price: yearly.price,
             period: '/year',
             highlight: true,
+            saveBadge: saving == null ? null : 'SAVE ${saving.percent}%',
+            note: saving?.perMonth == null
+                ? null
+                : "That's about ${saving!.perMonth} a month",
           ),
         SizedBox(height: c.s(8)),
         if (lifetime != null)
@@ -667,6 +721,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     required String period,
     required bool selected,
     bool highlight = false,
+    String? saveBadge,
+    String? note,
   }) {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
@@ -729,12 +785,41 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           ),
                         ),
                       ],
+                      if (saveBadge != null)
+                        Container(
+                          key: const Key('save-badge'),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.mint,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            saveBadge,
+                            style: const TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.ink,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                   Text(
                     subtitle,
                     style: const TextStyle(color: AppTheme.mute, fontSize: 12),
                   ),
+                  if (note != null)
+                    Text(
+                      note,
+                      key: const Key('per-month-note'),
+                      style: const TextStyle(
+                        color: AppTheme.mute,
+                        fontSize: 12,
+                      ),
+                    ),
                 ],
               ),
             ),
