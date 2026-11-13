@@ -150,6 +150,7 @@ enum PaywallSource {
   mathBee,
   wordPacks,
   studioVoice,
+  results,
 }
 
 class PaywallScreen extends ConsumerStatefulWidget {
@@ -508,6 +509,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       'Make more room for the words your child wants to explore.',
     PaywallSource.studioVoice =>
       'More voice choices for your own practice words.',
+    PaywallSource.results =>
+      'More adventures, school lists and Math Bee for the next rounds.',
     PaywallSource.general => 'Turn school words into small, happy wins.',
   };
 

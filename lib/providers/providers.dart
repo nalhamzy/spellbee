@@ -15,6 +15,7 @@ import 'package:spellbee/core/services/daily_reminder.dart';
 import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/services/iap_service.dart';
 import 'package:spellbee/core/services/promo_config.dart';
+import 'package:spellbee/core/services/results_offer.dart';
 import 'package:spellbee/core/services/review_prompt.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/core/services/stt_service.dart';
@@ -648,6 +649,10 @@ final whykeeperPromoProvider = FutureProvider<String?>((ref) async {
     return null;
   }
 });
+
+final resultsOfferServiceProvider = Provider<ResultsOfferService>(
+  (ref) => ResultsOfferService(ref.read(storageServiceProvider).preferences),
+);
 
 /// True while a store purchase is received but not yet confirmed by the
 /// verification server. main() invalidates it whenever the markers change.

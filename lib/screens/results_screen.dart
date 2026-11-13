@@ -9,6 +9,7 @@ import 'package:spellbee/core/models/word.dart';
 import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
+import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/screens/test_screen.dart';
 import 'package:spellbee/widgets/celebration.dart';
 import 'package:spellbee/widgets/parent_gate.dart';
@@ -35,6 +36,44 @@ class ResultsScreen extends ConsumerStatefulWidget {
 class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   /// A small "for grown-ups" rating card after a success moment.
   bool _offerReview = false;
+
+  /// A small "for grown-ups" Premium card after a good round. Never shown
+  /// together with the rating card.
+  bool _offerPremium = false;
+
+  bool _decidePremiumOffer({required bool reviewOffered}) {
+    if (kIsWeb) return false; // web build = store screenshot mode
+    try {
+      return ref
+          .read(resultsOfferServiceProvider)
+          .recordRound(
+            accuracy: widget.result.accuracy,
+            premium: ref.read(isPremiumProvider),
+            reviewOffered: reviewOffered,
+          );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _seePremium() async {
+    final approved = await showParentGate(
+      context,
+      message: 'Please ask a parent to look at SpellBee Premium.',
+      confirmLabel: 'Continue',
+    );
+    if (!mounted) return;
+    setState(() => _offerPremium = false);
+    if (!approved) return;
+    ref.read(eventLoggerProvider).log(FunnelEvent.parentGatePass, {
+      'source': 'results',
+    });
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const PaywallScreen(source: PaywallSource.results),
+      ),
+    );
+  }
 
   bool _decideReviewOffer() {
     if (kIsWeb) return false; // web build = store screenshot mode
@@ -88,6 +127,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   void initState() {
     super.initState();
     _offerReview = _decideReviewOffer();
+    _offerPremium = _decidePremiumOffer(reviewOffered: _offerReview);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final tts = ref.read(ttsServiceProvider);
       final premium = ref.read(isPremiumProvider);
@@ -309,6 +349,14 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
                           onDismiss: () => setState(() => _offerReview = false),
                         ),
                       ],
+                      if (_offerPremium && !_offerReview) ...[
+                        SizedBox(height: context.s(16)),
+                        _PremiumAskCard(
+                          onSee: _seePremium,
+                          onDismiss: () =>
+                              setState(() => _offerPremium = false),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -526,6 +574,61 @@ class _ReviewAskCard extends StatelessWidget {
               FilledButton.tonal(
                 onPressed: onRate,
                 child: const Text('Rate SpellBee'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Parent-facing Premium card, same pattern as [_ReviewAskCard]. The
+/// paywall opens only after the parent gate; "Not now" just hides it. No
+/// price here: the paywall shows the store's own terms.
+class _PremiumAskCard extends StatelessWidget {
+  final VoidCallback onSee;
+  final VoidCallback onDismiss;
+
+  const _PremiumAskCard({required this.onSee, required this.onDismiss});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('premium-ask'),
+      padding: EdgeInsets.all(context.s(14)),
+      decoration: AppTheme.card(
+        color: AppTheme.surface,
+        radius: context.s(16),
+        shadow: false,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'FOR GROWN-UPS',
+            style: TextStyle(
+              color: AppTheme.mute,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.1,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'SpellBee Premium adds all three Bee Adventures, unlimited '
+            'school word lists and Math Bee rounds, and online studio '
+            'voices for custom practice words.',
+            style: TextStyle(color: AppTheme.ink, fontSize: 13, height: 1.35),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            children: [
+              TextButton(onPressed: onDismiss, child: const Text('Not now')),
+              FilledButton.tonal(
+                onPressed: onSee,
+                child: const Text('See Premium'),
               ),
             ],
           ),
