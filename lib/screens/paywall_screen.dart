@@ -238,6 +238,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   }
 
   Future<void> _openUrl(Uri url) async {
+    final approved = await showParentGate(
+      context,
+      message: 'Please ask a parent to open this page.',
+    );
+    if (!approved || !mounted) return;
     var opened = false;
     try {
       opened = await launchUrl(url, mode: LaunchMode.externalApplication);

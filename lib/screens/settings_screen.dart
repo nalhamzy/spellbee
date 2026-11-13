@@ -128,6 +128,11 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     trailing: const Icon(Icons.open_in_new_rounded, size: 18),
                     onTap: () async {
+                      final approved = await showParentGate(
+                        context,
+                        message: 'Please ask a parent to open this page.',
+                      );
+                      if (!approved || !context.mounted) return;
                       final ok = await launchUrl(
                         LegalUrls.privacy,
                         mode: LaunchMode.externalApplication,
@@ -150,6 +155,11 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     trailing: const Icon(Icons.open_in_new_rounded, size: 18),
                     onTap: () async {
+                      final approved = await showParentGate(
+                        context,
+                        message: 'Please ask a parent to open this page.',
+                      );
+                      if (!approved || !context.mounted) return;
                       final ok = await launchUrl(
                         LegalUrls.terms,
                         mode: LaunchMode.externalApplication,
