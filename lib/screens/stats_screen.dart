@@ -11,6 +11,7 @@ import 'package:spellbee/core/utils/responsive.dart';
 import 'package:spellbee/providers/providers.dart';
 import 'package:spellbee/screens/test_screen.dart';
 import 'package:spellbee/widgets/progress_cards.dart';
+import 'package:spellbee/widgets/whykeeper_card.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -147,6 +148,7 @@ class StatsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              const WhykeeperCard(source: 'stats'),
             ],
           ),
         ),

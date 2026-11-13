@@ -18,6 +18,7 @@ class FunnelEvent {
   static const restoreResult = 'restore_result';
   static const reviewPromptShown = 'review_prompt_shown';
   static const reminderEnabled = 'reminder_enabled';
+  static const promoOpen = 'promo_open';
 
   static const all = {
     paywallView,
@@ -28,6 +29,7 @@ class FunnelEvent {
     restoreResult,
     reviewPromptShown,
     reminderEnabled,
+    promoOpen,
   };
 }
 

@@ -8,6 +8,7 @@ import 'package:spellbee/core/services/daily_reminder.dart';
 import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/screens/paywall_screen.dart';
 import 'package:spellbee/widgets/parent_gate.dart';
+import 'package:spellbee/widgets/whykeeper_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -115,6 +116,7 @@ class SettingsScreen extends ConsumerWidget {
                   const _RestorePurchasesTile(),
                 ],
               ),
+              const WhykeeperCard(source: 'settings'),
               SizedBox(height: context.s(12)),
               _SettingsCard(
                 children: [

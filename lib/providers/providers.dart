@@ -14,6 +14,7 @@ import 'package:spellbee/core/services/ai_word_generator.dart';
 import 'package:spellbee/core/services/daily_reminder.dart';
 import 'package:spellbee/core/services/event_logger.dart';
 import 'package:spellbee/core/services/iap_service.dart';
+import 'package:spellbee/core/services/promo_config.dart';
 import 'package:spellbee/core/services/review_prompt.dart';
 import 'package:spellbee/core/services/storage_service.dart';
 import 'package:spellbee/core/services/stt_service.dart';
@@ -634,6 +635,19 @@ final reviewPromptServiceProvider = Provider<ReviewPromptService>(
     signals: ref.read(sessionSignalsProvider),
   ),
 );
+
+/// The remote switch for the Whykeeper card: a validated store URL for this
+/// platform, or null to hide the card. One-shot read (a static file, once a
+/// day), so a FutureProvider is right here. Any failure means null.
+final whykeeperPromoProvider = FutureProvider<String?>((ref) async {
+  try {
+    return await PromoConfigService(
+      ref.read(storageServiceProvider).preferences,
+    ).whykeeperUrl();
+  } catch (_) {
+    return null;
+  }
+});
 
 /// True while a store purchase is received but not yet confirmed by the
 /// verification server. main() invalidates it whenever the markers change.
